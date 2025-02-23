@@ -89,9 +89,9 @@ echo Python path is set to %PYTHON% >> %LOGFILE%
 @REM powershell -ExecutionPolicy Bypass -File "%SCRIPT_DIR%run_server2.ps1"
 @REM echo SERVER2 started. >> %LOGFILE%
 
-REM ==========================================
-REM Section 4: Setup for SERVER2
-REM ==========================================
+@REM REM ==========================================
+@REM REM Section 4: Setup for SERVER2
+@REM REM ==========================================
 
 @REM REM Install Python libraries for SERVER2
 @REM echo Installing Python libraries for SERVER2... >> %LOGFILE%

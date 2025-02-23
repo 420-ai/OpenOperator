@@ -1,3 +1,6 @@
 iso
 weights
 storage
+.gradio
+
+__pycache__
