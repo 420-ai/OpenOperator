@@ -18,3 +18,4 @@ win32security
 pathlib
 comtypes
 PyQt5
+uuid

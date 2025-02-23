@@ -37,3 +37,9 @@ Navigate yourself into folder `windows` and open terminal. Run command `docker-c
 
 - In case our removed the content of `storage` folder => The installation of W11 happens again
 - In case you keep the `storage` folder after initial installation => W11 will start without initial installation
+
+# TODO
+
+Fix not working ffmpeg after first installation => workaround restart Docker container
+
+- reason probably being that adding FFMPEG to the PATH happens on the same terminal as running the server2, resulting in server2 does not know that the PATH was updated and still using the old PATHs (without ffmpeg)

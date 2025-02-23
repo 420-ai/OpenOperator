@@ -86,11 +86,13 @@ set "STARTUP_SERVER2_BAT=%~dp0start_server_2.bat"
 REM ---------------------------
 REM 7) Schedule Startup Task
 REM ---------------------------
-schtasks /Create /TN "StartServer1" /SC ONSTART /TR "\"%STARTUP_SERVER1_BAT%\"" /RU "SYSTEM" /RL HIGHEST /F
-schtasks /Create /TN "StarServer2" /SC ONSTART /TR "\"%STARTUP_BAT%\"" /RU "SYSTEM" /RL HIGHEST /F
+REM Without /IT, the task will not run interactively = will not be able to catch screenshots and record videos
+REM Without /DELAY is needed in order to wait until network storage is available and user is logged in
+schtasks /Create /TN "StartServer1" /SC ONSTART /TR "\"%STARTUP_SERVER1_BAT%\"" /RU "Docker" /RL HIGHEST /IT /DELAY 0000:30 /F
+schtasks /Create /TN "StartServer2" /SC ONSTART /TR "\"%STARTUP_SERVER2_BAT%\"" /RU "Docker" /RL HIGHEST /IT /DELAY 0000:30 /F
 schtasks /Run /TN "StartServer1"
 schtasks /Run /TN "StartServer2"
 
 echo Installation completed at %date% %time% >> "%LOGFILE%"
-echo >>> Installation complete. Servers will start automatically on reboot.
+echo Installation complete. Servers will start automatically on reboot.
 exit

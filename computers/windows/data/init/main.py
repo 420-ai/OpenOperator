@@ -15,6 +15,11 @@ log_file = os.path.join("\\\\host.lan\\Data", "logs", "install_software.log")
 logging.basicConfig(filename=log_file, level=logging.INFO, 
                     format="%(asctime)s - %(levelname)s - %(message)s")
 
+
+TEMP_DIR = r"C:\TEMP"
+os.makedirs(TEMP_DIR, exist_ok=True)
+
+
 def log(message):
     print(message)
     logging.info(message)
@@ -36,18 +41,20 @@ def extract_ffmpeg(archive_path, extract_to):
         return False
 
 def update_system_path(new_path):
-    """ Updates the system PATH variable """
+    """Updates the system PATH variable (requires admin privileges)"""
     try:
         current_path = os.environ["PATH"]
         if new_path not in current_path:
-            log(f"Adding {new_path} to system PATH")
-            os.environ["PATH"] += os.pathsep + new_path
-            subprocess.run(['setx', 'PATH', f"{current_path};{new_path}"], shell=True)
-            log("PATH updated successfully.")
+            print(f"Adding {new_path} to system PATH")
+            # Append new_path to the current PATH
+            updated_path = f"{current_path}{os.pathsep}{new_path}"
+            # Use the /M flag to update the system (machine) environment variable
+            subprocess.run(['setx', '/M', 'PATH', updated_path], shell=True, check=True)
+            print("System PATH updated successfully. A restart may be required for changes to take effect.")
         else:
-            log("ffmpeg path already in PATH.")
+            print("The specified path is already in the PATH.")
     except Exception as e:
-        log(f"Failed to update PATH: {e}")
+        print(f"Failed to update PATH: {e}")
 
 def find_ffmpeg_bin(root_dir):
     """ Searches for the 'bin' folder inside any 'ffmpeg*' extracted folder. """
@@ -64,8 +71,6 @@ def find_ffmpeg_bin(root_dir):
     return None  # No valid bin folder found
 
 def download_and_install(name, mirrors, tools_config):
-    temp_dir = os.getenv('TEMP')
-    
     if name.lower() == "vs code":
         file_extension = 'exe'
     elif name.lower() == "microsoft teams":
@@ -73,7 +78,7 @@ def download_and_install(name, mirrors, tools_config):
     else:
         file_extension = mirrors[0].split('.')[-1]
     
-    installer_path = os.path.join(temp_dir, f'{name}_installer.{file_extension}')
+    installer_path = os.path.join(TEMP_DIR, f'{name}_installer.{file_extension}')
     log(f'Downloading {name} ... into {installer_path}')
     
     for url in mirrors:
@@ -94,7 +99,7 @@ def download_and_install(name, mirrors, tools_config):
 
     # FFMPEG
     if name.lower() == "ffmpeg":
-        extract_dir = os.path.join(temp_dir, "ffmpeg")
+        extract_dir = os.path.join(TEMP_DIR, "ffmpeg")
         if extract_ffmpeg(installer_path, extract_dir):
             ffmpeg_bin_path = find_ffmpeg_bin(extract_dir)
             if os.path.exists(ffmpeg_bin_path):

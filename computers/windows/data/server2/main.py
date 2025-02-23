@@ -15,7 +15,7 @@ import subprocess, signal
 from pathlib import Path
 from typing import Any, Optional
 from typing import List, Dict, Tuple
-
+import json
 import Xlib
 import lxml.etree
 import pyautogui
@@ -30,18 +30,31 @@ from pyxcursor import Xcursor
 from computer import Computer, WindowManager
 # global computer
 from human import Human
+from uuid import uuid4
+import getpass
 
 # Setup logging
 log_file = os.path.join("\\\\host.lan\\Data", "logs", "server_2.log")
 logging.basicConfig(
     filename=log_file,
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
+     format="%(asctime)s - %(levelname)s - %(funcName)s - %(message)s"
 )
+
+
+# logging.info("WORKING DIRECTORY 1")
+# logging.info(os.getcwd())
+# # Change working directory to the script's location
+# os.chdir(os.path.dirname(os.path.abspath(__file__)))
+# logging.info("WORKING DIRECTORY 2")
+# logging.info(os.getcwd())
+
 
 #Flask logging
 logger = logging.getLogger('werkzeug')
 logger.setLevel(logging.INFO)
+
+
 
 
 
@@ -84,14 +97,20 @@ pyautogui.DARWIN_CATCH_UP_TIME = 0
 computer = Computer()
 recording_process = None  # fixme: this is a temporary solution for recording, need to be changed to support multiple-process
 
+
+
+logging.info(__file__)
+logging.info(os.path.dirname(__file__))
+
+logging.info(os.getcwd())
+
 recording_path = os.path.join(os.path.dirname(__file__), "recordings")
-#create tmp directory if not exists
+# create tmp directory if not exists
 os.makedirs(recording_path, exist_ok=True)
 recording_path = os.path.join(recording_path, "recording.mp4")
+logging.info("recording dir set to " + recording_path)
 
-print("recording dir set to", recording_path)
 
-# recording_path = "/tmp/recording.mp4"
 
 @app.errorhandler(Exception)
 def handle_exception(e):
@@ -1493,61 +1512,86 @@ def close_window():
 
 @app.route('/start_recording', methods=['POST'])
 def start_recording():
-    global recording_process
-    if recording_process:
-        return jsonify({'status': 'error', 'message': 'Recording is already in progress.'}), 400
+    try:
 
-    if platform_name == 'Linux':
-        d = display.Display()
-        screen_width = d.screen().width_in_pixels
-        screen_height = d.screen().height_in_pixels
+        global recording_process
+        if recording_process:
+            return jsonify({'status': 'error', 'message': 'Recording is already in progress.'}), 400
 
-        start_command = f"ffmpeg -y -f x11grab -draw_mouse 1 -s {screen_width}x{screen_height} -i :0.0 -pix_fmt yuv420p -c:v libx264 -r 30 '{recording_path}'"
+        if platform_name == 'Linux':
+            d = display.Display()
+            screen_width = d.screen().width_in_pixels
+            screen_height = d.screen().height_in_pixels
 
-        recording_process = subprocess.Popen(shlex.split(start_command), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    elif platform_name == 'Windows':
-        screen_width, screen_height = pyautogui.size()
-        start_command = f"ffmpeg -y -f gdigrab -draw_mouse 1 -video_size {screen_width}x{screen_height} -i desktop -pix_fmt yuv420p -c:v libx264 -r 30 '{recording_path}'"
+            start_command = f"ffmpeg -y -f x11grab -draw_mouse 1 -s {screen_width}x{screen_height} -i :0.0 -pix_fmt yuv420p -c:v libx264 -r 30 '{recording_path}'"
 
-        recording_process = subprocess.Popen(shlex.split(start_command), stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    else:
-        return jsonify({'status': 'error', 'message': 'Recording is not supported on this platform.'}), 400
-    
-    return jsonify({'status': 'success', 'message': f'Started recording to: {recording_path}.\nCOMMAND: {start_command}'})
+            recording_process = subprocess.Popen(shlex.split(start_command), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        elif platform_name == 'Windows':
+            screen_width, screen_height = pyautogui.size()
+            start_command = f"ffmpeg -y -f gdigrab -draw_mouse 1 -video_size {screen_width}x{screen_height} -i desktop -pix_fmt yuv420p -c:v libx264 -r 30 '{recording_path}'"
+
+            recording_process = subprocess.Popen(
+                shlex.split(start_command), 
+                stdin=subprocess.PIPE, 
+                stdout=subprocess.DEVNULL, 
+                stderr=subprocess.DEVNULL,
+                creationflags=subprocess.CREATE_NO_WINDOW)
+        else:
+            return jsonify({'status': 'error', 'message': 'Recording is not supported on this platform.'}), 400
+        
+        return jsonify({'status': 'success', 'message': f'Started recording to: {recording_path}.\nCOMMAND: {start_command}'})
+
+    except Exception as e:
+        logging.error(f"Error starting recording: {e}")
+        logging.error("\n" + traceback.format_exc() + "\n")
+
+        return jsonify({'status': 'error', 'message': f'Failed to start recording: {e}'}), 500
 
 @app.route('/end_recording', methods=['POST'])
 def end_recording():
-    global recording_process
+    try:
 
-    if not recording_process:
-        return jsonify({'status': 'error', 'message': 'No recording in progress to stop.'}), 400
+        global recording_process
 
-    # recording_process.send_signal(signal.SIGINT)
-    # ps_childrend = recording_process.children()
-    # logging.info(f"Children: {ps_childrend}")
+        if not recording_process:
+            return jsonify({'status': 'error', 'message': 'No recording in progress to stop.'}), 400
 
-    # for c in ps_childrend:
-    #     c.send_signal(signal.CTRL_C_EVENT)
-    # os.killpg(os.getpgid(recording_process.pid), signal.SIGTERM)
-    # os.kill(recording_process.pid, signal.CTRL_C_EVENT)
-    recording_process.communicate(b'q') 
-    # os.kill(recording_process.pid, signal.SIGINT)
-    # os.kill(recording_process.pid, signal.SIGINT)
-    recording_process.wait()
-    recording_process.terminate()
-    # if recording_process.poll() is None:  
-    #     # Forcefully kill the process if it did not terminate  
-    #     recording_process.kill()
-    recording_process = None
 
-    # return recording video file
-    if os.path.exists(recording_path):
-        return  jsonify({'status': 'success', 'message': f'record saved to: {recording_path}'}), 200
-    else:
-        return abort(404, description="Recording failed")
+        logging.info(f"Recording process: {recording_process}")
+
+        # recording_process.send_signal(signal.SIGINT)
+        # ps_childrend = recording_process.children()
+        # logging.info(f"Children: {ps_childrend}")
+
+        # for c in ps_childrend:
+        #     c.send_signal(signal.CTRL_C_EVENT)
+        # os.killpg(os.getpgid(recording_process.pid), signal.SIGTERM)
+        # os.kill(recording_process.pid, signal.CTRL_C_EVENT)
+        recording_process.communicate(b'q') 
+        # os.kill(recording_process.pid, signal.SIGINT)
+        # os.kill(recording_process.pid, signal.SIGINT)
+        code = recording_process.wait()
+        recording_process.terminate()
+        # if recording_process.poll() is None:  
+        #     # Forcefully kill the process if it did not terminate  
+        #     recording_process.kill()
+        recording_process = None
+        # return recording video file
+
+        if os.path.exists(recording_path):
+            return  jsonify({'status': 'success', 'message': f'record saved to: {recording_path}'}), 200
+        else:
+            return abort(404, description="Recording failed")
+        
+    except Exception as e:
+        logging.error(f"Error starting recording: {e}")
+        logging.error("\n" + traceback.format_exc() + "\n")
+
+        return jsonify({'status': 'error', 'message': f'Failed to start recording: {e}'}), 500
 
 @app.route('/get_recording', methods=['GET'])
 def get_recording():
+
     if os.path.exists(recording_path):
         return send_file(recording_path, as_attachment=True)
     else:

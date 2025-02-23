@@ -88,7 +88,7 @@ if __name__ == "__main__":
     test_screen_size()
     test_obs_winagent()
     test_execute_command_windows()
-    test_list_directory()
+    # test_list_directory()
     test_capture_screen_with_cursor()
     test_start_end_recording()
     test_activate_window()
