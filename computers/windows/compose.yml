@@ -1,0 +1,24 @@
+services:
+  oowincomputer:
+    container_name: oowincomputer
+    build: 
+      context: ./dockur
+      dockerfile: Dockerfile
+    devices:
+      - /dev/kvm
+      - /dev/net/tun
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - 8006:8006
+      - 3389:3389/tcp
+      - 3389:3389/udp
+      - 5000:5000
+      - 6000:6000
+    volumes:
+      - ./iso/win11.iso:/custom.iso
+      - ./scripts:/oem
+      - ./data:/data
+      - ./storage:/storage
+    restart: always
+    stop_grace_period: 2m

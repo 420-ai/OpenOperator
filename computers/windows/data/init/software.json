@@ -1,0 +1,43 @@
+{
+  "git": {
+    "mirrors": [
+      "https://github.com/git-for-windows/git/releases/download/v2.37.1.windows.1/Git-2.37.1-64-bit.exe"
+    ]
+  },
+  "7zip": {
+    "mirrors": ["https://www.7-zip.org/a/7z2407-x64.exe"]
+  },
+  "Google Chrome": {
+    "mirrors": [
+      "https://dl.google.com/chrome/install/latest/chrome_installer.exe"
+    ],
+    "alias": "google-chrome"
+  },
+  "VS Code": {
+    "mirrors": ["https://update.code.visualstudio.com/latest/win32-x64/stable"],
+    "alias": "code"
+  },
+  "Microsoft Teams": {
+    "mirrors": [
+      "https://statics.teams.microsoft.com/production-windows-x64/1.6.00.4472/Teams_windows_x64.msi"
+    ],
+    "alias": "teams",
+    "user": {
+      "name": "ditluser-g1-8@TESTTESTDITL1TENANTTEST.onmicrosoft.com",
+      "password": "TLI~NfW1NTNJhV~7"
+    }
+  },
+  "ffmpeg": {
+    "mirrors": [
+      "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.7z"
+    ]
+  },
+  "VLC": {
+    "mirrors": [
+      "https://ftp.free.org/mirrors/videolan/vlc/3.0.21/win64/vlc-3.0.21-win64.exe",
+      "https://mirror.fcix.net/videolan-ftp/vlc/3.0.21/win64/vlc-3.0.21-win64.exe",
+      "https://mirror.raiolanetworks.com/videolan/vlc/3.0.21/win64/vlc-3.0.21-win64.exe"
+    ],
+    "alias": "vlc"
+  }
+}
