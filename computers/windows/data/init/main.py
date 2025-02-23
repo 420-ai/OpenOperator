@@ -5,19 +5,63 @@ import requests
 import subprocess
 import logging
 import pythoncom
+import glob
 
 # Ensure COM is properly initialized
 pythoncom.CoInitializeEx(pythoncom.COINIT_APARTMENTTHREADED)
 
 # Setup logging
-desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
-log_file = os.path.join(desktop_path, "initialization.log")
+log_file = os.path.join("\\\\host.lan\\Data", "logs", "install_software.log")
 logging.basicConfig(filename=log_file, level=logging.INFO, 
                     format="%(asctime)s - %(levelname)s - %(message)s")
 
 def log(message):
     print(message)
     logging.info(message)
+
+def extract_ffmpeg(archive_path, extract_to):
+    """ Extracts ffmpeg using 7-Zip """
+    seven_zip_path = r"C:\Program Files\7-Zip\7z.exe"
+    
+    if not os.path.exists(seven_zip_path):
+        log("7-Zip is required but not found in the expected path. Install 7-Zip first.")
+        return False
+    
+    try:
+        subprocess.run([seven_zip_path, 'x', archive_path, f'-o{extract_to}', '-y'], check=True)
+        log(f"Extracted ffmpeg to {extract_to}")
+        return True
+    except subprocess.CalledProcessError as e:
+        log(f"Error extracting ffmpeg: {e}")
+        return False
+
+def update_system_path(new_path):
+    """ Updates the system PATH variable """
+    try:
+        current_path = os.environ["PATH"]
+        if new_path not in current_path:
+            log(f"Adding {new_path} to system PATH")
+            os.environ["PATH"] += os.pathsep + new_path
+            subprocess.run(['setx', 'PATH', f"{current_path};{new_path}"], shell=True)
+            log("PATH updated successfully.")
+        else:
+            log("ffmpeg path already in PATH.")
+    except Exception as e:
+        log(f"Failed to update PATH: {e}")
+
+def find_ffmpeg_bin(root_dir):
+    """ Searches for the 'bin' folder inside any 'ffmpeg*' extracted folder. """
+    ffmpeg_folders = glob.glob(os.path.join(root_dir, "ffmpeg*"))
+    
+    if not ffmpeg_folders:
+        return None  # No ffmpeg folder found
+
+    for folder in ffmpeg_folders:
+        bin_path = os.path.join(folder, "bin")
+        if os.path.exists(bin_path) and os.path.isfile(os.path.join(bin_path, "ffmpeg.exe")):
+            return bin_path  # Found the correct bin folder
+
+    return None  # No valid bin folder found
 
 def download_and_install(name, mirrors, tools_config):
     temp_dir = os.getenv('TEMP')
@@ -46,34 +90,49 @@ def download_and_install(name, mirrors, tools_config):
     else:
         log(f'Failed to download {name}.')
         return
+    
 
-    silent_args = {
-        'git': ['/VERYSILENT', '/NORESTART'],
-        '7zip': ['/S'],
-        'google chrome': ['/silent', '/install'],
-        'vs code': ['/VERYSILENT', '/mergetasks=!runcode', '/SUPPRESSMSGBOXES', '/NORESTART', '/SP-', '/ACCEPTEULA'],
-        'vlc': ['/S'],
-        'microsoft teams': ['OPTIONS=noAutoStart=true', 'ALLUSERS=1', '/quiet', '/norestart']
-    }
-    args = silent_args.get(name.lower(), ['/S'])
+    # FFMPEG
+    if name.lower() == "ffmpeg":
+        extract_dir = os.path.join(temp_dir, "ffmpeg")
+        if extract_ffmpeg(installer_path, extract_dir):
+            ffmpeg_bin_path = find_ffmpeg_bin(extract_dir)
+            if os.path.exists(ffmpeg_bin_path):
+                update_system_path(ffmpeg_bin_path)
+            else:
+                log("Could not find ffmpeg binary folder after extraction.")
+        else:
+            log("Failed to extract ffmpeg.")
     
-    if file_extension == 'exe':
-        log(f'Installing {name}...')
-        try:
-            subprocess.run([installer_path] + args, check=True)
-            log(f'{name} installed successfully.')
-        except subprocess.CalledProcessError as e:
-            log(f'Installation failed for {name}: {e}')
-            logging.error(f'Installation failed for {name}: {e}')
-    
-    elif file_extension == 'msi':
-        log(f'Installing {name} (MSI)...')
-        try:
-            subprocess.run(["msiexec", "/i", installer_path] + args, check=True)
-            log(f'{name} installed successfully.')
-        except subprocess.CalledProcessError as e:
-            log(f'Installation failed for {name}: {e}')
-            logging.error(f'Installation failed for {name}: {e}')
+    # ANY OTHER SOFTWARE
+    else:
+        silent_args = {
+            'git': ['/VERYSILENT', '/NORESTART'],
+            '7zip': ['/S'],
+            'google chrome': ['/silent', '/install'],
+            'vs code': ['/VERYSILENT', '/mergetasks=!runcode', '/SUPPRESSMSGBOXES', '/NORESTART', '/SP-', '/ACCEPTEULA'],
+            'vlc': ['/S'],
+            'microsoft teams': ['OPTIONS=noAutoStart=true', 'ALLUSERS=1', '/quiet', '/norestart']
+        }
+        args = silent_args.get(name.lower(), ['/S'])
+
+        if file_extension == 'exe':
+            log(f'Installing {name}...')
+            try:
+                subprocess.run([installer_path] + args, check=True)
+                log(f'{name} installed successfully.')
+            except subprocess.CalledProcessError as e:
+                log(f'Installation failed for {name}: {e}')
+                logging.error(f'Installation failed for {name}: {e}')
+        
+        elif file_extension == 'msi':
+            log(f'Installing {name} (MSI)...')
+            try:
+                subprocess.run(["msiexec", "/i", installer_path] + args, check=True)
+                log(f'{name} installed successfully.')
+            except subprocess.CalledProcessError as e:
+                log(f'Installation failed for {name}: {e}')
+                logging.error(f'Installation failed for {name}: {e}')
     
     os.remove(installer_path)
 

@@ -1,9 +1,8 @@
 import os
 
-desktop_path = os.path.join(os.path.expanduser('~'), 'Desktop')
-file_path = os.path.join(desktop_path, 'hello_from_python.txt')
+log_file = os.path.join("\\\\host.lan\\Data", "logs", "hello.log")
 
-with open(file_path, 'w') as file:
+with open(log_file, 'w') as file:
     file.write('hello world from python')
 
-print(f'File created at {file_path}')
+print(f'File created at {log_file}')

@@ -5,8 +5,7 @@ from datetime import datetime
 import setproctitle
 
 # Setup logging
-user_desktop = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
-log_file = os.path.join(user_desktop, 'server_1.log')
+log_file = os.path.join("\\\\host.lan\\Data", "logs", "server_1.log")
 
 logging.basicConfig(
     filename=log_file,

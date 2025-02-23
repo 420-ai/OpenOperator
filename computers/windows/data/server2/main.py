@@ -7,68 +7,7 @@ from logging import FileHandler
 from logging.handlers import RotatingFileHandler
 from contextlib import redirect_stdout
 from io import StringIO
-
-# Setup logging
-user_desktop = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
-log_file = os.path.join(user_desktop, 'server_2.log')
-
-logging.basicConfig(
-    filename=log_file,
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
-
-# Redirect stdout and stderr to log file
-class Logger(object):
-    def __init__(self,logger):
-        self.logger = logger
-        self.stdout = sys.stdout
-        sys.stdout = self
-        self.msg = ""
-
-        # handle exceptions and errors
-        sys.excepthook = self.excepthook
-
-    def __del__(self):
-        sys.stdout = self.stdout
-    def write(self, data):
-        if data != '\n':
-            self.msg += data
-        else:
-            self.logger.info(self.msg)
-            self.msg = ""
-        self.stdout.write(data)
-    def flush(self):
-        self.stdout.flush()
-
-    # catch exceptions and log to file
-    def excepthook(self, exctype, value, traceback):
-        self.logger.error("Uncaught exception", exc_info=(exctype, value, traceback))
-        self.stdout.excepthook(exctype, value, traceback)
-    
-    # log errors
-    def error(self, msg):
-        self.logger.error(msg)
-
-
-# Flask logging
 import argparse
-parser = argparse.ArgumentParser()
-parser.add_argument("--log_file", help="log file path", type=str,
-                    default=os.path.join(os.path.dirname(__file__), "server.log"))
-#port
-parser.add_argument("--port", help="port", type=int, default=5000)
-
-args = parser.parse_args()
-log_file = args.log_file
-
-# logging.basicConfig(filename='server.log',level=logging.DEBUG, filemode='w' )
-
-# logging.basicConfig(filename=log_file,level=logging.INFO, filemode='w' )
-logger = logging.getLogger('werkzeug')
-custom_logger = Logger(logger)
-# check if argument log_file is passed
-
 import ctypes
 import platform
 import shlex
@@ -87,6 +26,35 @@ from flask import Flask, request, jsonify, send_file, abort  # , send_from_direc
 from lxml.etree import _Element
 import traceback
 import time
+from pyxcursor import Xcursor
+from computer import Computer, WindowManager
+# global computer
+from human import Human
+
+# Setup logging
+log_file = os.path.join("\\\\host.lan\\Data", "logs", "server_2.log")
+logging.basicConfig(
+    filename=log_file,
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+
+#Flask logging
+logger = logging.getLogger('werkzeug')
+logger.setLevel(logging.INFO)
+
+
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--log_file", help="log file path", type=str,
+                    default=os.path.join(os.path.dirname(__file__), "server.log"))
+#port
+parser.add_argument("--port", help="port", type=int, default=5000)
+
+args = parser.parse_args()
+log_file = args.log_file
+
 
 platform_name: str = platform.system()
 
@@ -105,13 +73,6 @@ elif platform_name=="Windows":
 
     Accessible = Any
 
-from pyxcursor import Xcursor
-
-
-from computer import Computer, WindowManager
-# global computer
-
-from human import Human
 human = Human()
 
 app = Flask(__name__)
@@ -119,8 +80,8 @@ app = Flask(__name__)
 pyautogui.PAUSE = 0
 pyautogui.DARWIN_CATCH_UP_TIME = 0
 
-logger = app.logger
-computer = Computer(logger)
+
+computer = Computer()
 recording_process = None  # fixme: this is a temporary solution for recording, need to be changed to support multiple-process
 
 recording_path = os.path.join(os.path.dirname(__file__), "recordings")
@@ -134,7 +95,7 @@ print("recording dir set to", recording_path)
 
 @app.errorhandler(Exception)
 def handle_exception(e):
-    logger.error("\n" + traceback.format_exc() + "\n")
+    logging.error("\n" + traceback.format_exc() + "\n")
 
     return jsonify({"status": "error", "message": str(e)}), 500
   
@@ -197,8 +158,8 @@ def execute_command_windows():
             'status': 'success',  
         })  
     except Exception as e:
-        logger.error(f"Failed to execute command: {command}. Error: {e}")
-        logger.error("\n" + traceback.format_exc() + "\n")
+        logging.error(f"Failed to execute command: {command}. Error: {e}")
+        logging.error("\n" + traceback.format_exc() + "\n")
 
         return jsonify({  
             'status': 'error',  
@@ -232,7 +193,7 @@ def execute_command():
             'returncode': result.returncode
         })
     except Exception as e:
-        logger.error("\n" + traceback.format_exc() + "\n")
+        logging.error("\n" + traceback.format_exc() + "\n")
         return jsonify({
             'status': 'error',
             'message': str(e)
@@ -265,7 +226,7 @@ def probe_endpoint():
 # Used with the --prepare-image flag gracefully shutdown the VM at the first setup
 @app.route('/shutdown', methods=['POST'])
 def shutdown_endpoint():
-    logger.info('/shutdown')
+    logging.info('/shutdown')
 
     os.system("shutdown /s /t 2")
 
@@ -275,8 +236,8 @@ def shutdown_endpoint():
 def launch_app():
     data = request.json
     # log the request data 
-    logger.info('/setup/launch')
-    logger.info(data)
+    logging.info('/setup/launch')
+    logging.info(data)
     shell = data.get("shell", False)
     shell = True
 
@@ -305,7 +266,7 @@ def launch_app():
     except Exception as e:
         
 
-        logger.error("\n" + traceback.format_exc() + "\n")
+        logging.error("\n" + traceback.format_exc() + "\n")
         # return jsonify({"status": "error", "message": str(e)}), 500
         return jsonify({"status": "error", 
                         "message": str(e),
@@ -347,7 +308,7 @@ def capture_screen_with_cursor():
         # Use the screencapture utility to capture the screen with the cursor
         subprocess.run(["screencapture", "-C", file_path])
     else:
-        logger.warning(f"The platform you're using ({user_platform}) is not currently supported")
+        logging.warning(f"The platform you're using ({user_platform}) is not currently supported")
 
     return send_file(file_path, mimetype='image/png')
 
@@ -382,8 +343,8 @@ def get_terminal_output():
             return "Currently not implemented for platform {:}.".format(platform.platform()), 500
         return jsonify({"output": output, "status": "success"})
     except Exception as e:
-        logger.error("Failed to get terminal output. Error: %s", e)
-        logger.error("\n" + traceback.format_exc() + "\n")
+        logging.error("Failed to get terminal output. Error: %s", e)
+        logging.error("\n" + traceback.format_exc() + "\n")
         return jsonify({"status": "error", "message": str(e)}), 500
 
 import win32gui
@@ -429,8 +390,8 @@ def get_obs_winagent():
         img_base64 = base64.b64encode(img_bytes.read()).decode('utf-8')  
         return jsonify({"image": img_base64, "window_title": window_title, "rect": rect, "window_names_str": window_names_str, "computer_clipboard": computer_clipboard, "human_input": human_input, "status": "success"})  
     except Exception as e:  
-        logger.error("Failed to get OBS window agent. Error: %s", e)
-        logger.error("\n" + traceback.format_exc() + "\n")
+        logging.error("Failed to get OBS window agent. Error: %s", e)
+        logging.error("\n" + traceback.format_exc() + "\n")
         return jsonify({"status": "error", "message": str(e)}), 500  
 
 
@@ -604,7 +565,7 @@ def _create_atspi_node(node: Accessible, depth: int = 0, flag: Optional[str] = N
 
     # HYPERPARAMETER
     if depth==50:
-        logger.warning("Max depth reached")
+        logging.warning("Max depth reached")
         return xml_node
 
     if flag=="calc" and node_role_name=="table":
@@ -622,7 +583,7 @@ def _create_atspi_node(node: Accessible, depth: int = 0, flag: Optional[str] = N
         first_showing = False
         column_base = None
         for r in range(MAX_ROW):
-            #logger.warning(r)
+            #logging.warning(r)
             for clm in range(column_base or 0, MAXIMUN_COLUMN):
                 child_node: Accessible = node[index_base+clm]
                 showing: bool = child_node.getState().contains(STATE_SHOWING)
@@ -643,11 +604,11 @@ def _create_atspi_node(node: Accessible, depth: int = 0, flag: Optional[str] = N
             for i, ch in enumerate(node):
                 # HYPERPARAMETER
                 if i>=1025:
-                    logger.warning("Max width reached")
+                    logging.warning("Max width reached")
                     break
                 xml_node.append(_create_atspi_node(ch, depth+1, flag))
         except:
-            logger.warning("Error occurred during children traversing. Has Ignored. Node: %s", lxml.etree.tostring(xml_node, encoding="unicode"))
+            logging.warning("Error occurred during children traversing. Has Ignored. Node: %s", lxml.etree.tostring(xml_node, encoding="unicode"))
         return xml_node
     #  }}} function _create_atspi_node # 
 
@@ -840,14 +801,14 @@ def _create_pywinauto_node(node: BaseWrapper, depth: int = 0, flag: Optional[str
 
     # HYPERPARAMETER
     if depth==50:
-        logger.warning("Max depth reached")
+        logging.warning("Max depth reached")
         #print("Max depth reached")
         return xml_node
 
     for i, ch in enumerate(node.children()):
         # HYPERPARAMETER
         if i>=2048:
-            logger.warning("Max width reached")
+            logging.warning("Max width reached")
             #print("Max width reached")
             break
         xml_node.append(_create_pywinauto_node(ch, depth+1, flag))
@@ -874,7 +835,7 @@ def get_accessibility_tree():
 
         xml_node = lxml.etree.Element("desktop", nsmap=_accessibility_ns_map)
         for wnd in desktop.windows():
-            logger.debug("Win UIA AT parsing: %s(%d)", wnd.element_info.name, len(wnd.children()))
+            logging.debug("Win UIA AT parsing: %s(%d)", wnd.element_info.name, len(wnd.children()))
             node: _Element = _create_pywinauto_node(wnd, 1)
             xml_node.append(node)
         return jsonify({"AT": lxml.etree.tostring(xml_node, encoding="unicode")})
@@ -1092,7 +1053,7 @@ def get_wallpaper():
         process = subprocess.Popen(['osascript', '-e', script], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         output, error = process.communicate()
         if error:
-            logger.error("Error: %s", error.decode('utf-8'))
+            logging.error("Error: %s", error.decode('utf-8'))
             return None
         return output.strip().decode('utf-8')
 
@@ -1104,7 +1065,7 @@ def get_wallpaper():
             )
             return output.decode('utf-8').strip().replace('file://', '').replace("'", "")
         except subprocess.CalledProcessError as e:
-            logger.error("Error: %s", e)
+            logging.error("Error: %s", e)
             return None
 
     os_name = platform.system()
@@ -1116,7 +1077,7 @@ def get_wallpaper():
     elif os_name == 'Linux':
         wallpaper_path = get_wallpaper_linux()
     else:
-        logger.error(f"Unsupported OS: {os_name}")
+        logging.error(f"Unsupported OS: {os_name}")
         abort(400, description="Unsupported OS")
 
     if wallpaper_path:
@@ -1124,8 +1085,8 @@ def get_wallpaper():
             # Ensure the filename is secure
             return send_file(wallpaper_path, mimetype='image/png')
         except Exception as e:
-            logger.error(f"An error occurred while serving the wallpaper file: {e}")
-            logger.error("\n" + traceback.format_exc() + "\n")
+            logging.error(f"An error occurred while serving the wallpaper file: {e}")
+            logging.error("\n" + traceback.format_exc() + "\n")
             
             abort(500, description="Unable to serve the wallpaper file")
     else:
@@ -1206,7 +1167,16 @@ def get_platform():
 
 @app.route('/cursor_position', methods=['GET'])
 def get_cursor_position():
-    return pyautogui.position().x, pyautogui.position().y
+    cursor_position = jsonify(
+        {
+            "x": pyautogui.position().x,
+            "y": pyautogui.position().y
+        }
+    )
+    # cursor_position = pyautogui.position().x, pyautogui.position().y
+    # print("Cursor position:", cursor_position)
+
+    return cursor_position
 
 
 @app.route("/setup/change_wallpaper", methods=['POST'])
@@ -1236,8 +1206,8 @@ def change_wallpaper():
                 ["osascript", "-e", f'tell application "Finder" to set desktop picture to POSIX file "{path}"'])
         return "Wallpaper changed successfully"
     except Exception as e:
-        logger.error(f"Failed to change wallpaper. Error: {e}")
-        logger.error("\n" + traceback.format_exc() + "\n")
+        logging.error(f"Failed to change wallpaper. Error: {e}")
+        logging.error("\n" + traceback.format_exc() + "\n")
         return f"Failed to change wallpaper. Error: {e}", 500
 
 
@@ -1271,7 +1241,7 @@ def download_file():
 
         except requests.RequestException as e:
             error = e
-            logger.error(f"Failed to download {url}. Retrying... ({max_retries - i - 1} attempts left)")
+            logging.error(f"Failed to download {url}. Retrying... ({max_retries - i - 1} attempts left)")
 
     return f"Failed to download {url}. No retries left. Error: {error}", 500
 
@@ -1299,8 +1269,8 @@ def open_file():
             time.sleep(5)
         return "File opened successfully"
     except Exception as e:
-        logger.error(f"Failed to open {path}. Error: {e}")
-        logger.error("\n" + traceback.format_exc() + "\n")
+        logging.error(f"Failed to open {path}. Error: {e}")
+        logging.error("\n" + traceback.format_exc() + "\n")
         return f"Failed to open {path}. Error: {e}", 500
 
 
@@ -1554,7 +1524,7 @@ def end_recording():
 
     # recording_process.send_signal(signal.SIGINT)
     # ps_childrend = recording_process.children()
-    # logger.info(f"Children: {ps_childrend}")
+    # logging.info(f"Children: {ps_childrend}")
 
     # for c in ps_childrend:
     #     c.send_signal(signal.CTRL_C_EVENT)
@@ -1576,6 +1546,12 @@ def end_recording():
     else:
         return abort(404, description="Recording failed")
 
+@app.route('/get_recording', methods=['GET'])
+def get_recording():
+    if os.path.exists(recording_path):
+        return send_file(recording_path, as_attachment=True)
+    else:
+        return jsonify({'status': 'error', 'message': 'Recording file not found.'}), 404
 
 @app.route('/save_state', methods=['POST'])
 def save_state():

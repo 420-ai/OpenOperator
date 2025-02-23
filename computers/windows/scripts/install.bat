@@ -1,115 +1,96 @@
 @echo off
+setlocal EnableDelayedExpansion
 
-REM Set script directory
-set SCRIPT_DIR=%~dp0
+REM ---------------------------
+REM 1) Set up logging
+REM ---------------------------
+set "LOGFILE=\\host.lan\Data\logs\install_bat.txt"
+echo ================================================= >> "%LOGFILE%"
+echo Installation started at %date% %time% >> "%LOGFILE%"
+echo ================================================= >> "%LOGFILE%"
 
-REM Log file path
-set LOGFILE=%USERPROFILE%\Desktop\install_log.txt
+REM ---------------------------
+REM 2) Download & Install Python system-wide (silent)
+REM ---------------------------
+set "PYTHON_INSTALLER=%TEMP%\python_installer.exe"
+set "PYTHON_URL=https://www.python.org/ftp/python/3.10.0/python-3.10.0-amd64.exe"
 
-REM Start logging
-echo INSTALLATION STARTED AT %date% %time% > %LOGFILE%
+echo Downloading Python installer... >> "%LOGFILE%"
+curl -L -o "%PYTHON_INSTALLER%" "%PYTHON_URL%" >> "%LOGFILE%" 2>&1
 
-REM ==========================================
-REM Section 1: Initial Setup and Python Install
-REM ==========================================
+echo Installing Python system-wide... >> "%LOGFILE%"
+"%PYTHON_INSTALLER%" /quiet InstallAllUsers=1 PrependPath=1 InstallLauncherAllUsers=1 >> "%LOGFILE%" 2>&1
+if %ERRORLEVEL% neq 0 (
+    echo Python installation failed with error code %ERRORLEVEL%. >> "%LOGFILE%"
+    exit /b %ERRORLEVEL%
+)
 
-REM Download Python installer
-echo Downloading Python... >> %LOGFILE%
-curl -L -o "%TEMP%\python_installer.exe" "https://www.python.org/ftp/python/3.10.0/python-3.10.0-amd64.exe" >> %LOGFILE% 2>&1
+set "PYTHON_PATH=C:\Program Files\Python310\python.exe"
+set "PYTHONW_PATH=C:\Program Files\Python310\pythonw.exe"
+setx PYTHON "%PYTHON_PATH%" /M >nul
+setx PYTHONW "%PYTHONW_PATH%" /M >nul
 
-REM Install Python silently
-echo Installing Python... >> %LOGFILE%
-"%TEMP%\python_installer.exe" /quiet InstallAllUsers=0 PrependPath=1 Include_test=0 >> %LOGFILE% 2>&1
-echo Python installed successfully! >> %LOGFILE%
+echo Python set to %PYTHON_PATH% >> "%LOGFILE%"
+echo Pythonw set to %PYTHONW_PATH% >> "%LOGFILE%"
 
-REM Define Python path
-set PYTHON=%USERPROFILE%\AppData\Local\Programs\Python\Python310\python.exe
-echo Python path is set to %PYTHON% >> %LOGFILE%
 
-@REM REM ==========================================
-@REM REM Section 2: Install software
-@REM REM ==========================================
 
-@REM REM Install Python libraries for INITIALIZE
-@REM echo Installing Python libraries for INITIALIZE... >> %LOGFILE%
-@REM %PYTHON% -m pip install --upgrade pip >> %LOGFILE% 2>&1
-@REM %PYTHON% -m pip install -r "\\host.lan\Data\init\requirements.txt" >> %LOGFILE% 2>&1
-@REM echo Python libraries for INITIALIZE installed successfully! >> %LOGFILE%
+REM ---------------------------
+REM 3) Install software
+REM ---------------------------
 
-@REM REM Run INITIALIZE Python script from network path
-@REM echo Running Python script INITIALIZE from network... >> %LOGFILE%
-@REM %PYTHON% "\\host.lan\Data\init\main.py" >> %LOGFILE% 2>&1
-@REM echo Python script INITIALIZE executed. >> %LOGFILE%
+REM Update pip
+"%PYTHON_PATH%" -m pip install --upgrade pip >> "%LOGFILE%" 2>&1
 
-@REM REM ==========================================
-@REM REM Section 3: Setup for SERVER1
-@REM REM ==========================================
+REM Install Python libraries for INITIALIZE
+echo Installing Python libraries for INITIALIZE... >> %LOGFILE%
+"%PYTHON_PATH%" -m pip install -r "\\host.lan\Data\init\requirements.txt" >> "%LOGFILE%" 2>&1
+echo Python libraries for INITIALIZE installed successfully! >> %LOGFILE%
 
-@REM REM Make exception for Server1 in Windows Firewall
-@REM netsh advfirewall firewall add rule name="SERVER1 Flask" dir=in action=allow protocol=TCP localport=6000
+REM Run INITIALIZE Python script from network path
+echo Running Python script INITIALIZE from network... >> %LOGFILE%
+"%PYTHON_PATH%" "\\host.lan\Data\init\main.py" >> "%LOGFILE%" 2>&1
+echo Python script INITIALIZE executed. >> %LOGFILE%
 
-@REM REM Install Python libraries for SERVER1
-@REM echo Installing Python libraries for SERVER1... >> %LOGFILE%
-@REM %PYTHON% -m pip install --upgrade pip >> %LOGFILE% 2>&1
-@REM %PYTHON% -m pip install -r "\\host.lan\Data\server1\requirements.txt" >> %LOGFILE% 2>&1
-@REM echo Python libraries for SERVER1 installed successfully! >> %LOGFILE%
 
-@REM REM Create scheduled task to run SERVER1 on startup (hidden)
-@REM echo Creating scheduled task for SERVER1... >> %LOGFILE%
-@REM schtasks /Create /TN "StartSERVER1" /TR "powershell -ExecutionPolicy Bypass -File \"%SCRIPT_DIR%run_server1.ps1\"" /SC ONLOGON /RL HIGHEST /F
-@REM schtasks /Run /TN "StartSERVER1"
-@REM echo Scheduled task for SERVER1 created successfully! >> %LOGFILE%
 
-@REM REM Start SERVER1 immediately in the background (hidden)
-@REM echo Starting SERVER1 immediately... >> %LOGFILE%
-@REM powershell -ExecutionPolicy Bypass -File "%SCRIPT_DIR%run_server1.ps1"
-@REM echo SERVER1 started. >> %LOGFILE%
+REM ---------------------------
+REM 4) Install Required Python Packages for SERVERS
+REM ---------------------------
+echo Installing Python libraries... >> "%LOGFILE%"
+"%PYTHON_PATH%" -m pip install -r "\\host.lan\Data\server1\requirements.txt" >> "%LOGFILE%" 2>&1
+"%PYTHON_PATH%" -m pip install -r "\\host.lan\Data\server2\requirements.txt" >> "%LOGFILE%" 2>&1
 
-@REM REM ==========================================
-@REM REM Section 4: Setup for SERVER2
-@REM REM ==========================================
+REM ---------------------------
+REM 5) Add Firewall Rules
+REM ---------------------------
+echo Adding firewall rules... >> "%LOGFILE%"
+netsh advfirewall firewall add rule name="SERVER1 Flask" dir=in action=allow protocol=TCP localport=6000
+netsh advfirewall firewall add rule name="SERVER2 Flask" dir=in action=allow protocol=TCP localport=5000
 
-@REM REM Make exception for Server1 in Windows Firewall
-@REM netsh advfirewall firewall add rule name="SERVER2 Flask" dir=in action=allow protocol=TCP localport=5000
+REM ---------------------------
+REM 6) Create Startup Script
+REM ---------------------------
+set "STARTUP_SERVER1_BAT=%~dp0start_server_1.bat"
+(
+    echo @echo off
+    echo start /b "" "%PYTHONW_PATH%" "\\host.lan\Data\server1\main.py"
+) > "%STARTUP_SERVER1_BAT%"
 
-@REM REM Install Python libraries for SERVER2
-@REM echo Installing Python libraries for SERVER2... >> %LOGFILE%
-@REM %PYTHON% -m pip install --upgrade pip >> %LOGFILE% 2>&1
-@REM %PYTHON% -m pip install -r "\\host.lan\Data\server2\requirements.txt" >> %LOGFILE% 2>&1
-@REM echo Python libraries for SERVER2 installed successfully! >> %LOGFILE%
+set "STARTUP_SERVER2_BAT=%~dp0start_server_2.bat"
+(
+    echo @echo off
+    echo start /b "" "%PYTHONW_PATH%" "\\host.lan\Data\server2\main.py"
+) > "%STARTUP_SERVER2_BAT%"
 
-@REM REM Create scheduled task to run SERVER2 on startup (hidden)
-@REM echo Creating scheduled task for SERVER2... >> %LOGFILE%
-@REM schtasks /Create /TN "StartSERVER2" /TR "powershell -ExecutionPolicy Bypass -File \"%SCRIPT_DIR%run_server2.ps1\"" /SC ONLOGON /RL HIGHEST /F
-@REM schtasks /Run /TN "StartSERVER2"
-@REM echo Scheduled task for SERVER2 created successfully! >> %LOGFILE%
+REM ---------------------------
+REM 7) Schedule Startup Task
+REM ---------------------------
+schtasks /Create /TN "StartServer1" /SC ONSTART /TR "\"%STARTUP_SERVER1_BAT%\"" /RU "SYSTEM" /RL HIGHEST /F
+schtasks /Create /TN "StarServer2" /SC ONSTART /TR "\"%STARTUP_BAT%\"" /RU "SYSTEM" /RL HIGHEST /F
+schtasks /Run /TN "StartServer1"
+schtasks /Run /TN "StartServer2"
 
-@REM REM Start SERVER2 immediately in the background (hidden)
-@REM echo Starting SERVER2 immediately... >> %LOGFILE%
-@REM powershell -ExecutionPolicy Bypass -File "%SCRIPT_DIR%run_server2.ps1"
-@REM echo SERVER2 started. >> %LOGFILE%
-
-@REM REM ==========================================
-@REM REM Section 4: Setup for SERVER2
-@REM REM ==========================================
-
-@REM REM Install Python libraries for SERVER2
-@REM echo Installing Python libraries for SERVER2... >> %LOGFILE%
-@REM %PYTHON% -m pip install --upgrade pip >> %LOGFILE% 2>&1
-@REM %PYTHON% -m pip install -r "\\host.lan\Data\server2\requirements.txt" >> %LOGFILE% 2>&1
-@REM echo Python libraries for SERVER2 installed successfully! >> %LOGFILE%
-
-@REM REM Create scheduled task to run SERVER2 on startup
-@REM echo Creating scheduled task for SERVER2... >> %LOGFILE%
-@REM schtasks /Create /TN "StartSERVER2" /TR "%PYTHON% \\host.lan\Data\server2\main.py" /SC ONSTART /RL HIGHEST /F >> %LOGFILE% 2>&1
-@REM echo Scheduled task for SERVER2 created successfully! >> %LOGFILE%
-
-@REM REM Start SERVER2 immediately
-@REM echo Starting SERVER2 immediately... >> %LOGFILE%
-@REM start /B %PYTHON% -u "\\host.lan\Data\server1\main.py"
-@REM echo SERVER2 started. >> %LOGFILE%
-
-REM ==========================================
-REM Installation Complete
-REM ==========================================
-echo INSTALLATION COMPLETED AT %date% %time% >> %LOGFILE%
+echo Installation completed at %date% %time% >> "%LOGFILE%"
+echo >>> Installation complete. Servers will start automatically on reboot.
+exit
