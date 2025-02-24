@@ -1,7 +1,9 @@
 services:
   windowscomputer:
     container_name: windowscomputer
-    image: lukaskellerstein/windows-computer:0.0.2
+    build: 
+      context: ./dockur
+      dockerfile: Dockerfile
     devices:
       - /dev/kvm
       - /dev/net/tun

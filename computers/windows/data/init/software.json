@@ -21,11 +21,7 @@
     "mirrors": [
       "https://statics.teams.microsoft.com/production-windows-x64/1.6.00.4472/Teams_windows_x64.msi"
     ],
-    "alias": "teams",
-    "user": {
-      "name": "ditluser-g1-8@TESTTESTDITL1TENANTTEST.onmicrosoft.com",
-      "password": "TLI~NfW1NTNJhV~7"
-    }
+    "alias": "teams"
   },
   "ffmpeg": {
     "mirrors": [
