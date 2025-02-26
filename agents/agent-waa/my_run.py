@@ -29,9 +29,9 @@ emulator_ip = "127.0.0.1" # Port :5000 => Server2 on computer ["windows VM in do
 a11y_backend = "uia" # "uia" or "win32"
 
 # ????
-if som_config in ["a11y", "omni", "mixed-omni"]:
+if som_origin in ["a11y", "omni", "mixed-omni"]:
     som_config = None
-elif som_config in ["oss", "mixed-oss"]:
+elif som_origin in ["oss", "mixed-oss"]:
     som_config = {
         "pipeline": ["webparse", "groundingdino", "ocr"],
         "groundingdino": {
