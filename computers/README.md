@@ -36,3 +36,8 @@ Navigate yourself into folder `windows` and open terminal. Run command `docker-c
 ### 1.4 Run (local)
 
 We can run version with pre-builded docker container `lukaskellerstein/windows-computer:<VERSION>` or we can build locally new docker container. Navigate to `windows` and run command `docker compose -f compose-local.yml up`
+
+
+### 1.5 RDP
+
+You can open the VM via `http://localhost:8006`
