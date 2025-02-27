@@ -4,7 +4,7 @@ storage
 .gradio
 logs
 __pycache__
-
+.venv
 
 **/test-servers/recordings/
 **/test-servers/screenshots/
