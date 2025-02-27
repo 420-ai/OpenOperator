@@ -14,7 +14,7 @@ services:
       - 5000:5000
       - 6000:6000
     volumes:
-      - ./iso/win11.iso:/custom.iso
+      - ./iso/win.iso:/custom.iso
       - ./scripts:/oem
       - ./data:/data
       - ./storage:/storage
