@@ -4,11 +4,7 @@ This model recognizes UI elements on the screenshot. Source: https://github.com/
 
 ## Install
 
-In this folder open terminal
-
-1. Run `conda create -n "ui-model" python==3.12`
-2. Run `conda activate ui-model`
-3. Run `pip install -r requirements.txt`
+Run `uv sync`
 
 ## Weights
 
@@ -16,13 +12,13 @@ Ensure you have the V2 weights downloaded in weights folder (**ensure caption we
 
 ```
 rm -rf weights/icon_detect weights/icon_caption weights/icon_caption_florence
-for folder in icon_caption icon_detect; do huggingface-cli download microsoft/OmniParser-v2.0 --local-dir weights --repo-type model --include "$folder/*"; done
+for folder in icon_caption icon_detect; do uv run huggingface-cli download microsoft/OmniParser-v2.0 --local-dir weights --repo-type model --include "$folder/*"; done
 mv weights/icon_caption weights/icon_caption_florence
 ```
 
 ## Test
 
-Test it via command `python gradio_demo.py`.
+Test it via command `uv run gradio_demo.py`.
 
 Open `http://localhost:7861` and test it by uploading some screenshot.
 
@@ -30,4 +26,4 @@ Kill it.
 
 # Run
 
-Run the server via `python server/omniparserserver.py`.
+Run the server via `uv run server/omniparserserver.py`.
