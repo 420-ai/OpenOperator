@@ -2,9 +2,10 @@ iso
 weights
 storage
 .gradio
-logs
 __pycache__
 .venv
+
+**/logs/*.txt
 
 **/test-servers/recordings/
 **/test-servers/screenshots/
