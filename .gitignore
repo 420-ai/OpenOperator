@@ -7,8 +7,11 @@ __pycache__
 .venv
 
 **/logs/*.txt
+*.log
 
 **/test-servers/recordings/
 **/test-servers/screenshots/
 **/server2/recordings/
 **/server2/screenshots/
+
+models/ui/imgs
