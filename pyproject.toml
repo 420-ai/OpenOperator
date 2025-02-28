@@ -1,5 +1,5 @@
 [project]
-name = "echo_operator"
+name = "echo-operator"
 version = "0.1.0"
 description = "The Echo Operator workspace"
 readme = "README.md"
@@ -7,4 +7,12 @@ requires-python = ">=3.12"
 dependencies = []
 
 [tool.uv.workspace]
-members = ["models/ui", "agents/*", ]
+members = ["models/ui", "agents/*", "cli"]
+
+[tool.ruff]
+line-length = 140
+
+[tool.ruff.format]
+quote-style = "single"
+
+docstring-code-format = true
