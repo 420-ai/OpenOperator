@@ -12,9 +12,10 @@ def cli():
 def model():
     pass
 
-
-cli.add_command(model)
-model.add_command(download_model)
+def main():
+    cli.add_command(model)
+    model.add_command(download_model)
+    cli()
 
 if __name__ == '__main__':
-    cli()
+    main()
