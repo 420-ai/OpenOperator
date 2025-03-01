@@ -1,13 +1,62 @@
 # Echo Operator
 
+## Structure
 
-## Developing in this repository
+- `packages/cli`: Command-line interface that uses the core library
 
-This project's dependencies are managed by the `uv` tools. Please install it by following [instructions here](https://docs.astral.sh/uv/getting-started/installation/)
+## Setup
 
-After installing the tool, you can simply run `uv sync` at the root of the repo:
+### Prerequisites
+
+- Python 3.9 or higher
+
+### Installation
+
+#### On Windows:
+```
+setup.bat
+```
+
+#### On macOS/Linux:
+```
+chmod +x setup.py
+./setup.py
+```
+
+Or simply run:
+```
+python setup.py
+```
+
+The setup script will:
+1. Install `uv` if it's not already installed
+2. Create a virtual environment
+3. Use `uv sync` to install all workspace packages
+4. Run a test command to verify the installation
+
+## Development
+
+After activating the virtual environment:
+
+- On Windows: `.venv\Scripts\activate.bat`
+- On macOS/Linux: `source .venv/bin/activate`
+
+You can update all dependencies using:
 
 ```
-$ uv sync
+uv sync
 ```
 
+## Using the CLI
+
+After installation and activating the environment, you can use the CLI:
+
+```
+ec hello
+```
+
+## Adding New Packages
+
+1. Create a new directory under `packages/`
+2. Add a `pyproject.toml` file
+4. Run `uv sync` to update dependencies
