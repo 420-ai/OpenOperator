@@ -1,21 +1,22 @@
 import click
 
-from commands.model import download_model
+from cli.commands.model import model_group
+
+
+@click.command()
+def hello():
+    """Say hello."""
+    click.echo('Hello, World!')
 
 
 @click.group()
-def cli():
-    pass
-
-
-@click.group()
-def model():
-    pass
-
+@click.version_option()
 def main():
-    cli.add_command(model)
-    model.add_command(download_model)
-    cli()
+    """CLI for Echo Operator."""
+    pass
+
+
+main.add_command(model_group)
 
 if __name__ == '__main__':
     main()

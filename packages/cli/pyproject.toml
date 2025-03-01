@@ -10,7 +10,8 @@ dependencies = [
 ]
 
 [project.scripts]
-project = "cli.main:main"
+cli = "cli.main:main"
+ec = "cli.main:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/cli"]
