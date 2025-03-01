@@ -1,5 +1,5 @@
 [project]
-name = "echo_operator_cli"
+name = "echo-operator-cli"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -8,3 +8,13 @@ dependencies = [
     "click>=8.1.8",
     "huggingface-hub>=0.29.1",
 ]
+
+[project.scripts]
+project = "cli.main:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/cli"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
