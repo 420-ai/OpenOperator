@@ -1055,7 +1055,7 @@ source = { virtual = "." }
 [[package]]
 name = "echo-operator-cli"
 version = "0.1.0"
-source = { virtual = "cli" }
+source = { editable = "packages/cli" }
 dependencies = [
     { name = "click" },
     { name = "huggingface-hub" },
