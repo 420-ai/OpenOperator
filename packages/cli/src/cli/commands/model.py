@@ -1,6 +1,7 @@
 import click
 
 from os import path
+from shutil import rmtree
 from huggingface_hub import snapshot_download
 from pathlib import Path
 
@@ -24,8 +25,9 @@ def download_model():
     
     # rename icon_detect to icon_detect_florence
     if path.exists(path.join(weights_path, 'icon_detect_florence')):
-        # remove it 
-        click.echo('removing existing icon_detect_florence')
-        Path(path.join(weights_path, 'icon_detect_florence')).unlink(missing_ok=True)
+        # unlink a previously downloaded icon_detect_florence directory
+        rmtree(path.join(weights_path, 'icon_detect_florence'))
 
     Path(path.join(weights_path, 'icon_detect')).rename(path.join(weights_path, 'icon_detect_florence'))
+
+    click.echo('models downloaded successfully!')
