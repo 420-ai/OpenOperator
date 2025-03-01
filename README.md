@@ -3,6 +3,8 @@
 ## Structure
 
 - `packages/cli`: Command-line interface that uses the core library
+- `packages/agent-waa`: a vision based agent that can leverage OmniParser and a set of tools to automate as an automation-client
+- `packages/automaton`: a server 
 
 ## Setup
 
@@ -44,7 +46,7 @@ After activating the virtual environment:
 You can update all dependencies using:
 
 ```
-uv sync
+uv sync && uv pip install -e packages/cli
 ```
 
 ## Using the CLI
@@ -53,6 +55,12 @@ After installation and activating the environment, you can use the CLI:
 
 ```
 ec hello
+```
+
+For example, to download models the the `weights` directory:
+
+```
+ec model download
 ```
 
 ## Adding New Packages
