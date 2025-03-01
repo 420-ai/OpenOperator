@@ -49,21 +49,20 @@ def main():
     # Use uv sync to install all packages in the workspace
     print("Synchronizing workspace packages...")
     
+    activate_cmd = "source .venv/bin/activate && "
+
     # Use different activation approach based on platform
     if platform.system() == "Windows":
         activate_cmd = r".venv\Scripts\activate.bat && "
-        run_command(f"{activate_cmd}uv sync", shell=True)
         
-        # Test the CLI
-        print("Testing CLI command...")
-        run_command(f"{activate_cmd}project hello", shell=True)
-    else:
-        activate_cmd = "source .venv/bin/activate && "
-        run_command(f"{activate_cmd}uv sync", shell=True)
-        
-        # Test the CLI
-        print("Testing CLI command...")
-        run_command(f"{activate_cmd}ec hello", shell=True)
+    # Install dependencies
+    run_command(f"{activate_cmd}uv sync", shell=True)
+
+    run_command(f"{activate_cmd}uv pip install -e packages/cli", shell=True)
+
+    # Test the CLI
+    print("Testing CLI command...")
+    run_command(f"{activate_cmd}ec hello", shell=True)
     
     print("\nSetup complete!")
     
