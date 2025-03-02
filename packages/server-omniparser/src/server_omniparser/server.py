@@ -1,17 +1,14 @@
-import os
-import sys
 import time
 import uvicorn
 
 from fastapi import FastAPI
 from pydantic import BaseModel
+from os import path
 from typing import TypedDict, Optional
 
 from .util.omniparser import Omniparser
 
-root_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.append(root_dir)
-
+root_dir = path.join(path.dirname(path.dirname(path.dirname(path.dirname(path.dirname(path.abspath(__file__)))))))
 
 class Config(TypedDict):
     som_model_path: str
@@ -30,9 +27,9 @@ class OmniParserServer:
 
     def __init__(self, config: Optional[Config] = None):
         self.config: Config = {
-            'som_model_path': '../../../../weights/icon_detect_florence/model.pt',
+            'som_model_path': path.join(root_dir, 'weights/icon_detect_florence/model.pt'),
             'caption_model_name': 'florence2',
-            'caption_model_path': '../../../../weights/icon_caption',
+            'caption_model_path': path.join(root_dir, 'weights/icon_caption'),
             'device': 'cpu',
             'BOX_TRESHOLD': 0.05,
         }
@@ -58,7 +55,8 @@ class OmniParserServer:
     def start(self, host: str = 'localhost', port: int = 8000):
         """Start the FastAPI server."""
         print(f'Starting server at http://{host}:{port}')
-        uvicorn.run('server:app', host=host, port=port, reload=True)
+        uvicorn.run('server_omniparser.server:app', host=host, port=port, reload=True)
+
 
 # export this class variable for uvicorn to reload when code changes
 app = OmniParserServer.app
