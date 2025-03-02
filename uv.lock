@@ -18,6 +18,7 @@ members = [
     "agent-waa-3",
     "echo-operator",
     "echo-operator-cli",
+    "echo-server-omniparser",
     "model-omniparser",
     "test-servers",
 ]
@@ -1065,6 +1066,83 @@ dependencies = [
 requires-dist = [
     { name = "click", specifier = ">=8.1.8" },
     { name = "huggingface-hub", specifier = ">=0.29.1" },
+]
+
+[[package]]
+name = "echo-server-omniparser"
+version = "0.1.0"
+source = { editable = "packages/server-omniparser" }
+dependencies = [
+    { name = "accelerate" },
+    { name = "anthropic", extra = ["bedrock", "vertex"] },
+    { name = "azure-identity" },
+    { name = "boto3" },
+    { name = "dashscope" },
+    { name = "dill" },
+    { name = "easyocr" },
+    { name = "einops" },
+    { name = "google-auth" },
+    { name = "gradio" },
+    { name = "groq" },
+    { name = "huggingface-hub", extra = ["cli"] },
+    { name = "jsonschema" },
+    { name = "numpy" },
+    { name = "openai" },
+    { name = "opencv-python" },
+    { name = "opencv-python-headless" },
+    { name = "paddleocr" },
+    { name = "paddlepaddle" },
+    { name = "pre-commit" },
+    { name = "pyautogui" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+    { name = "ruff" },
+    { name = "screeninfo" },
+    { name = "streamlit" },
+    { name = "supervision" },
+    { name = "timm" },
+    { name = "torch" },
+    { name = "torchvision" },
+    { name = "transformers" },
+    { name = "uiautomation" },
+    { name = "ultralytics" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "accelerate", specifier = ">=1.4.0" },
+    { name = "anthropic", extras = ["bedrock", "vertex"], specifier = ">=0.37.1" },
+    { name = "azure-identity", specifier = ">=1.20.0" },
+    { name = "boto3", specifier = ">=1.28.57" },
+    { name = "dashscope", specifier = ">=1.22.1" },
+    { name = "dill", specifier = ">=0.3.9" },
+    { name = "easyocr", specifier = ">=1.7.2" },
+    { name = "einops", specifier = ">=0.8.1" },
+    { name = "google-auth", specifier = ">=2,<3" },
+    { name = "gradio", specifier = ">=5.13.2" },
+    { name = "groq", specifier = ">=0.18.0" },
+    { name = "huggingface-hub", extras = ["cli"], specifier = ">=0.29.1" },
+    { name = "jsonschema", specifier = "==4.22.0" },
+    { name = "numpy", specifier = "==1.26.4" },
+    { name = "openai", specifier = ">=1.64.0" },
+    { name = "opencv-python", specifier = ">=4.11.0.86" },
+    { name = "opencv-python-headless", specifier = ">=4.11.0.86" },
+    { name = "paddleocr", specifier = ">=2.9.1" },
+    { name = "paddlepaddle", specifier = ">=2.6.2" },
+    { name = "pre-commit", specifier = "==3.8.0" },
+    { name = "pyautogui", specifier = "==0.9.54" },
+    { name = "pytest", specifier = "==8.3.3" },
+    { name = "pytest-asyncio", specifier = "==0.23.6" },
+    { name = "ruff", specifier = "==0.6.7" },
+    { name = "screeninfo", specifier = ">=0.8.1" },
+    { name = "streamlit", specifier = ">=1.38.0" },
+    { name = "supervision", specifier = ">=0.24.0" },
+    { name = "timm", specifier = ">=1.0.15" },
+    { name = "torch", specifier = ">=2.6.0" },
+    { name = "torchvision", specifier = ">=0.21.0" },
+    { name = "transformers", specifier = ">=4.49.0" },
+    { name = "uiautomation", specifier = ">=2.0.20" },
+    { name = "ultralytics", specifier = ">=8.3.80" },
 ]
 
 [[package]]
