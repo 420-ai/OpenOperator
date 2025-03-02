@@ -1,6 +1,7 @@
 import click
 
 from cli.commands.model import model_group
+from cli.commands.omniparser import omniparser_group
 
 
 @click.command()
@@ -17,6 +18,7 @@ def main():
 
 
 main.add_command(model_group)
+main.add_command(omniparser_group)
 
 if __name__ == '__main__':
     main()

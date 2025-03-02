@@ -6,7 +6,8 @@ import uvicorn
 from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import TypedDict, Optional
-from util.omniparser import Omniparser
+
+from .util.omniparser import Omniparser
 
 root_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(root_dir)

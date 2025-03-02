@@ -58,7 +58,7 @@ def main():
     # Install dependencies
     run_command(f"{activate_cmd}uv sync", shell=True)
 
-    run_command(f"{activate_cmd}uv pip install -e packages/cli", shell=True)
+    run_command(f"{activate_cmd}uv pip install -e packages/*", shell=True)
 
     # Test the CLI
     print("Testing CLI command...")

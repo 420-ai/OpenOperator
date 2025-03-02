@@ -1059,12 +1059,14 @@ version = "0.1.0"
 source = { editable = "packages/cli" }
 dependencies = [
     { name = "click" },
+    { name = "echo-server-omniparser" },
     { name = "huggingface-hub" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "click", specifier = ">=8.1.8" },
+    { name = "echo-server-omniparser", editable = "packages/server-omniparser" },
     { name = "huggingface-hub", specifier = ">=0.29.1" },
 ]
 
