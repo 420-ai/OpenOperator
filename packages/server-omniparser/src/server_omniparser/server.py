@@ -6,9 +6,9 @@ from pydantic import BaseModel
 from os import path
 from typing import TypedDict, Optional
 
-from .util.omniparser import Omniparser
 
 root_dir = path.join(path.dirname(path.dirname(path.dirname(path.dirname(path.dirname(path.abspath(__file__)))))))
+
 
 class Config(TypedDict):
     som_model_path: str
@@ -26,6 +26,8 @@ class OmniParserServer:
     app = FastAPI()
 
     def __init__(self, config: Optional[Config] = None):
+        from .util.omniparser import Omniparser
+
         self.config: Config = {
             'som_model_path': path.join(root_dir, 'weights/icon_detect_florence/model.pt'),
             'caption_model_name': 'florence2',

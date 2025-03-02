@@ -57,14 +57,27 @@ After installation and activating the environment, you can use the CLI:
 ec hello
 ```
 
-For example, to download models the the `weights` directory:
+## Commands
 
+### Model Commands
+
+Download the models
 ```
 ec model download
+```
+
+### OmniParser
+
+Start the OmniParser server
+
+```
+ec omniparser start
 ```
 
 ## Adding New Packages
 
 1. Create a new directory under `packages/`
 2. Add a `pyproject.toml` file
+3. Add relative path to the package in `scripts/requirements-dev.txt` so it gets placed in the editable mode during development
 4. Run `uv sync` to update dependencies
+5. Run `uv pip install -e packages/xyz` to start development
