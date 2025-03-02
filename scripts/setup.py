@@ -49,7 +49,7 @@ def main():
     # Use uv sync to install all packages in the workspace
     print("Synchronizing workspace packages...")
     
-    activate_cmd = "source .venv/bin/activate && "
+    activate_cmd = ". .venv/bin/activate && "
 
     # Use different activation approach based on platform
     if platform.system() == "Windows":
@@ -72,7 +72,7 @@ def main():
         print(r".venv\Scripts\activate.bat")
     else:
         print("\nTo activate the environment, run:")
-        print("source .venv/bin/activate")
+        print(". .venv/bin/activate")
     
     print("\nAfter activation, you can use the CLI:")
     print("ec model download")
