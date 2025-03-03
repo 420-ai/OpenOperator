@@ -47,7 +47,7 @@ After activating the virtual environment:
 You can update all dependencies using:
 
 ```
-uv sync && uv pip install -e packages/cli
+uv sync && uv pip install -r scripts/requirements-dev.txt
 ```
 
 ## Using the CLI
