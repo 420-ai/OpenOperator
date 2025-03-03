@@ -56,7 +56,7 @@ def main():
         activate_cmd = r".venv\Scripts\activate.bat && "
         
     # Install dependencies
-    run_command(f"{activate_cmd}uv sync", shell=True)
+    run_command(f"{activate_cmd}uv sync --all-packages", shell=True)
 
     run_command(f"{activate_cmd}uv pip install -r scripts/requirements-dev.txt", shell=True)
 

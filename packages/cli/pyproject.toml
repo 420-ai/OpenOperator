@@ -8,11 +8,13 @@ dependencies = [
     "click>=8.1.8",
     "huggingface-hub>=0.29.1",
     "echo-server-omniparser",
+    "echo-operator-ui",
     "uvicorn>=0.34.0",
 ]
 
 [tool.uv.sources]
 echo-server-omniparser = { workspace = true }
+echo-operator-ui = { workspace = true }
 
 [project.scripts]
 cli = "cli.main:main"
