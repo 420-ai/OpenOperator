@@ -39,14 +39,14 @@ python main.py
 
 ## Port forwarding
 
-If you want to use port forwarding to access the server via `127.0.0.1:5050` on the host, you need to make sure steps below are done.
+If you want to use port forwarding to access the server via `127.0.0.1:5050` on the host (server is running on VM on port `:5000`), you need to make sure steps below are done.
 
 ### 1.1 Windows Firewall
 
 Windows Defender Firewall may be blocking external connections. To allow traffic:
 1. Open **Windows Defender Firewall with Advanced Security**.
 2. Go to **Inbound Rules** > **New Rule**.
-3. Select **Port** > Choose **TCP** and enter `5050`.
+3. Select **Port** > Choose **TCP** and enter `5000`.
 4. Allow the connection for **all networks** (private, public, domain).
 5. Name the rule and save it.
 
@@ -61,11 +61,11 @@ In order to access the server via port `5050`, you need to setup a port forwardi
    - **Protocol**: TCP
    - **Source port**: `5050`
    - **Forward to**: `Windows 11` (or Name of your VM)
-   - **Destination port**: `5050`
+   - **Destination port**: `5000`
 
 ### 1.3 Test it
 
-**Step 1** is to ensure the server is running correctly from the Windows VM. Open url (`http://127.0.0.1:5050/probe`) in browser on your Windows 11 machine. You should see response:
+**Step 1** is to ensure the server is running correctly from the Windows VM. Open url (`http://127.0.0.1:5000/probe`) in browser on your Windows 11 machine. You should see response:
 ```
 {
   "message": "Service is operational",
