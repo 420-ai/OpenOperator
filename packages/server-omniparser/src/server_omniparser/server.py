@@ -1,11 +1,10 @@
 import time
-import uvicorn
 
 from fastapi import FastAPI
 from pydantic import BaseModel
 from os import path
-from typing import TypedDict, Optional
-
+from typing import TypedDict
+from .util.omniparser import Omniparser
 
 root_dir = path.join(path.dirname(path.dirname(path.dirname(path.dirname(path.dirname(path.abspath(__file__)))))))
 
@@ -22,47 +21,32 @@ class ParseRequest(BaseModel):
     base64_image: str
 
 
-class OmniParserServer:
-    app = FastAPI()
+config: Config = {
+    'som_model_path': path.join(root_dir, 'weights/icon_detect/model.pt'),
+    'caption_model_name': 'florence2',
+    'caption_model_path': path.join(root_dir, 'weights/icon_caption_florence'),
+    'device': 'cpu',
+    'BOX_TRESHOLD': 0.05,
+}
 
-    def __init__(self, config: Optional[Config] = None):
-        from .util.omniparser import Omniparser
+if config:
+    config.update(config)
 
-        self.config: Config = {
-            'som_model_path': path.join(root_dir, 'weights/icon_detect_florence/model.pt'),
-            'caption_model_name': 'florence2',
-            'caption_model_path': path.join(root_dir, 'weights/icon_caption'),
-            'device': 'cpu',
-            'BOX_TRESHOLD': 0.05,
-        }
+omniparser = Omniparser(config)
 
-        if config:
-            self.config.update(config)
-
-        self.omniparser = Omniparser(self.config)
-
-    @app.post('/parse/')
-    async def parse(self, parse_request: ParseRequest):
-        print('start parsing...')
-        start = time.time()
-        dino_labled_img, parsed_content_list = self.omniparser.parse(parse_request.base64_image)
-        latency = time.time() - start
-        print('time:', latency)
-        return {'som_image_base64': dino_labled_img, 'parsed_content_list': parsed_content_list, 'latency': latency}
-
-    @app.get('/probe/')
-    async def root():
-        return {'message': 'Omniparser API ready'}
-
-    def start(self, host: str = 'localhost', port: int = 8000):
-        """Start the FastAPI server."""
-        print(f'Starting server at http://{host}:{port}')
-        uvicorn.run('server_omniparser.server:app', host=host, port=port, reload=True)
+app = FastAPI()
 
 
-# export this class variable for uvicorn to reload when code changes
-app = OmniParserServer.app
+@app.post('/parse')
+async def parse(parse_request: ParseRequest):
+    print('start parsing...')
+    start = time.time()
+    dino_labled_img, parsed_content_list = omniparser.parse(parse_request.base64_image)
+    latency = time.time() - start
+    print('time:', latency)
+    return {'som_image_base64': dino_labled_img, 'parsed_content_list': parsed_content_list, 'latency': latency}
 
-if __name__ == '__main__':
-    print('Starting OmniParser server...')
-    OmniParserServer().start(host='localhost', port=8000)
+
+@app.get('/probe')
+async def probe():
+    return {'message': 'Omniparser API ready'}

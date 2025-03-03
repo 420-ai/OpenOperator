@@ -8,6 +8,7 @@ dependencies = [
     "click>=8.1.8",
     "huggingface-hub>=0.29.1",
     "echo-server-omniparser",
+    "uvicorn>=0.34.0",
 ]
 
 [tool.uv.sources]

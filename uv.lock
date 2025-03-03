@@ -1061,6 +1061,7 @@ dependencies = [
     { name = "click" },
     { name = "echo-server-omniparser" },
     { name = "huggingface-hub" },
+    { name = "uvicorn" },
 ]
 
 [package.metadata]
@@ -1068,6 +1069,7 @@ requires-dist = [
     { name = "click", specifier = ">=8.1.8" },
     { name = "echo-server-omniparser", editable = "packages/server-omniparser" },
     { name = "huggingface-hub", specifier = ">=0.29.1" },
+    { name = "uvicorn", specifier = ">=0.34.0" },
 ]
 
 [[package]]
@@ -1083,6 +1085,7 @@ dependencies = [
     { name = "dill" },
     { name = "easyocr" },
     { name = "einops" },
+    { name = "fastapi" },
     { name = "google-auth" },
     { name = "gradio" },
     { name = "groq" },
@@ -1120,6 +1123,7 @@ requires-dist = [
     { name = "dill", specifier = ">=0.3.9" },
     { name = "easyocr", specifier = ">=1.7.2" },
     { name = "einops", specifier = ">=0.8.1" },
+    { name = "fastapi", specifier = ">=0.115.10" },
     { name = "google-auth", specifier = ">=2,<3" },
     { name = "gradio", specifier = ">=5.13.2" },
     { name = "groq", specifier = ">=0.18.0" },
