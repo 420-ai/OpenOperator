@@ -7,7 +7,7 @@ requires-python = ">=3.12"
 dependencies = []
 
 [tool.uv.workspace]
-members = ["packages/*", "models/ui", "agents/*"]
+members = ["packages/*", "agents/*"]
 
 [tool.ruff]
 line-length = 140
