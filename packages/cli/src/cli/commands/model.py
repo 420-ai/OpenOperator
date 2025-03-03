@@ -22,7 +22,7 @@ def download_model():
     click.echo(f'downloading models to {weights_path}')
     snapshot_download('microsoft/OmniParser-v2.0', allow_patterns='icon_caption/*', local_dir=weights_path)
     snapshot_download('microsoft/OmniParser-v2.0', allow_patterns='icon_detect/*', local_dir=weights_path)
-    
+
     # rename icon_caption to icon_caption_florence
     if path.exists(path.join(weights_path, 'icon_caption_florence')):
         # unlink a previously downloaded icon_caption_florence directory

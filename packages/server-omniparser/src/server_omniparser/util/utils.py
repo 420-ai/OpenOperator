@@ -37,17 +37,25 @@ def get_caption_model_processor(model_name, model_name_or_path='Salesforce/blip2
 
         processor = Blip2Processor.from_pretrained('Salesforce/blip2-opt-2.7b')
         if device == 'cpu':
-            model = Blip2ForConditionalGeneration.from_pretrained(model_name_or_path, device_map=None, torch_dtype=torch.float32)
+            model = Blip2ForConditionalGeneration.from_pretrained(
+                model_name_or_path, device_map=None, torch_dtype=torch.float32
+            )
         else:
-            model = Blip2ForConditionalGeneration.from_pretrained(model_name_or_path, device_map=None, torch_dtype=torch.float16).to(device)
+            model = Blip2ForConditionalGeneration.from_pretrained(
+                model_name_or_path, device_map=None, torch_dtype=torch.float16
+            ).to(device)
     elif model_name == 'florence2':
         from transformers import AutoProcessor, AutoModelForCausalLM
 
         processor = AutoProcessor.from_pretrained('microsoft/Florence-2-base', trust_remote_code=True)
         if device == 'cpu':
-            model = AutoModelForCausalLM.from_pretrained(model_name_or_path, torch_dtype=torch.float32, trust_remote_code=True)
+            model = AutoModelForCausalLM.from_pretrained(
+                model_name_or_path, torch_dtype=torch.float32, trust_remote_code=True
+            )
         else:
-            model = AutoModelForCausalLM.from_pretrained(model_name_or_path, torch_dtype=torch.float16, trust_remote_code=True).to(device)
+            model = AutoModelForCausalLM.from_pretrained(
+                model_name_or_path, torch_dtype=torch.float16, trust_remote_code=True
+            ).to(device)
     return {'model': model.to(device), 'processor': processor}
 
 
@@ -61,7 +69,9 @@ def get_yolo_model(model_path):
 
 
 @torch.inference_mode()
-def get_parsed_content_icon(filtered_boxes, starting_idx, image_source, caption_model_processor, prompt=None, batch_size=128):
+def get_parsed_content_icon(
+    filtered_boxes, starting_idx, image_source, caption_model_processor, prompt=None, batch_size=128
+):
     # Number of samples per batch, --> 128 roughly takes 4 GB of GPU memory for florence v2 model
     to_pil = ToPILImage()
     if starting_idx:
@@ -71,8 +81,14 @@ def get_parsed_content_icon(filtered_boxes, starting_idx, image_source, caption_
     croped_pil_image = []
     for i, coord in enumerate(non_ocr_boxes):
         try:
-            xmin, xmax = int(coord[0] * image_source.shape[1]), int(coord[2] * image_source.shape[1])
-            ymin, ymax = int(coord[1] * image_source.shape[0]), int(coord[3] * image_source.shape[0])
+            xmin, xmax = (
+                int(coord[0] * image_source.shape[1]),
+                int(coord[2] * image_source.shape[1]),
+            )
+            ymin, ymax = (
+                int(coord[1] * image_source.shape[0]),
+                int(coord[3] * image_source.shape[0]),
+            )
             cropped_image = image_source[ymin:ymax, xmin:xmax, :]
             cropped_image = cv2.resize(cropped_image, (64, 64))
             croped_pil_image.append(to_pil(cropped_image))
@@ -100,11 +116,20 @@ def get_parsed_content_icon(filtered_boxes, starting_idx, image_source, caption_
             inputs = processor(images=batch, text=[prompt] * len(batch), return_tensors='pt').to(device=device)
         if 'florence' in model.config.name_or_path:
             generated_ids = model.generate(
-                input_ids=inputs['input_ids'], pixel_values=inputs['pixel_values'], max_new_tokens=20, num_beams=1, do_sample=False
+                input_ids=inputs['input_ids'],
+                pixel_values=inputs['pixel_values'],
+                max_new_tokens=20,
+                num_beams=1,
+                do_sample=False,
             )
         else:
             generated_ids = model.generate(
-                **inputs, max_length=100, num_beams=5, no_repeat_ngram_size=2, early_stopping=True, num_return_sequences=1
+                **inputs,
+                max_length=100,
+                num_beams=5,
+                no_repeat_ngram_size=2,
+                early_stopping=True,
+                num_return_sequences=1,
             )  # temperature=0.01, do_sample=True,
         generated_text = processor.batch_decode(generated_ids, skip_special_tokens=True)
         generated_text = [gen.strip() for gen in generated_text]
@@ -148,10 +173,18 @@ def get_parsed_content_icon_phi3v(filtered_boxes, ocr_bbox, image_source, captio
         max_len = max([x.shape[1] for x in inputs['input_ids']])
         for i, v in enumerate(inputs['input_ids']):
             inputs['input_ids'][i] = torch.cat(
-                [processor.tokenizer.pad_token_id * torch.ones(1, max_len - v.shape[1], dtype=torch.long), v], dim=1
+                [
+                    processor.tokenizer.pad_token_id * torch.ones(1, max_len - v.shape[1], dtype=torch.long),
+                    v,
+                ],
+                dim=1,
             )
             inputs['attention_mask'][i] = torch.cat(
-                [torch.zeros(1, max_len - v.shape[1], dtype=torch.long), inputs['attention_mask'][i]], dim=1
+                [
+                    torch.zeros(1, max_len - v.shape[1], dtype=torch.long),
+                    inputs['attention_mask'][i],
+                ],
+                dim=1,
             )
         inputs_cat = {k: torch.concatenate(v).to(device) for k, v in inputs.items()}
 
@@ -216,7 +249,9 @@ def remove_overlap(boxes, iou_threshold, ocr_bbox=None):
             # add the following 2 lines to include ocr bbox
             if ocr_bbox:
                 # only add the box if it does not overlap with any ocr bbox
-                if not any(IoU(box1, box3) > iou_threshold and not is_inside(box1, box3) for k, box3 in enumerate(ocr_bbox)):
+                if not any(
+                    IoU(box1, box3) > iou_threshold and not is_inside(box1, box3) for k, box3 in enumerate(ocr_bbox)
+                ):
                     filtered_boxes.append(box1)
             else:
                 filtered_boxes.append(box1)
@@ -368,10 +403,15 @@ def annotate(
     labels = [f'{phrase}' for phrase in range(boxes.shape[0])]
 
     box_annotator = BoxAnnotator(
-        text_scale=text_scale, text_padding=text_padding, text_thickness=text_thickness, thickness=thickness
+        text_scale=text_scale,
+        text_padding=text_padding,
+        text_thickness=text_thickness,
+        thickness=thickness,
     )  # 0.8 for mobile/web, 0.3 for desktop # 0.4 for mind2web
     annotated_frame = image_source.copy()
-    annotated_frame = box_annotator.annotate(scene=annotated_frame, detections=detections, labels=labels, image_size=(w, h))
+    annotated_frame = box_annotator.annotate(
+        scene=annotated_frame, detections=detections, labels=labels, image_size=(w, h)
+    )
 
     label_coordinates = {f'{phrase}': v for phrase, v in zip(phrases, xywh)}
     return annotated_frame, label_coordinates
@@ -459,7 +499,12 @@ def get_som_labeled_img(
         imgsz = (h, w)
     # print('image size:', w, h)
     xyxy, logits, phrases = predict_yolo(
-        model=model, image=image_source, box_threshold=BOX_TRESHOLD, imgsz=imgsz, scale_img=scale_img, iou_threshold=0.1
+        model=model,
+        image=image_source,
+        box_threshold=BOX_TRESHOLD,
+        imgsz=imgsz,
+        scale_img=scale_img,
+        iou_threshold=0.1,
     )
     xyxy = xyxy / torch.Tensor([w, h, w, h]).to(xyxy.device)
     image_source = np.asarray(image_source)
@@ -474,12 +519,20 @@ def get_som_labeled_img(
         ocr_bbox = None
 
     ocr_bbox_elem = [
-        {'type': 'text', 'bbox': box, 'interactivity': False, 'content': txt, 'source': 'box_ocr_content_ocr'}
+        {
+            'type': 'text',
+            'bbox': box,
+            'interactivity': False,
+            'content': txt,
+            'source': 'box_ocr_content_ocr',
+        }
         for box, txt in zip(ocr_bbox, ocr_text)
         if int_box_area(box, w, h) > 0
     ]
     xyxy_elem = [
-        {'type': 'icon', 'bbox': box, 'interactivity': True, 'content': None} for box in xyxy.tolist() if int_box_area(box, w, h) > 0
+        {'type': 'icon', 'bbox': box, 'interactivity': True, 'content': None}
+        for box in xyxy.tolist()
+        if int_box_area(box, w, h) > 0
     ]
     filtered_boxes = remove_overlap_new(boxes=xyxy_elem, iou_threshold=iou_threshold, ocr_bbox=ocr_bbox_elem)
 
@@ -495,10 +548,17 @@ def get_som_labeled_img(
     if use_local_semantics:
         caption_model = caption_model_processor['model']
         if 'phi3_v' in caption_model.config.model_type:
-            parsed_content_icon = get_parsed_content_icon_phi3v(filtered_boxes, ocr_bbox, image_source, caption_model_processor)
+            parsed_content_icon = get_parsed_content_icon_phi3v(
+                filtered_boxes, ocr_bbox, image_source, caption_model_processor
+            )
         else:
             parsed_content_icon = get_parsed_content_icon(
-                filtered_boxes, starting_idx, image_source, caption_model_processor, prompt=prompt, batch_size=batch_size
+                filtered_boxes,
+                starting_idx,
+                image_source,
+                caption_model_processor,
+                prompt=prompt,
+                batch_size=batch_size,
             )
         ocr_text = [f'Text Box ID {i}: {txt}' for i, txt in enumerate(ocr_text)]
         icon_start = len(ocr_text)
@@ -522,7 +582,11 @@ def get_som_labeled_img(
     # draw boxes
     if draw_bbox_config:
         annotated_frame, label_coordinates = annotate(
-            image_source=image_source, boxes=filtered_boxes, logits=logits, phrases=phrases, **draw_bbox_config
+            image_source=image_source,
+            boxes=filtered_boxes,
+            logits=logits,
+            phrases=phrases,
+            **draw_bbox_config,
         )
     else:
         annotated_frame, label_coordinates = annotate(

@@ -17,6 +17,7 @@ def main():
     """CLI for Echo Operator."""
     pass
 
+
 main.add_command(hello)
 main.add_command(model_group)
 main.add_command(omniparser_group)

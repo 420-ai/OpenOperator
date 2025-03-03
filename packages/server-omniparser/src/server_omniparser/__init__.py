@@ -1,2 +1,2 @@
 def hello() -> str:
-    return "Hello from server-omniparser!"
+    return 'Hello from server-omniparser!'

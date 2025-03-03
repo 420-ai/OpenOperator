@@ -44,7 +44,11 @@ async def parse(parse_request: ParseRequest):
     dino_labled_img, parsed_content_list = omniparser.parse(parse_request.base64_image)
     latency = time.time() - start
     print('time:', latency)
-    return {'som_image_base64': dino_labled_img, 'parsed_content_list': parsed_content_list, 'latency': latency}
+    return {
+        'som_image_base64': dino_labled_img,
+        'parsed_content_list': parsed_content_list,
+        'latency': latency,
+    }
 
 
 @app.get('/probe')

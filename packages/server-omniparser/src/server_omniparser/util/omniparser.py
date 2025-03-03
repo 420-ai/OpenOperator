@@ -14,7 +14,9 @@ class Omniparser(object):
 
         self.som_model = get_yolo_model(model_path=config['som_model_path'])
         self.caption_model_processor = get_caption_model_processor(
-            model_name=config['caption_model_name'], model_name_or_path=config['caption_model_path'], device=device
+            model_name=config['caption_model_name'],
+            model_name_or_path=config['caption_model_path'],
+            device=device,
         )
 
     def parse(self, image_base64: str):
@@ -31,7 +33,11 @@ class Omniparser(object):
         }
 
         (text, ocr_bbox), _ = check_ocr_box(
-            image, display_img=False, output_bb_format='xyxy', easyocr_args={'text_threshold': 0.8}, use_paddleocr=False
+            image,
+            display_img=False,
+            output_bb_format='xyxy',
+            easyocr_args={'text_threshold': 0.8},
+            use_paddleocr=False,
         )
         dino_labled_img, label_coordinates, parsed_content_list = get_som_labeled_img(
             image,
