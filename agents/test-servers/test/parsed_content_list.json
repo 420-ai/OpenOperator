@@ -1,0 +1,266 @@
+[
+    {
+        "type": "text",
+        "bbox": [
+            0.8587458729743958,
+            0.8829113841056824,
+            0.9009901285171509,
+            0.899789035320282
+        ],
+        "interactivity": false,
+        "content": "Windows",
+        "source": "box_ocr_content_ocr"
+    },
+    {
+        "type": "text",
+        "bbox": [
+            0.9108911156654358,
+            0.8818565607070923,
+            1.0,
+            0.902953565120697
+        ],
+        "interactivity": false,
+        "content": "Enterprise Evaluation",
+        "source": "box_ocr_content_ocr"
+    },
+    {
+        "type": "text",
+        "bbox": [
+            0.8574257493019104,
+            0.899789035320282,
+            1.0,
+            0.9208860993385315
+        ],
+        "interactivity": false,
+        "content": "Windows Licensevalid for 84 days",
+        "source": "box_ocr_content_ocr"
+    },
+    {
+        "type": "text",
+        "bbox": [
+            0.8534653186798096,
+            0.9208860993385315,
+            1.0,
+            0.9419831037521362
+        ],
+        "interactivity": false,
+        "content": "Butla 2610Dage_release 240331-1435",
+        "source": "box_ocr_content_ocr"
+    },
+    {
+        "type": "text",
+        "bbox": [
+            0.03762376308441162,
+            0.9567510485649109,
+            0.06006600707769394,
+            0.9715189933776855
+        ],
+        "interactivity": false,
+        "content": "44'F",
+        "source": "box_ocr_content_ocr"
+    },
+    {
+        "type": "text",
+        "bbox": [
+            0.03696369752287865,
+            0.9757384061813354,
+            0.06666667014360428,
+            0.99472576379776
+        ],
+        "interactivity": false,
+        "content": "Sunny",
+        "source": "box_ocr_content_ocr"
+    },
+    {
+        "type": "icon",
+        "bbox": [
+            0.3626621663570404,
+            0.9511870741844177,
+            0.5372302532196045,
+            0.99795001745224
+        ],
+        "interactivity": true,
+        "content": "Search ",
+        "source": "box_yolo_content_ocr"
+    },
+    {
+        "type": "icon",
+        "bbox": [
+            0.0,
+            0.2649693787097931,
+            0.059659045189619064,
+            0.37666961550712585
+        ],
+        "interactivity": true,
+        "content": "VLC media player ",
+        "source": "box_yolo_content_ocr"
+    },
+    {
+        "type": "icon",
+        "bbox": [
+            0.00037974712904542685,
+            0.007292942143976688,
+            0.058004267513751984,
+            0.10597600787878036
+        ],
+        "interactivity": true,
+        "content": "Recycle Bin ",
+        "source": "box_yolo_content_ocr"
+    },
+    {
+        "type": "icon",
+        "bbox": [
+            0.00034690499887801707,
+            0.13077209889888763,
+            0.055271975696086884,
+            0.25253430008888245
+        ],
+        "interactivity": true,
+        "content": "Google chrome ",
+        "source": "box_yolo_content_ocr"
+    },
+    {
+        "type": "icon",
+        "bbox": [
+            0.9025089144706726,
+            0.9504884481430054,
+            0.9211863875389099,
+            0.9964156150817871
+        ],
+        "interactivity": true,
+        "content": "co ",
+        "source": "box_yolo_content_ocr"
+    },
+    {
+        "type": "icon",
+        "bbox": [
+            0.9239752292633057,
+            0.9476608037948608,
+            0.9939841628074646,
+            0.9971363544464111
+        ],
+        "interactivity": true,
+        "content": "12*03 PM 3/2/2025 ",
+        "source": "box_yolo_content_ocr"
+    },
+    {
+        "type": "icon",
+        "bbox": [
+            0.609200119972229,
+            0.9515141248703003,
+            0.6389347910881042,
+            0.9926740527153015
+        ],
+        "interactivity": true,
+        "content": "Microsoft Edge browser.",
+        "source": "box_yolo_content_yolo"
+    },
+    {
+        "type": "icon",
+        "bbox": [
+            0.5418857336044312,
+            0.9517319798469543,
+            0.5689412951469421,
+            0.9919409155845642
+        ],
+        "interactivity": true,
+        "content": "Microsoft Edge browser.",
+        "source": "box_yolo_content_yolo"
+    },
+    {
+        "type": "icon",
+        "bbox": [
+            0.6427873969078064,
+            0.9508728384971619,
+            0.671513557434082,
+            0.9932146072387695
+        ],
+        "interactivity": true,
+        "content": "Microsoft Office",
+        "source": "box_yolo_content_yolo"
+    },
+    {
+        "type": "icon",
+        "bbox": [
+            0.5749632716178894,
+            0.9522061944007874,
+            0.6029326319694519,
+            0.9906096458435059
+        ],
+        "interactivity": true,
+        "content": "folder.",
+        "source": "box_yolo_content_yolo"
+    },
+    {
+        "type": "icon",
+        "bbox": [
+            0.3301238417625427,
+            0.9511701464653015,
+            0.35920289158821106,
+            0.9957588911056519
+        ],
+        "interactivity": true,
+        "content": "Windows",
+        "source": "box_yolo_content_yolo"
+    },
+    {
+        "type": "icon",
+        "bbox": [
+            0.8549622297286987,
+            0.9516236782073975,
+            0.8793910145759583,
+            0.9938662052154541
+        ],
+        "interactivity": true,
+        "content": "Clone",
+        "source": "box_yolo_content_yolo"
+    },
+    {
+        "type": "icon",
+        "bbox": [
+            0.8316299319267273,
+            0.9537692666053772,
+            0.8527389764785767,
+            0.9936105608940125
+        ],
+        "interactivity": true,
+        "content": "Go to the previous item or page.",
+        "source": "box_yolo_content_yolo"
+    },
+    {
+        "type": "icon",
+        "bbox": [
+            0.880043625831604,
+            0.9496493339538574,
+            0.9022020101547241,
+            0.9951554536819458
+        ],
+        "interactivity": true,
+        "content": "Displaying",
+        "source": "box_yolo_content_yolo"
+    },
+    {
+        "type": "icon",
+        "bbox": [
+            0.9566543102264404,
+            0.29239243268966675,
+            0.9911749362945557,
+            0.3496583104133606
+        ],
+        "interactivity": true,
+        "content": "Next",
+        "source": "box_yolo_content_yolo"
+    },
+    {
+        "type": "icon",
+        "bbox": [
+            0.007402881979942322,
+            0.9462494850158691,
+            0.03831702470779419,
+            0.9985857009887695
+        ],
+        "interactivity": true,
+        "content": "3, October, 2024",
+        "source": "box_yolo_content_yolo"
+    }
+]

@@ -15,6 +15,8 @@ services:
       - 3389:3389/udp
       - 5000:5000
       - 6000:6000
+      - 7200:7200
+      - 9222:9222
     volumes:
       - ./iso/win11.iso:/custom.iso
       - ./scripts:/oem

@@ -45,4 +45,8 @@ ENV RAM_SIZE="4G"
 ENV CPU_CORES="2"
 ENV DISK_SIZE="64G"
 
+# Enable QEMU's JSON-based QEMU Machine Protocol (QMP)
+# Finish ?? Do we need the QMP controller
+# ENV ARGUMENTS="-qmp tcp:0.0.0.0:7200,server,nowait"
+
 ENTRYPOINT ["/usr/bin/tini", "-s", "/run/entry.sh"]

@@ -1,5 +1,6 @@
 import json
 import logging
+from pprint import pprint
 import re
 from typing import Dict, List
 # from mm_agents.planner.computer import Computer, WindowManager
@@ -7,6 +8,7 @@ from mm_agents.navi.gpt.gpt4v_planner import GPT4V_Planner
 from mm_agents.navi.gpt import planner_messages
 import copy
 from io import BytesIO
+from mm_agents.navi.screenparsing_oss.element_extractor.utils import draw_colored_image
 
 logger = logging.getLogger("desktopenv.agent")
 
@@ -353,7 +355,13 @@ class NaviAgent:
                 # omni extractor
                 rendering = "N/A"
                 regions = self.omni_proposal.propose_ents(image, with_captions=True)
-                
+
+                # print("AGENT REGIONS")
+                # print(len(regions))
+
+                # for region in regions[:1]:
+                #     pprint(region)
+
                 rects = [[int(ent["shape"]["x"]), int(ent["shape"]["y"]), int((ent["shape"]["x"]+ent["shape"]["width"])), int((ent["shape"]["y"]+ent["shape"]["height"]))] for ent in regions]
                 color_mapping_debug = {"image": "red", "text": "blue", "icon": "green"}
                 color_mapping_prompt = {"image": "red", "icon": "green"}

@@ -5,7 +5,16 @@ storage
 __pycache__
 .venv
 
+.env
+tmp
+models
+cache
+
+**/configs/results
+**/evaluation_examples_windows/results
+
 **/logs/*.txt
+**/logs/*.log
 
 **/test-servers/recordings/
 **/test-servers/screenshots/
