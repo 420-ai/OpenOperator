@@ -39,10 +39,15 @@ def run_single_example(agent, env, example, max_steps, instruction, args, exampl
             continue
 
         logger.info("Agent: Thinking...")
-        response, actions, logs, computer_update_args = agent.predict(
-            instruction,
-            obs
-        )
+        try:
+            response, actions, logs, computer_update_args = agent.predict(
+                instruction,
+                obs
+            )
+        except Exception as e:
+            logger.error("Error in agent predict: %s", e)
+            logger.error(traceback.format_exc())
+            break
 
         # update the computer object, used by navi's action space
         if computer_update_args:

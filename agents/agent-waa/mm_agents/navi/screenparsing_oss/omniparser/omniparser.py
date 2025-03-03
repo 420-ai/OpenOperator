@@ -1,3 +1,4 @@
+from pprint import pprint
 from mm_agents.navi.screenparsing_oss.omniparser.utils import get_som_labeled_img, check_ocr_box, get_caption_model_processor, get_yolo_model, get_parsed_content_icon, get_parsed_content_icon_phi3v
 import torch
 from ultralytics import YOLO
@@ -8,11 +9,12 @@ import base64
 import tempfile
 from pathlib import Path
 import numpy as np
+import os
 
 defaultconfig = {
-    'som_model_path': '/models/omni/icon_detect/model.pt',
+    'som_model_path': f'{os.getcwd()}/models/omni/icon_detect/model.pt',
     'device': 'cuda' if torch.cuda.is_available() else 'cpu',
-    'caption_model_path': '/models/omni/icon_caption_florence',
+    'caption_model_path': f'{os.getcwd()}/models/omni/icon_caption_florence',
     'draw_bbox_config': {
         'text_scale': 0.8,
         'text_thickness': 2,
@@ -28,6 +30,12 @@ defaultconfig = {
 class Omniparser(object):
     def __init__(self, config: Dict = {}):
         self.config = {**defaultconfig, **config}
+
+        print(os.getcwd())
+        print(self.config['som_model_path'])
+        print(os.path.exists(self.config['som_model_path']))
+        print(Path(self.config['som_model_path']).exists())
+        print(Path(self.config['som_model_path']))
         
         if not (som_path := Path(self.config['som_model_path'])).exists():
             som_path_st = som_path.with_suffix('.safetensors')
@@ -71,6 +79,11 @@ class Omniparser(object):
             ocr_text=text,
             use_local_semantics=False
         )
+
+        print("LABELED COORDINATES:")
+        pprint(label_coordinates)
+        print("PARSED CONTENT LIST:")
+        pprint(parsed_content_list)
         
         image = Image.open(io.BytesIO(base64.b64decode(dino_labled_img)))
         # formating output
@@ -90,6 +103,9 @@ class Omniparser(object):
                         'type': 'icon'
                     } for i, (k, coord) in enumerate(label_coordinates.items()) if i >= len(parsed_content_list)
                 ]
+        
+        print("RETURN LIST:")
+        pprint(return_list)
 
         return [image, return_list]
     
@@ -121,6 +137,9 @@ class Omniparser(object):
             filtered_ents[i]['text'] = txt
             filtered_ents[i]['text_from'] = 'omni'
             
+        print("OMNIPARSER - CAPTION_ENTS")
+        print(parsed_content_icon)
+
         return parsed_content_icon
         
     def propose_ents(self, image: Image, with_captions: bool = True) -> List[Dict]:  
@@ -130,9 +149,17 @@ class Omniparser(object):
   
         # Parse image to get entities  
         _, ents = self.parse(tmp.name)
+
+        print("OMNIPARSER - AFTER PARSE")
+        print(ents)
+
         if with_captions:
             self.caption_ents(image, ents)
-        return [
+
+        print("OMNIPARSER - AFTER CAPTIONS")
+        print(ents)
+
+        result = [
             {
                 **ent,
                 "shape": {
@@ -144,6 +171,11 @@ class Omniparser(object):
             }
             for ent in ents
         ]
+
+        print("OMNIPARSER - PROPOSE_ENTS")
+        print(result)
+
+        return result
 
 
 if __name__ == '__main__':

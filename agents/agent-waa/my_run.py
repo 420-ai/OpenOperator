@@ -5,6 +5,14 @@ import os
 import json
 import traceback
 import logging
+from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
+
+print("Environment variables")
+print(os.getenv("AZURE_API_KEY"))
+print(os.getenv("AZURE_ENDPOINT"))
 
 log_file = os.path.join("my_run.log")
 logging.basicConfig(
@@ -16,6 +24,7 @@ logging.basicConfig(
 # -------------------------------------------------------
 # -------------------------------------------------------
 
+server="azure" # "oai", "azure"
 model="gpt-4o"
 som_origin="omni" # "a11y", "omni", "mixed-omni", "oss", "mixed-oss"
 som_config=""
@@ -49,12 +58,21 @@ test_config_base_dir = "evaluation_examples_windows"
 domain = "notepad"
 example_id = "366de66e-cbae-4d72-b042-26390db2b145-WOS"
 
+
+# Arguments
+class Args:
+    pass
+
+args = Args()
+args.sleep_after_execution = 3
+
+
 # -------------------------------------------------------
 # -------------------------------------------------------
 # -------------------------------------------------------
 
 agent = NaviAgent(
-            server="oai",
+            server=server,
             model=model,
             som_config=som_config,
             som_origin=som_origin,
@@ -79,7 +97,6 @@ max_steps = 15
 scores = []
 example_result_dir = os.path.join(test_config_base_dir, f"results/{domain}/{example_id}")
 os.makedirs(example_result_dir, exist_ok=True)
-args = None # FINISH
 
 # Run example
 
