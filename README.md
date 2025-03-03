@@ -4,6 +4,7 @@
 
 - `packages/cli`: Command-line interface that uses the core library
 - `packages/agent-waa`: a vision based agent that can leverage OmniParser and a set of tools to automate as an automation-client
+- `packages/agent-oo`: a simplified vision based agent that can leverage OmniParser and a set of tools to automate as an automation-client
 - `packages/automaton`: a server 
 
 ## Setup
