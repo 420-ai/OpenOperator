@@ -1,4 +1,3 @@
-from pprint import pprint
 from mm_agents.navi.screenparsing_oss.omniparser.utils import get_som_labeled_img, check_ocr_box, get_caption_model_processor, get_yolo_model, get_parsed_content_icon, get_parsed_content_icon_phi3v
 import torch
 from ultralytics import YOLO
@@ -79,11 +78,6 @@ class Omniparser(object):
             ocr_text=text,
             use_local_semantics=False
         )
-
-        print("LABELED COORDINATES:")
-        pprint(label_coordinates)
-        print("PARSED CONTENT LIST:")
-        pprint(parsed_content_list)
         
         image = Image.open(io.BytesIO(base64.b64decode(dino_labled_img)))
         # formating output
@@ -103,9 +97,6 @@ class Omniparser(object):
                         'type': 'icon'
                     } for i, (k, coord) in enumerate(label_coordinates.items()) if i >= len(parsed_content_list)
                 ]
-        
-        print("RETURN LIST:")
-        pprint(return_list)
 
         return [image, return_list]
     
@@ -137,8 +128,8 @@ class Omniparser(object):
             filtered_ents[i]['text'] = txt
             filtered_ents[i]['text_from'] = 'omni'
             
-        print("OMNIPARSER - CAPTION_ENTS")
-        print(parsed_content_icon)
+        # print("OMNIPARSER - CAPTION_ENTS")
+        # print(parsed_content_icon)
 
         return parsed_content_icon
         
@@ -149,15 +140,10 @@ class Omniparser(object):
   
         # Parse image to get entities  
         _, ents = self.parse(tmp.name)
-
-        print("OMNIPARSER - AFTER PARSE")
-        print(ents)
-
         if with_captions:
             self.caption_ents(image, ents)
 
-        print("OMNIPARSER - AFTER CAPTIONS")
-        print(ents)
+
 
         result = [
             {
@@ -172,8 +158,8 @@ class Omniparser(object):
             for ent in ents
         ]
 
-        print("OMNIPARSER - PROPOSE_ENTS")
-        print(result)
+        # print("OMNIPARSER - PROPOSE_ENTS")
+        # print(result)
 
         return result
 
