@@ -1,5 +1,5 @@
 [project]
-name = "agent-waa-3"
+name = "agent-oo"
 version = "0.0.1"
 description = "Agent based on WAA"
 authors = [{name = "Lukas Kellerstein", email = "lkellerstein@gmail.com"}]
