@@ -45,7 +45,8 @@ screen_width = 1920
 screen_height = 1200
 headless = False
 observation_type = "screenshot_a11y_tree" # "a11y_tree", "screenshot_a11y_tree", "som"
-emulator_ip = "127.0.0.1" # Port :5000 => Server2 on computer ["windows VM in docker"]
+emulator_ip = "127.0.0.1" # Server2 on computer ["windows VM in docker" or "windows VM"]
+emulator_port = 5050 # Server2 on computer ["windows VM in docker" or "windows VM"]
 a11y_backend = "uia" # "uia" or "win32"
 
 test_config_base_dir = "configs"
@@ -78,8 +79,9 @@ env = DesktopEnv(
         screen_size=(screen_width, screen_height),
         headless=headless,
         require_a11y_tree=observation_type,
+        a11y_backend=a11y_backend,
         emulator_ip=emulator_ip, #for OS running on docker
-        a11y_backend=a11y_backend
+        emulator_port=emulator_port, #for OS running on docker
     )
 
 config_file = os.path.join(test_config_base_dir, f"examples/{domain}/{example_id}.json")

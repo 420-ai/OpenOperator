@@ -1,4 +1,5 @@
 version = 1
+revision = 1
 requires-python = ">=3.12"
 resolution-markers = [
     "python_full_version >= '3.13' and sys_platform == 'darwin'",
@@ -16,7 +17,7 @@ resolution-markers = [
 [manifest]
 members = [
     "agent-oo",
-    "agent-waa-3",
+    "agent-waa",
     "echo-agent-orchestrator",
     "echo-operator",
     "echo-operator-cli",
@@ -204,7 +205,7 @@ requires-dist = [
 [[package]]
 name = "agent-waa-3"
 version = "0.0.1"
-source = { virtual = "agents/agent-waa" }
+source = { virtual = "agents/agent-oo" }
 dependencies = [
     { name = "accelerate" },
     { name = "addict" },
@@ -309,11 +310,11 @@ requires-dist = [
     { name = "numpy", specifier = ">=1.24.5" },
     { name = "odfpy", specifier = ">=1.4.1" },
     { name = "openai", specifier = ">=1.64.0" },
-    { name = "opencv-python", specifier = "~=4.8.1.78" },
+    { name = "opencv-python", specifier = ">=4.11.0.86" },
     { name = "openpyxl", specifier = ">=3.1.5" },
     { name = "pandas", specifier = "~=2.2.3" },
     { name = "pdfplumber", specifier = ">=0.11.5" },
-    { name = "pillow", specifier = ">=11.0.0" },
+    { name = "pillow", specifier = ">=11.1.0" },
     { name = "playwright", specifier = ">=1.50.0" },
     { name = "psutil", specifier = "~=5.9.6" },
     { name = "py7zr", specifier = ">=0.22.0" },

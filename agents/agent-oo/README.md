@@ -17,7 +17,7 @@ AZURE_ENDPOINT=https://<AZURE_OPENAI_NAME>.openai.azure.com/openai/deployments/<
 
 ## Run
 
-`uv run my_run.py`
+`uv run main.py`
 
 # Development Notes
 
