@@ -13,11 +13,10 @@ from autogen_ext.models.openai import AzureOpenAIChatCompletionClient
 # logger.setLevel(logging.DEBUG)
 
 def create_chat_client():
-    
-    print(f'{os.getenv("AZURE_OPENAI_ENDPOINT")}')
-    
-    # Define a model client. You can use other model client that implements
-    # the `ChatCompletionClient` interface.
+    """ 
+    Define a model client. You can use other model client that implements
+    the `ChatCompletionClient` interface.
+    """
     model_client = AzureOpenAIChatCompletionClient(
         model='gpt-4o',
         api_key=os.getenv('AZURE_OPENAI_API_KEY'),

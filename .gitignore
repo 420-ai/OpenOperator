@@ -24,3 +24,5 @@ dist
 
 models/ui/imgs
 models/vision
+
+**/node_modules

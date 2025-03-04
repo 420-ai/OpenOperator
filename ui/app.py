@@ -31,6 +31,7 @@ async def handle_message(message, history):
         if len(response_content) > 0:
             yield response_content
 
+gr.set_static_paths(paths=["static"])
 
 with gr.Blocks(theme=gr.themes.Ocean()) as demo:
     gr.Markdown("# Echo Operator")
@@ -44,6 +45,12 @@ with gr.Blocks(theme=gr.themes.Ocean()) as demo:
             )
         with gr.Column(scale=7):
             gr.Markdown("## Agent Screen")
+            gr.HTML(
+                """
+                <div id="vnc-frame" width="100%" height="100%"></div>
+                """,
+                label="Agent Screen",
+            )
 
 if __name__ == "__main__":
     demo.launch()
