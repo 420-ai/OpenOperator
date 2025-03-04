@@ -1,0 +1,7 @@
+PyQt5
+requests
+pywinauto
+pyautogui
+pywin32
+opencv-python
+asyncio

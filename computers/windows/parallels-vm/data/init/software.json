@@ -1,0 +1,24 @@
+{
+  "VLC": {
+    "mirrors": [
+      "https://ftp.free.org/mirrors/videolan/vlc/3.0.21/win64/vlc-3.0.21-win64.exe",
+      "https://mirror.fcix.net/videolan-ftp/vlc/3.0.21/win64/vlc-3.0.21-win64.exe",
+      "https://mirror.raiolanetworks.com/videolan/vlc/3.0.21/win64/vlc-3.0.21-win64.exe"
+    ],
+    "alias": "vlc"
+  },
+  "7zip": {
+    "mirrors": ["https://www.7-zip.org/a/7z2407-x64.exe"]
+  },
+  "Microsoft Teams": {
+    "mirrors": [
+      "https://statics.teams.microsoft.com/production-windows-x64/1.6.00.4472/Teams_windows_x64.msi"
+    ],
+    "alias": "teams"
+  },
+  "ffmpeg": {
+    "mirrors": [
+      "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.7z"
+    ]
+  }
+}

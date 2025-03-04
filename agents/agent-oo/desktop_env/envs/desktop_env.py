@@ -55,6 +55,7 @@ class DesktopEnv(gym.Env):
             require_a11y_tree: bool = True,
             require_terminal: bool = False,
             emulator_ip: str = None,
+            emulator_port: int = 5000
     ):
         """
         Args:
@@ -83,14 +84,16 @@ class DesktopEnv(gym.Env):
             self.remote_vm = False
             self._start_emulator()
             self.vm_ip = self._get_vm_ip()
+            self.vm_port = emulator_port
         else:
             self.remote_vm = True
             logger.info("Using external emulator...")
             self.vm_ip = emulator_ip
+            self.vm_port = emulator_port
             # self._wait_emulator()
 
-        self.controller = PythonController(vm_ip=self.vm_ip)
-        self.setup_controller = SetupController(vm_ip=self.vm_ip, cache_dir=self.cache_dir_base)
+        self.controller = PythonController(vm_ip=self.vm_ip, vm_port=self.vm_port)
+        self.setup_controller = SetupController(vm_ip=self.vm_ip, vm_port=self.vm_port, cache_dir=self.cache_dir_base)
         # self.vm_controller = VMController(cache_dir=self.cache_dir_base)
 
         # logger.info("(QEMU) get_status: %s", json.dumps(self.vm_controller.get_status(), indent=2))
