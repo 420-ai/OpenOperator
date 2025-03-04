@@ -82,7 +82,7 @@ if __name__ == "__main__":
     import os
 
     process = subprocess.Popen(
-        ["uv", "run", "novnc_proxy.py", "--target-host=172.25.85.217", "--target-port=5900"],
+        ["uv", "run", "novnc_proxy.py", f"--target-host={os.getenv("VNC_TARGET_HOST")}", "--target-port=5900"],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         stdin=subprocess.PIPE,
