@@ -8,7 +8,6 @@ __pycache__
 
 .env
 tmp
-models
 cache
 dist
 
@@ -24,3 +23,4 @@ dist
 **/server2/screenshots/
 
 models/ui/imgs
+models/vision

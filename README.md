@@ -2,31 +2,27 @@
 
 ## Structure
 
-- `packages/cli`: Command-line interface that uses the core library
-- `packages/agent-waa`: a vision based agent that can leverage OmniParser and a set of tools to automate as an automation-client
-- `packages/agent-oo`: a simplified vision based agent that can leverage OmniParser and a set of tools to automate as an automation-client
-- `packages/automaton`: a server 
+- `models/*`: all packages related to downloading models and simple servers that provide access to local versions of a model
+- `agents/*`: agents that are used in the repo
+- `ui`: a Web-based UI to help facilitate the usage of these agents 
+- `computer`: VMs and automation server
 
 ## Setup
 
 ### Prerequisites
 
-- Python 3.9 or higher
+- Python 3.12 or higher
 
 ### Installation
 
 #### On Windows:
+
 ```
 setup.bat
 ```
 
 #### On macOS/Linux:
-```
-chmod +x setup.py
-./setup.py
-```
 
-Or simply run:
 ```
 python setup.py
 ```
@@ -34,8 +30,7 @@ python setup.py
 The setup script will:
 1. Install `uv` if it's not already installed
 2. Create a virtual environment
-3. Use `uv sync` to install all workspace packages
-4. Run a test command to verify the installation
+3. Use `uv sync` to install all packages dependencies
 
 ## Development
 
@@ -46,33 +41,23 @@ After activating the virtual environment:
 
 You can update all dependencies using:
 
-```
-uv sync && uv pip install -r scripts/requirements-dev.txt
-```
+# Getting Started
 
-## Using the CLI
 
-After installation and activating the environment, you can use the CLI:
+## OmniParser
 
-```
-ec hello
-```
-
-## Commands
-
-### Model Commands
-
-Download the models
-```
-ec model download
-```
-
-### OmniParser
-
-Start the OmniParser server
+### Model Download
 
 ```
-ec omniparser start
+$ cd models/downloader
+$ uv run download.py omniparser
+```
+
+### Start the OmniParser server
+
+```
+$ cd models/server-omniparser
+$ uv run server.py
 ```
 
 ## Adding New Packages

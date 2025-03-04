@@ -1,0 +1,14 @@
+[project]
+name = "echo-operator-ui"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [{ name = "Ken Chau", email = "kchau@microsoft.com" }]
+requires-python = ">=3.12"
+dependencies = [
+    "gradio>=5.13.2",
+    "autogen-agentchat>=0.4.7",
+    "autogen-ext[openai,azure]>=0.4.7",
+    "python-dotenv>=1.0.1",
+    "azure-identity>=1.20.0",
+]
