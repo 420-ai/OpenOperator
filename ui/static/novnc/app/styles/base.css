@@ -47,6 +47,8 @@ body {
 
 html {
     height:100%;
+    margin:0;
+    padding:0;
 }
 
 .noVNC_only_touch.noVNC_hidden {
