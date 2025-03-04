@@ -11,4 +11,5 @@ dependencies = [
     "autogen-ext[openai,azure]>=0.4.7",
     "python-dotenv>=1.0.1",
     "azure-identity>=1.20.0",
+    "websockify>=0.12.0",
 ]
