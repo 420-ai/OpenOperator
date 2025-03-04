@@ -12,7 +12,8 @@ import time
 # pythoncom.CoInitializeEx(pythoncom.COINIT_APARTMENTTHREADED)
 
 # Setup logging
-log_file = os.path.join(".", "logs", "install_software.log")
+# log_file = os.path.join(".", "logs", "install_software.log")
+log_file = r"C:\INSTALL\logs\install_software.log"
 logging.basicConfig(filename=log_file, level=logging.INFO, 
                     format="%(asctime)s - %(levelname)s - %(message)s")
 
@@ -141,8 +142,10 @@ def download_and_install(name, mirrors, tools_config):
                 logging.error(f'Installation failed for {name}: {e}')
     
     # Time sleep for waiting until the installation process is released
-    time.sleep(1)
+    time.sleep(3)
+    print(f"Removing {installer_path}")
     os.remove(installer_path)
+    print(f"Removed {installer_path}")
 
 def start_installation():
     json_path = os.path.join(os.path.dirname(__file__), 'software.json')

@@ -35,7 +35,7 @@ import getpass
 
 # Setup logging
 # log_file = os.path.join(".", "logs", "server_2.log")
-log_file = r"C:\Users\lukaskellerstein\Projects\Github\420-ai\OpenOperator\computers\windows_vm\logs\server_2.log"
+log_file = r"C:\INSTALL\logs\server_2.log"
 logging.basicConfig(
     filename=log_file,
     level=logging.INFO,

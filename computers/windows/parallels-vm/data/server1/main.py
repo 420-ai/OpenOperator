@@ -6,7 +6,7 @@ import setproctitle
 
 # Setup logging
 # log_file = os.path.join(".", "logs", "server_1.log")
-log_file = r"C:\Users\lukaskellerstein\Projects\Github\420-ai\OpenOperator\computers\windows_vm\logs\server_1.log"
+log_file = r"C:\INSTALL\logs\server_1.log"
 
 logging.basicConfig(
     filename=log_file,
