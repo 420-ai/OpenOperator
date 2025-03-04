@@ -10,6 +10,7 @@ dependencies = [
     "echo-server-omniparser",
     "echo-operator-ui",
     "uvicorn>=0.34.0",
+    "python-dotenv>=1.0.1",
 ]
 
 [tool.uv.sources]
@@ -17,7 +18,6 @@ echo-server-omniparser = { workspace = true }
 echo-operator-ui = { workspace = true }
 
 [project.scripts]
-cli = "cli.main:main"
 ec = "cli.main:main"
 
 [tool.hatch.build.targets.wheel]

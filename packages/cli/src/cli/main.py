@@ -3,6 +3,10 @@ import click
 from cli.commands.model import model_group
 from cli.commands.omniparser import omniparser_group
 from cli.commands.ui import ui_start
+from dotenv import load_dotenv
+
+# loading variables from .env file
+load_dotenv()
 
 
 @click.command()

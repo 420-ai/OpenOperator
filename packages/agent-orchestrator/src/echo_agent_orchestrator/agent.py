@@ -1,13 +1,12 @@
 from autogen_agentchat.agents import AssistantAgent
-from autogen_agentchat.ui import Console
 from autogen_ext.models.openai import OpenAIChatCompletionClient
-import asyncio
+import os
 
 # Define a model client. You can use other model client that implements
 # the `ChatCompletionClient` interface.
 model_client = OpenAIChatCompletionClient(
     model='gpt-4o',
-    # api_key="YOUR_API_KEY",
+    api_key=os.getenv('OPENAI_API_KEY'),
 )
 
 
@@ -28,12 +27,3 @@ agent = AssistantAgent(
     reflect_on_tool_use=True,
     model_client_stream=True,  # Enable streaming tokens from the model client.
 )
-
-
-# Run the agent and stream the messages to the console.
-async def main() -> None:
-    await Console(agent.run_stream(task='What is the weather in New York?'))
-
-
-# NOTE: if running this inside a Python script you'll need to use asyncio.run(main()).
-asyncio.run(main())

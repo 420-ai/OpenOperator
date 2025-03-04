@@ -1175,6 +1175,7 @@ dependencies = [
     { name = "echo-operator-ui" },
     { name = "echo-server-omniparser" },
     { name = "huggingface-hub" },
+    { name = "python-dotenv" },
     { name = "uvicorn" },
 ]
 
@@ -1184,6 +1185,7 @@ requires-dist = [
     { name = "echo-operator-ui", editable = "packages/ui" },
     { name = "echo-server-omniparser", editable = "packages/server-omniparser" },
     { name = "huggingface-hub", specifier = ">=0.29.1" },
+    { name = "python-dotenv", specifier = ">=1.0.1" },
     { name = "uvicorn", specifier = ">=0.34.0" },
 ]
 
