@@ -4,7 +4,7 @@ setlocal EnableDelayedExpansion
 REM ---------------------------
 REM 1) Set up logging
 REM ---------------------------
-set "LOGFILE=..\data\logs\install_bat.txt"
+set "LOGFILE=C:\Users\lukaskellerstein\Projects\Github\420-ai\OpenOperator\computers\windows_vm\logs\install_bat.txt"
 echo ================================================= >> "%LOGFILE%"
 echo Installation started at %date% %time% >> "%LOGFILE%"
 echo ================================================= >> "%LOGFILE%"
@@ -44,12 +44,12 @@ REM Update pip
 
 REM Install Python libraries for INITIALIZE
 echo Installing Python libraries for INITIALIZE... >> %LOGFILE%
-"%PYTHON_PATH%" -m pip install -r "..\data\init\requirements.txt" >> "%LOGFILE%" 2>&1
+"%PYTHON_PATH%" -m pip install -r "C:\Users\lukaskellerstein\Projects\Github\420-ai\OpenOperator\computers\windows_vm\data\init\requirements.txt" >> "%LOGFILE%" 2>&1
 echo Python libraries for INITIALIZE installed successfully! >> %LOGFILE%
 
 REM Run INITIALIZE Python script from network path
 echo Running Python script INITIALIZE from network... >> %LOGFILE%
-"%PYTHON_PATH%" "..\data\init\main.py" >> "%LOGFILE%" 2>&1
+"%PYTHON_PATH%" "C:\Users\lukaskellerstein\Projects\Github\420-ai\OpenOperator\computers\windows_vm\data\init\main.py" >> "%LOGFILE%" 2>&1
 echo Python script INITIALIZE executed. >> %LOGFILE%
 
 
@@ -57,9 +57,10 @@ echo Python script INITIALIZE executed. >> %LOGFILE%
 REM ---------------------------
 REM 4) Install Required Python Packages for SERVERS
 REM ---------------------------
-echo Installing Python libraries... >> "%LOGFILE%"
-"%PYTHON_PATH%" -m pip install -r "..\data\server1\requirements.txt" >> "%LOGFILE%" 2>&1
-"%PYTHON_PATH%" -m pip install -r "..\data\server2\requirements.txt" >> "%LOGFILE%" 2>&1
+echo Installing Python libraries for servers... >> "%LOGFILE%"
+"%PYTHON_PATH%" -m pip install -r "C:\Users\lukaskellerstein\Projects\Github\420-ai\OpenOperator\computers\windows_vm\data\server1\requirements.txt" >> "%LOGFILE%" 2>&1
+"%PYTHON_PATH%" -m pip install -r "C:\Users\lukaskellerstein\Projects\Github\420-ai\OpenOperator\computers\windows_vm\data\server2\requirements.txt" >> "%LOGFILE%" 2>&1
+echo Python libraries for servers was installed >> "%LOGFILE%"
 
 REM ---------------------------
 REM 5) Add Firewall Rules
@@ -67,31 +68,39 @@ REM ---------------------------
 echo Adding firewall rules... >> "%LOGFILE%"
 netsh advfirewall firewall add rule name="SERVER1 Flask" dir=in action=allow protocol=TCP localport=6000
 netsh advfirewall firewall add rule name="SERVER2 Flask" dir=in action=allow protocol=TCP localport=5000
+echo Adding firewall rules was added >> "%LOGFILE%"
 
 REM ---------------------------
 REM 6) Create Startup Script
 REM ---------------------------
+echo Creating .bat files for servers >> "%LOGFILE%"
 set "STARTUP_SERVER1_BAT=%~dp0start_server_1.bat"
 (
     echo @echo off
-    echo start /b "" "%PYTHONW_PATH%" "..\data\server1\main.py"
+    echo start /b "" "%PYTHONW_PATH%" "C:\Users\lukaskellerstein\Projects\Github\420-ai\OpenOperator\computers\windows_vm\data\server1\main.py"
 ) > "%STARTUP_SERVER1_BAT%"
 
 set "STARTUP_SERVER2_BAT=%~dp0start_server_2.bat"
 (
     echo @echo off
-    echo start /b "" "%PYTHONW_PATH%" "..\data\server2\main.py"
+    echo start /b "" "%PYTHONW_PATH%" "C:\Users\lukaskellerstein\Projects\Github\420-ai\OpenOperator\computers\windows_vm\data\server2\main.py"
 ) > "%STARTUP_SERVER2_BAT%"
+echo .bat files for servers was created >> "%LOGFILE%"
 
 REM ---------------------------
 REM 7) Schedule Startup Task
 REM ---------------------------
 REM Without /IT, the task will not run interactively = will not be able to catch screenshots and record videos
 REM Without /DELAY is needed in order to wait until network storage is available and user is logged in
-schtasks /Create /TN "StartServer1" /SC ONSTART /TR "\"%STARTUP_SERVER1_BAT%\"" /RU "Docker" /RL HIGHEST /IT /DELAY 0000:30 /F
-schtasks /Create /TN "StartServer2" /SC ONSTART /TR "\"%STARTUP_SERVER2_BAT%\"" /RU "Docker" /RL HIGHEST /IT /DELAY 0000:30 /F
+echo Creating 'scheduled tasks' for servers >> "%LOGFILE%"
+schtasks /Create /TN "StartServer1" /SC ONSTART /TR "\"%STARTUP_SERVER1_BAT%\"" /RU "lukaskellerstein" /RL HIGHEST /IT /DELAY 0000:30 /F
+schtasks /Create /TN "StartServer2" /SC ONSTART /TR "\"%STARTUP_SERVER2_BAT%\"" /RU "lukaskellerstein" /RL HIGHEST /IT /DELAY 0000:30 /F
+echo 'scheduled tasks' for servers was created >> "%LOGFILE%"
+
+echo Trigerring 'scheduled tasks' for servers >> "%LOGFILE%"
 schtasks /Run /TN "StartServer1"
 schtasks /Run /TN "StartServer2"
+echo 'scheduled tasks' for servers was started >> "%LOGFILE%"
 
 echo Installation completed at %date% %time% >> "%LOGFILE%"
 echo Installation complete. Servers will start automatically on reboot.
