@@ -35,7 +35,12 @@ class OOGenAgent(BaseChatAgent):
 
         print(messages)
 
-        return Response(chat_message=TextMessage(content="FUCK"))
+        result = TextMessage(
+            source=self.name, 
+            content="FUCK"
+        )
+
+        return Response(chat_message=result)
     
     async def on_messages_stream(
         self, messages: Sequence[ChatMessage], cancellation_token: CancellationToken
@@ -49,9 +54,14 @@ class OOGenAgent(BaseChatAgent):
         # Call LLM
 
         print(messages)
+
+        result = TextMessage(
+            source=self.name, 
+            content="FUCK"
+        )
         
         yield Response(
-            chat_message=TextMessage(content="FUCK"),
+            chat_message=result,
             inner_messages=[],
         )
     
