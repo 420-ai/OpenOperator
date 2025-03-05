@@ -7,7 +7,7 @@ requires-python = ">=3.12"
 dependencies = [
     "asyncio>=3.4.3",
     "autogen-agentchat>=0.4.8",
-    "autogen-ext[azure,openai]>=0.4.8",
+    "autogen-ext[azure,openai,web-surfer]>=0.4.8",
     "azure-core>=1.32.0",
     "azure-identity>=1.20.0",
     "python-dotenv>=1.0.1",

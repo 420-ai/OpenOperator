@@ -1,86 +1,84 @@
-from autogen_agentchat.ui import Console
-import asyncio
-from agent.agent_planner import OOPlannerAgent
-import logging.config
 import os
+import sys
+import asyncio
 
-CURRENT_FOLDER = os.path.dirname(os.path.abspath(__file__))
-# -------------------------------------------------------
-# -------------------------------------------------------
-# Logging
+from autogen_agentchat.ui import Console
+from autogen_agentchat.conditions import TextMentionTermination, MaxMessageTermination
+from autogen_agentchat.teams import RoundRobinGroupChat
+from autogen_ext.models.openai import AzureOpenAIChatCompletionClient
+from autogen_ext.agents.web_surfer import MultimodalWebSurfer
+from autogen_agentchat.agents import AssistantAgent
 
-LOG_DIR = os.path.join(CURRENT_FOLDER, "logs")
-os.makedirs(LOG_DIR, exist_ok=True)  # Ensure the directory exists
-LOG_FILE = os.path.join(LOG_DIR, "app.log")
+from dotenv import load_dotenv
 
-LOGGING_CONFIG = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "detailed": {
-            "format": "%(asctime)s - %(levelname)s - %(name)s - %(funcName)s - %(message)s",
-            "datefmt": "%Y-%m-%d %H:%M:%S",
-        }
-    },
-    "handlers": {
-        "file": {
-            "class": "logging.FileHandler",
-            "filename": LOG_FILE,
-            "formatter": "detailed",
-            "level": "DEBUG",
-        },
-        "console": {
-            "class": "logging.StreamHandler",
-            "formatter": "detailed",
-            "level": "DEBUG",
-        },
-    },
-    "root": {
-        "handlers": ["console", "file"],
-        "level": "DEBUG",
-    },
-    "loggers": {
-        "urllib3": {  
-            "level": "INFO",
-            "propagate": False,
-        },
-        "PIL": {  
-            "level": "INFO",
-            "propagate": False,
-        },
-        "openai": {  
-            "level": "INFO",
-            "propagate": False,
-        },
-        "httpcore": {
-            "level": "INFO",
-            "propagate": False,
-        },
-        "autogen_core": {
-            "level": "ERROR",
-            "propagate": False,
-        },
-        "httpx": {
-            "level": "ERROR",
-            "propagate": False,
-        },
-    },
-}
+import textwrap
 
-logging.config.dictConfig(LOGGING_CONFIG)
-logger = logging.getLogger("main")
+import logging
 
-# -------------------------------------------------------
-# -------------------------------------------------------
+from autogen_agentchat import EVENT_LOGGER_NAME, TRACE_LOGGER_NAME
 
-TASK = 'Please open Notepad, create a new file named "draft.txt", type "This is a draft.", and save it to the Documents folder.'
+logging.basicConfig(level=logging.WARNING)
 
-# Main function
+# For trace logging.
+trace_logger = logging.getLogger(TRACE_LOGGER_NAME)
+trace_logger.addHandler(logging.StreamHandler())
+trace_logger.setLevel(logging.DEBUG)
+
+load_dotenv()
+
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
+
+
 async def main() -> None:
+    model_client = AzureOpenAIChatCompletionClient(
+        azure_deployment="gpt-4o",
+        model="gpt-4o",
+        model_info={
+            "vision": True,
+            "function_calling": True,
+            "json_output": True,
+            "family": "gpt-4o",
+        },
+        api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+        azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+        api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
+        use_ocr=True,
+    )
 
-    agent_planner = OOPlannerAgent()
+    # Define an agent
+    web_surfer_agent = MultimodalWebSurfer(
+        name="MultimodalWebSurfer",
+        model_client=model_client,
+        headless=False,
+    )
 
-    stream = agent_planner.run_stream(task=TASK)
+    termination_agent = AssistantAgent(
+        name="DoubleChecker",
+        model_client=model_client,
+        system_message="You are an agent who can verify the information provided in the most recent message. If the task defined by the Team is completed, respond with 'Task completed'. If the task is not completed, respond with 'Task not completed'.",
+    )
+
+    # Define a team
+    termination = MaxMessageTermination(15) | TextMentionTermination("Task completed")
+    agent_team = RoundRobinGroupChat(
+        [web_surfer_agent, termination_agent],
+        max_turns=10,
+        termination_condition=termination,
+    )
+
+    # # Run the team and stream messages to the console
+    stream = agent_team.run_stream(
+        task=textwrap.dedent("""
+                                        Perform the following task:
+                                        - Navigate to Reddit for the subreddit r/learnprogramming
+                                        - Find the latest post
+                                        - Summarize the post
+                                    """)
+    )
     await Console(stream)
+    # Close the browser controlled by the agent
+    await web_surfer_agent.close()
+
 
 asyncio.run(main())
