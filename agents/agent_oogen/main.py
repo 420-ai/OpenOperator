@@ -1,6 +1,6 @@
 from autogen_agentchat.ui import Console
 import asyncio
-from agent.main import OOGenAgent
+from agent.agent_planner import OOPlannerAgent
 import logging.config
 import os
 
@@ -48,6 +48,22 @@ LOGGING_CONFIG = {
             "level": "INFO",
             "propagate": False,
         },
+        "openai": {  
+            "level": "INFO",
+            "propagate": False,
+        },
+        "httpcore": {
+            "level": "INFO",
+            "propagate": False,
+        },
+        "autogen_core": {
+            "level": "ERROR",
+            "propagate": False,
+        },
+        "httpx": {
+            "level": "ERROR",
+            "propagate": False,
+        },
     },
 }
 
@@ -62,9 +78,9 @@ TASK = 'Please open Notepad, create a new file named "draft.txt", type "This is 
 # Main function
 async def main() -> None:
 
-    agent = OOGenAgent()
+    agent_planner = OOPlannerAgent()
 
-    stream = agent.run_stream(task=TASK)
+    stream = agent_planner.run_stream(task=TASK)
     await Console(stream)
 
 asyncio.run(main())

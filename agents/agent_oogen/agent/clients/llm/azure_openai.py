@@ -12,7 +12,7 @@ AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT")
 AZURE_OPENAI_API_VERSION = os.getenv("AZURE_OPENAI_API_VERSION")
 
 # LLM
-llm_client = AzureOpenAIChatCompletionClient(
+llm = AzureOpenAIChatCompletionClient(
     model=AZURE_OPENAI_DEPLOYMENT,
     azure_endpoint=AZURE_OPENAI_BASEURL,
     api_version=AZURE_OPENAI_API_VERSION,
