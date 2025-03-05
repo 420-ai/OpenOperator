@@ -1,0 +1,59 @@
+Inputs:
+
+1. User objective:  
+Please open Notepad, create a new file named "draft.txt", type "This is a draft.", and save it to the Documents folder.
+
+2. Window title:  
+Desktop
+
+3. All window names:  
+Program Manager
+
+4. Clipboard content:  
+No content
+
+5. Text rendering:  
+Text rendering not available for now.
+
+6. Candidate elements:  
+ID | Type | Text content or description | Normalized location [x1, y1, x2, y2]  
+0 | text | Activate Windows | [0.82, 0.87, 0.92, 0.89]  
+1 | text | Go to | [0.82, 0.89, 0.85, 0.91]  
+2 | text | Settings to activate Windows: | [0.85, 0.89, 0.96, 0.91]  
+3 | text | 50PF | [0.03, 0.96, 0.04, 0.98]  
+4 | text | 12:27 PM | [0.94, 0.96, 0.98, 0.98]  
+5 | text | Mostly sunny | [0.03, 0.98, 0.07, 0.99]  
+6 | text | 3/5/2025 | [0.95, 0.98, 0.98, 0.99]  
+7 | icon | Search  | [0.37, 0.96, 0.5, 0.99]  
+8 | icon | Recycle Bin  | [0.0, 0.0, 0.04, 0.07]  
+9 | icon | VLC media player  | [0.0, 0.28, 0.04, 0.37]  
+10 | icon | Microsoft Edge  | [0.0, 0.19, 0.04, 0.27]  
+11 | icon | Mac Files  | [0.0, 0.09, 0.04, 0.18]  
+12 | icon | ENG  | [0.87, 0.96, 0.89, 0.99]  
+13 | icon | A folder or folder icon. | [0.55, 0.96, 0.58, 0.99]  
+14 | icon | Microsoft Outlook. | [0.63, 0.96, 0.65, 0.99]  
+15 | icon | A sticky note application. | [0.53, 0.96, 0.55, 0.99]  
+16 | icon | A black rectangle or rectangle. | [0.5, 0.96, 0.52, 0.99]  
+17 | icon | the Microsoft Edge browser. | [0.58, 0.96, 0.6, 0.99]  
+18 | icon | the Windows logo. | [0.35, 0.96, 0.37, 0.99]  
+19 | icon | A notification or message related to a new item or application. | [0.01, 0.95, 0.03, 1.0]  
+20 | icon | A shopping or shopping cart application. | [0.61, 0.96, 0.63, 0.99]  
+21 | icon | Refresh or reload. | [0.85, 0.96, 0.87, 0.99]  
+22 | icon | a pinning tool. | [0.83, 0.96, 0.85, 0.99]  
+23 | icon | Refresh or reload the page. | [0.92, 0.96, 0.94, 1.0]  
+24 | icon | A bookmark or note. | [0.9, 0.96, 0.92, 0.99]  
+25 | icon | a hat or profile icon. | [0.98, 0.96, 0.99, 0.99]  
+26 | icon | a blank screen or window. | [0.0, 0.95, 0.01, 1.0]  
+27 | icon | a blank screen or page. | [0.99, 0.95, 1.0, 1.0]  
+
+7. Images are sent as separate attachments.  
+
+8. History of previous actions code blocks taken to reach the current screen:  
+No previous actions  
+
+9. Textual memory:  
+
+```
+memory
+# empty memory block
+```
