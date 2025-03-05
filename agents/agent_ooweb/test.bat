@@ -1,0 +1,1 @@
+"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" --profile-directory=Default --remote-debugging-port=9222
