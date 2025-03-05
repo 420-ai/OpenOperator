@@ -1,15 +1,19 @@
+import logging
 import os
 import io
 import base64
 import requests
-from typing import List, Union
+from typing import List, Tuple, Union
 from PIL import Image
 
 from my_utils import save_to_json
 from agent.llm_clients.messages import planning_system_message
 
+logger = logging.getLogger("agent.llm_clients.azure_openai")
+
 class AzureOpenAIClient():
     def __init__(self, deployment_name="gpt-4o", temperature=1.0):
+        logger.debug("Initializing...")
 
         self.endpoint = os.environ.get("AZURE_ENDPOINT")
         self.api_key = os.getenv("AZURE_API_KEY")
@@ -24,9 +28,11 @@ class AzureOpenAIClient():
         # set the initial system message
         self.system_prompt =  planning_system_message
     
-    def plan(self, images, user_query):  
-        response = self.process_images(self.system_prompt, user_query, images, max_tokens=4096, temperature=self.temperature, only_text=True)
-        return response
+    def plan(self, images, user_query) -> Tuple[str, str]:  
+        logger.info("Planning...")
+        request, response = self.process_images(self.system_prompt, user_query, images, max_tokens=4096, temperature=self.temperature)
+        logger.info("Planning done. Response: \n %s", response)
+        return request, response
     
     def encode_image(self, image: Union[str, Image.Image], format) -> str:
         if isinstance(image, str):
@@ -65,7 +71,7 @@ class AzureOpenAIClient():
                 }
             }
 
-    def process_images(self, system_prompt: str, question: str, images: Union[str, Image.Image, List[Union[str, Image.Image]]], max_tokens=300, temperature=0, only_text=True, format="JPEG") -> str:
+    def process_images(self, system_prompt: str, question: str, images: Union[str, Image.Image, List[Union[str, Image.Image]]], max_tokens=300, temperature=0, format="JPEG") -> Tuple[str, str]:
 
         if system_prompt==None:
             system_prompt = "You are a helpful assistant."
@@ -84,7 +90,7 @@ class AzureOpenAIClient():
         
         content.append({"type": "text", "text": question})
 
-        payload = {
+        request = {
             "messages": [
                 {
                 "role": "system",
@@ -108,20 +114,14 @@ class AzureOpenAIClient():
             "top_p": 1.0,
         }
 
-        save_to_json(payload, "oai_payload.json")
-
         # print("Sending request...")
         try:
-            response = requests.post(self.endpoint, headers=self.headers, json=payload)
+            response = requests.post(self.endpoint, headers=self.headers, json=request)
             response.raise_for_status()
         except requests.RequestException as e:
             raise e
 
-        # return response.json()
-        if only_text:
-            return response.json()['choices'][0]['message']['content']
-        else:
-            return response
+        return request, response.json()['choices'][0]['message']['content']
     
 
  

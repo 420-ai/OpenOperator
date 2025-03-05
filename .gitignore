@@ -7,14 +7,14 @@ __pycache__
 .venv
 
 .env
-tmp
 cache
 dist
 
-**/configs/results
+**/results
 **/evaluation_examples_windows/results
 
-**/logs/*.txt
+**/tmp/*
+**/logs/*
 *.log
 
 **/test-servers/recordings/
@@ -22,7 +22,6 @@ dist
 **/server2/recordings/
 **/server2/screenshots/
 
-models/ui/imgs
 models/vision
 
 **/node_modules

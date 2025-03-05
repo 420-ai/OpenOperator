@@ -29,10 +29,8 @@ class ComputerEnv(gym.Env):
             emulator_ip: str = "127.0.0.1",
             emulator_port: int = 5000
     ):
-        # Initialize emulator and controller
-        logger.info("Initializing...")
+        logger.debug("Initializing...")
         
-        logger.info("Using external emulator...")
         self.remote_vm = True
         self.vm_ip = emulator_ip
         self.vm_port = emulator_port
@@ -46,8 +44,8 @@ class ComputerEnv(gym.Env):
 
         # episodic stuffs, like counters, will be updated or reset
         # when calling self.reset()
-        self._traj_no: int = -1
-        self._step_no: int = 0
+        self._episode_counter: int = -1
+        self._step_counter: int = 0
         self.action_history: List[Dict[str, any]] = []
 
     def reset(self, task_config: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
@@ -56,49 +54,61 @@ class ComputerEnv(gym.Env):
         Reset the environment and return the initial observation.
         """
 
-        logger.info("Resetting environment...")
+        logger.debug("Resetting environment...")
 
-        logger.info("Setting counters...")
-        self._traj_no += 1
-        self._step_no = 0
+        self._episode_counter += 1
+        self._step_counter = 0
         self.action_history.clear()
 
+        # Task validation
+        if task_config is None:
+            logger.error("Task configuration is missing!")
+            raise ValueError("Task configuration is missing!")
+
+        # ?? needed ??
         time.sleep(5)
 
-        logger.info("Starting emulator...")
+        logger.debug("Waiting for emulator...")
         self._wait_emulator()
-        logger.info("Emulator started.")
+        logger.debug("Emulator is ready!")
 
-        if task_config is not None:
-            logger.info("Setting task info...")
-            self._set_task_info(task_config)
+        logger.debug("Setting task info...")
+        self._set_task_info(task_config)
+        logger.debug("Task info set!")
 
-            # logger.info(f"TASK RESULT GETTER: {self.result_getter}")
-            # logger.info(f"EXPECTED RESULT GETTER: {self.expected_getter}")
-            # logger.info(f"TASK METRIC: {self.metric}")
-            # logger.info(f"TASK EVALUATOR: {self.evaluator}")
+        # logger.info(f"TASK RESULT GETTER: {self.result_getter}")
+        # logger.info(f"EXPECTED RESULT GETTER: {self.expected_getter}")
+        # logger.info(f"TASK METRIC: {self.metric}")
+        # logger.info(f"TASK EVALUATOR: {self.evaluator}")
 
-            time.sleep(5)
-            logger.info("Environment setup complete.")
+        # ?? needed ??
+        time.sleep(5)
+        logger.info("Environment setup complete.")
 
+        logger.info("Collecting initial observation...")
         observation = self._get_obs()
-        return observation
+        logger.info("Initial observation collected.")
+        info = {}
+        return observation, info
 
-    def step(self, action, pause=0.5):
+    def step(self, action):
         """
         GYMNASIUM ENVIRONMENT INTERFACE
         Execute the action and return the next observation, reward, done, and info.
         """
-        self._step_no += 1
+        self._step_counter += 1
         self.action_history.append(action)
 
         reward = 0  # todo: Define reward calculation for each example
         done = False  # todo: Define episode termination condition for each example
         info = {}
+
+
+
         # handle the special actions
         if action in ['WAIT', 'FAIL', 'DONE']:
             if action == 'WAIT':
-                time.sleep(pause)
+                time.sleep(1)
             elif action == 'FAIL':
                 done = True
                 info = {"fail": True}
@@ -119,8 +129,9 @@ class ComputerEnv(gym.Env):
                 self.controller.execute_python_windows_command(action)
             else:
                 raise ValueError("Unknown action space: {}".format(self.action_space))
+        
         # wait a little before taking the next observation
-        time.sleep(pause)
+        time.sleep(1)
         observation = self._get_obs()
 
         return observation, reward, done, info
@@ -149,10 +160,6 @@ class ComputerEnv(gym.Env):
     def vm_platform(self):
         return self.controller.get_vm_platform()
 
-    @property
-    def vm_screen_size(self):
-        return self.controller.get_vm_screen_size()
-
     def _wait_emulator(self):
         """
         Continuously calls `get_probe` until it returns True, indicating the VM is ready.
@@ -173,45 +180,11 @@ class ComputerEnv(gym.Env):
         logger.error("VM did not become ready after %d attempts.", max_attempts)
         return False
 
-    def _get_screenshot(self):
-        screenshot = None
-        # Get the screenshot and save to the image_path
-        max_retries = 20
-        for _ in range(max_retries):
-
-            try:
-
-                # Replace VM QEMU screenshot with the one from the server
-                # screenshot = self.vm_controller.take_screenshot()
-                screenshot = self.controller.get_screenshot()
-
-                os.makedirs("tmp", exist_ok=True)
-                file_path = os.path.join("tmp", "screenshot.png")
-                with open(file_path, "wb") as f:
-                    f.write(screenshot)
-
-                print("Screenshot saved")
-
-                if screenshot is not None:
-                    break
-                print("Retrying to get screenshot...")
-                time.sleep(1)
-
-            except Exception as e:
-                logger.error(f"Failed to get screenshot: {e}")
-                time.sleep(1)
-
-        if screenshot is None:
-            logger.error("Failed to get screenshot!")
-
-        return screenshot
-
-    
-
     def evaluate(self):
         """
         Evaluate whether the task is successfully completed.
         """
+        logger.info("Evaluating task...")
 
         if self.evaluator['func'] == "infeasible":
             if len(self.action_history) > 0 and self.action_history[-1] == "FAIL":
@@ -282,8 +255,6 @@ class ComputerEnv(gym.Env):
         Set task information from the task configuration.
         """
         self.task_id: str = task_config["id"]
-        self.cache_dir: str = os.path.join(self.cache_dir_base, self.task_id)
-        os.makedirs(self.cache_dir, exist_ok=True)
         self.instruction = task_config["instruction"]
         self.config = task_config["config"] if "config" in task_config else []
 
@@ -334,30 +305,27 @@ class ComputerEnv(gym.Env):
 
 
     def _get_obs(self):
-        screenshot = self._get_screenshot()
-        # screenshot = None
-        # print("screenshot done")
-        accessibility_tree = self.controller.get_accessibility_tree(backend=self.a11y_backend) if self.require_a11y_tree else None
+        # accessibility_tree = self.controller.get_accessibility_tree(backend=self.a11y_backend) if self.require_a11y_tree else None
         # accessibility_tree = "test"
         # accessibility_tree = None
         # print("accessibility_tree done")
-        terminal = self.controller.get_terminal_output() if self.require_terminal else None
+        # terminal = self.controller.get_terminal_output() if self.require_terminal else None
         # terminal = None
+        screenshot = self.controller.get_screenshot()
         obs = self.controller.get_obs_winagent()
         if obs is not None:
-            window_image, window_title, window_rect, window_names_str, computer_clipboard, human_input = obs
             return {
                 "screenshot": screenshot,
-                "accessibility_tree": accessibility_tree,
-                "terminal": terminal,
+                # "accessibility_tree": accessibility_tree,
+                # "terminal": terminal,
                 "instruction": self.instruction,
-                "window_title": window_title,
-                "window_rect": window_rect,
-                "window_image": window_image,
-                "window_names_str": window_names_str,
-                "computer_clipboard": computer_clipboard,
-                "human_input": human_input
-                }
+                "window_image": obs["window_image"],
+                "window_title": obs["window_title"],
+                "window_rect": obs["window_rect"],
+                "window_names_str": obs["window_names_str"],
+                "computer_clipboard": obs["computer_clipboard"],
+                "human_input": obs["human_input"]
+            }
         else:
             return None
         # print("terminal done")

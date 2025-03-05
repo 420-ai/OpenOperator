@@ -2,6 +2,10 @@ import json
 import base64
 from PIL import Image
 import io
+import os
+
+if not os.path.exists('tmp'):
+    os.makedirs('tmp')
 
 def save_to_json(data: list, filename: str) -> None:
     """
@@ -22,4 +26,13 @@ def save_base64_to_png(base64_string: str, filename: str) -> None:
     """
     image_data = base64.b64decode(base64_string)
     image = Image.open(io.BytesIO(image_data))
-    image.save(filename, "PNG")
+    image.save(f"tmp/{filename}", "PNG")
+
+def save_image(image: Image, filename: str) -> None:
+    """
+    Saves an image to a file.
+    
+    :param image: Image to save
+    :param filename: Name of the output file
+    """
+    image.save(f"tmp/{filename}", "PNG")

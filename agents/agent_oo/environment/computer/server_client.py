@@ -2,7 +2,9 @@ import json
 import logging
 import random
 from typing import Any, Dict, Optional
-
+import base64
+import io
+from PIL import Image
 import requests
 
 logger = logging.getLogger("environment.computer.ServerClient")
@@ -36,11 +38,6 @@ class ServerClient:
         headers = {
             'Content-Type': 'application/json'
         }
-
-        import base64  
-        from PIL import Image  
-        import io  
-  
         def image_to_base64_str(image):  
             buffered = io.BytesIO()  
             image.save(buffered, format="PNG")  # you can change the format to your preferred format  
@@ -64,13 +61,14 @@ class ServerClient:
             logger.error("Failed to update computer. Status code: %d", response.status_code)
 
 
-    def get_screenshot(self):
+    def get_screenshot(self) -> Optional[Image.Image]:
         """
         Gets a screenshot from the server. With the cursor.
         """
         response = requests.get(self.http_server + "/screenshot")
         if response.status_code == 200:
-            return response.content
+            image = Image.open(io.BytesIO(response.content))
+            return image
         else:
             logger.error("Failed to get screenshot. Status code: %d", response.status_code)
             return None
@@ -88,19 +86,25 @@ class ServerClient:
     def get_obs_winagent(self):
         """ Gets the observations for the agent from the server. None -> no observations or unexpected error.
         """
-        import base64
-        import io
-        from PIL import Image
+        
         response = requests.get(self.http_server + "/obs_winagent")
         if response.status_code == 200:
-            image_str = response.json()["image"]
-            image = Image.open(io.BytesIO(base64.b64decode(image_str)))
+            image_base64_str = response.json()["image"]
+            image = Image.open(io.BytesIO(base64.b64decode(image_base64_str)))
             window_title = response.json()["window_title"]
             rect = response.json()["rect"]
             window_names_str = response.json()["window_names_str"]
             computer_clipboard = response.json()["computer_clipboard"]
             human_input = response.json()["human_input"]
-            return image, window_title, rect, window_names_str, computer_clipboard, human_input
+
+            return {
+                "window_image": image, 
+                "window_title": window_title, 
+                "window_rect": rect, 
+                "window_names_str": window_names_str, 
+                "computer_clipboard": computer_clipboard, 
+                "human_input": human_input
+            }
         else:
             logger.error("Failed to get the observations for the agent from the server. Status code: %d", response.status_code)
             return None 
