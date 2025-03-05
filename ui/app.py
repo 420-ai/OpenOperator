@@ -77,25 +77,25 @@ app = gr.mount_gradio_app(app, demo, path="/")
 
 
 if __name__ == "__main__":
-    import subprocess
-    import signal
-    import os
+    # import subprocess
+    # import signal
+    # import os
 
-    process = subprocess.Popen(
-        ["uv", "run", "novnc_proxy.py", f"--target-host={os.getenv("VNC_TARGET_HOST")}", "--target-port=5900"],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        stdin=subprocess.PIPE,
-        start_new_session=True,
-        creationflags=subprocess.DETACHED_PROCESS
-    )
+    # process = subprocess.Popen(
+    #     ["uv", "run", "novnc_proxy.py", f"--target-host={os.getenv("VNC_TARGET_HOST")}", "--target-port=5900"],
+    #     stdout=subprocess.PIPE,
+    #     stderr=subprocess.PIPE,
+    #     stdin=subprocess.PIPE,
+    #     start_new_session=True,
+    #     creationflags=subprocess.DETACHED_PROCESS
+    # )
 
-    ## listen for SIGTERM, kill the detached process if received
-    def signal_handler(sig, frame):
-        print("SIGTERM received, killing the detached process...")
-        os.kill(process.pid, signal.SIGTERM)
+    # ## listen for SIGTERM, kill the detached process if received
+    # def signal_handler(sig, frame):
+    #     print("SIGTERM received, killing the detached process...")
+    #     os.kill(process.pid, signal.SIGTERM)
         
-    signal.signal(signal.SIGTERM, signal_handler)
+    # signal.signal(signal.SIGTERM, signal_handler)
 
     uvicorn.run(
         "app:app", host="127.0.0.1", port=7860, reload=True, timeout_graceful_shutdown=0
