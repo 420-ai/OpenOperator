@@ -1,6 +1,6 @@
-# WAA Agent
+# OO Agent
 
-WindowsAgentArena agent. Source: https://github.com/microsoft/WindowsAgentArena
+Open Operator agent. Based on: https://github.com/microsoft/WindowsAgentArena
 
 ### Azure OpenAI
 
@@ -34,3 +34,15 @@ screenshot = self.controller.get_screenshot()
 The QEMU controller does not work for me, even though I exposed the port 7200 in docker-compose file, and add the ARGUMETNS envVar in dockerfile.
 
 > We need to make QEMU controller work, but it is not critical for now.
+
+# TODO
+
+1. Improve observations
+
+- Add a11y - Accessiblity tree
+- Get terminal output
+
+2. Implement Evaluation phase
+
+- Getters
+- Metrics

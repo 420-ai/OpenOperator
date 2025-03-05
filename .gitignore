@@ -7,14 +7,15 @@ __pycache__
 .venv
 
 .env
-tmp
+models
 cache
 dist
 
-**/configs/results
+**/results
 **/evaluation_examples_windows/results
 
-**/logs/*.txt
+**/tmp/*
+**/logs/*
 *.log
 
 **/test-servers/recordings/

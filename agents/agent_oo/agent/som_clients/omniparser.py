@@ -1,20 +1,29 @@
 import base64
 import json
+import logging
 from pprint import pprint
-from typing import Dict, List
+from typing import Any, Dict, List
 import requests
 from io import BytesIO
 from PIL import Image
 
+logger = logging.getLogger("agent.som_clients.omniparser")
+
 class OmniparserClient:
-    # Server URL
-    SERVER_URL = "http://127.0.0.1:8000/parse/"
+
+    def __init__(self):
+        logger.debug("Initializing...")
+        # Server URL
+        self.SERVER_URL = "http://127.0.0.1:8000/parse/"
 
     # Function to encode image to base64
     def _encode_image(self, image):
         buffered = BytesIO()
         image.save(buffered, format="PNG")
         return base64.b64encode(buffered.getvalue()).decode("utf-8")
+
+    def _decode_image(self, base64_str) -> Image:
+        return Image.open(BytesIO(base64.b64decode(base64_str)))
 
     # Function to send image to the server
     def _send_image_to_server(self, base64_image):
@@ -38,20 +47,15 @@ class OmniparserClient:
             json.dump(data, f, ensure_ascii=False, indent=4)
 
     # Function to analyze image
-    def analyze_image(self, screenshot: Image) -> str:
+    def analyze_image(self, screenshot: Image) -> Dict[str, Any]:
+        logger.info("Analysing image...")
+
         # Shape of the image
         w, h = screenshot.size
 
         base64_image = self._encode_image(screenshot)
         response = self._send_image_to_server(base64_image)
         
-        if "som_image_base64" in response:
-            self._save_base64_image(response["som_image_base64"], "./tmp/parsed_image.png")
-        
-        if "parsed_content_list" in response:
-            self._save_json(response["parsed_content_list"], "./tmp/parsed_content_list.json")
-
-
         formatted_output = []
         for i, item in enumerate(response["parsed_content_list"]):
             formatted_output.append({
@@ -71,7 +75,7 @@ class OmniparserClient:
 
 
         return {
-            "parsed_image_path": "./tmp/parsed_image.png",
+            "parsed_image": self._decode_image(response.get("som_image_base64", "")),
             "parsed_image_base64": response.get("som_image_base64", ""),
             "parsed_content_list": formatted_output,
         }
@@ -81,6 +85,7 @@ class OmniparserClient:
     # Agents related methods
     # -----------------------------------------
     def caption_ents(self, image: Image, ents: List[Dict]):
+        logger.info("caption_ents()")
 
         # LK_TODO: Add logic for parsing A11y text !!!!!
 
@@ -95,20 +100,22 @@ class OmniparserClient:
         # return parsed_content_icon
         return [] 
 
-    def propose_ents(self, image: Image, with_captions: bool = True) -> List[Dict]:
+    def propose_ents(self, image: Image, with_captions: bool = True) -> Dict:
         """
         Uses the Omniparser client to analyze the image and generate entities.
         The returned list of entities has the same structure as in the original code.
         Since the Omniparser client does not return bounding boxes, each entity is 
         assigned a bounding box that covers the entire image.
         """
+        logger.info("propose_ents()")
+
         # Use the Omniparser client to analyze the image
-        result = self.client.analyze_image(image)
+        result = self.analyze_image(image)
 
         # print("OMNIPARSER - ANALYZE_IMAGE")
         # print(result["parsed_content_list"])
-
-        return result["parsed_content_list"]
+ 
+        return result
         
         # If the client returns a parsed image file, load it.
         # parsed_image_path = result.get("parsed_image_path")
