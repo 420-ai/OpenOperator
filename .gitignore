@@ -21,6 +21,7 @@ dist
 **/test-servers/screenshots/
 **/server2/recordings/
 **/server2/screenshots/
+**/agent_oogen/screenshots/
 
 models/vision
 

@@ -57,7 +57,7 @@ class OOPlannerAgent(BaseChatAgent):
     def __init__(self):
         logger.debug("Initializing...")
 
-        name = "OOPlannerAgent"
+        name = "agent_planner"
         description = "Agent responsible for planning"
         super().__init__(name, description)
         
