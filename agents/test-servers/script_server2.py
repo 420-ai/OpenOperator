@@ -57,7 +57,7 @@ def test_start_end_recording():
     print("Start Recording:", resp_start.json())
 
     import time
-    time.sleep(5)  # Record for 5 seconds
+    time.sleep(10)  # Record for 5 seconds
 
     # End recording
     resp_end = requests.post(f"{BASE_URL}/end_recording")
@@ -83,14 +83,14 @@ def test_close_all_windows():
     print("Close All Windows:", resp.text)
 
 if __name__ == "__main__":
-    test_platform()
-    test_cursor_position()
-    test_screen_size()
-    test_obs_winagent()
-    test_execute_command_windows()
+    # test_platform()
+    # test_cursor_position()
+    # test_screen_size()
+    # test_obs_winagent()
+    # test_execute_command_windows()
     # test_list_directory()
-    test_capture_screen_with_cursor()
+    # test_capture_screen_with_cursor()
     test_start_end_recording()
-    test_activate_window()
+    # test_activate_window()
     # Uncomment the line below if you are sure you want to close all windows.
     # test_close_all_windows()
