@@ -1,7 +1,10 @@
+import cv2
+import os
+from PIL import Image
+
 def extract_frames(video_path, num_frames=11):
-    import cv2
-    import os
-    from PIL import Image
+     # Get the directory of the video file
+    video_dir = os.path.dirname(video_path)
 
     # Open the video file
     cap = cv2.VideoCapture(video_path)
@@ -30,6 +33,12 @@ def extract_frames(video_path, num_frames=11):
             image = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
             image = image.resize((256, 256))  # Resize to 256x256 as expected by Magma
             images.append(image)
+
+            # Save frame as an image file in the same directory as the video
+            frame_filename = os.path.join(video_dir, f"frame_{captured_count:03d}.png")
+            image.save(frame_filename)
+            print(f"Saved: {frame_filename}")
+
             captured_count += 1
         
         frame_count += 1

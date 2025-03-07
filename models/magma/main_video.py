@@ -17,7 +17,7 @@ model.to(device)
 video_path = "./video/recording.mp4"
 
 # Extract frames from the video
-frames = extract_frames(video_path)
+frames = extract_frames(video_path, num_frames=20)
 if not frames:
     print("No frames extracted. Exiting.")
     exit()
@@ -31,7 +31,7 @@ image_tokens = "<image_start><image><image_end>\n" * len(frames)
 # Create conversation prompt
 convs = [
     {"role": "system", "content": "You are an AI that analyzes what is happening in the video."},
-    {"role": "user", "content": f"{image_tokens}\nWhat application got opened?"},
+    {"role": "user", "content": f"{image_tokens}\nWhat is happening on the video?"},
     {"role": "assistant", "content": ""}  # Ensuring space for the model's response
 ]
 
