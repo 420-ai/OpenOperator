@@ -19,3 +19,16 @@ You should see output in terminal as follows: `The time displayed on the compute
 ### Video
 
 To analyse video, run `uv run main_video.py`.
+
+You should see output in terminal as follows:
+
+```
+system
+You are an AI that analyzes what is happening in the video.
+
+user
+What is happening on the video?
+
+assistant
+screen showing the chat page of a social app
+```

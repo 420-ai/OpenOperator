@@ -49,7 +49,7 @@ generation_args = {
     "temperature": 0.3,  # Low temperature for more deterministic output
     "do_sample": True,   # Enable sampling-based generation
     "num_beams": 1,      # Greedy decoding
-    "max_new_tokens": 1024,
+    "max_new_tokens": 2048,
     "use_cache": True,
 }
 
