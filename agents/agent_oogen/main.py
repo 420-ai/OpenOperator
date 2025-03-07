@@ -81,7 +81,8 @@ logger = logging.getLogger("main")
 # -------------------------------------------------------
 # -------------------------------------------------------
 
-TASK = 'Please open Notepad, create a new file named "draft.txt", type "This is a draft.", and save it to the Documents folder.'
+# TASK = 'Please open Notepad, create a new file named "draft.txt", type "This is a draft.", and save it to the Documents folder.'
+TASK = 'Open MS Teams application, login as user "<USERNAME>" with password "<PASSWORD>", and send message to yourself with text "Hello from AI agent!".'
 
 # Main function
 async def main() -> None:

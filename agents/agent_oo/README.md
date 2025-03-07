@@ -36,17 +36,3 @@ screenshot = self.controller.get_screenshot()
 The QEMU controller does not work for me, even though I exposed the port 7200 in docker-compose file, and add the ARGUMETNS envVar in dockerfile.
 
 > We need to make QEMU controller work, but it is not critical for now.
-
-# TODO
-
-> The section below are only notes for Author. It is not needed to follow it
-
-1. Improve observations
-
-- Add a11y - Accessiblity tree
-- Get terminal output
-
-2. Implement Evaluation phase
-
-- Getters
-- Metrics
