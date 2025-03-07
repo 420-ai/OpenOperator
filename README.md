@@ -4,7 +4,7 @@
 
 - `models/*`: all packages related to downloading models and simple servers that provide access to local versions of a model
 - `agents/*`: agents that are used in the repo
-- `ui`: a Web-based UI to help facilitate the usage of these agents 
+- `ui`: a Web-based UI to help facilitate the usage of these agents
 - `computer`: VMs and automation server
 
 ## Setup
@@ -28,6 +28,7 @@ python setup.py
 ```
 
 The setup script will:
+
 1. Install `uv` if it's not already installed
 2. Create a virtual environment
 3. Use `uv sync` to install all packages dependencies
@@ -43,6 +44,11 @@ You can update all dependencies using:
 
 # Getting Started
 
+## Computer
+
+To run computer that agent controls follows documentation [here](./computers/README.md).
+
+In case you want default way (Works on Windows and Linux) run `docker-compose up` in folder `./computers/windows/docker`.
 
 ## OmniParser
 

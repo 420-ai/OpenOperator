@@ -7,7 +7,7 @@ import io
 
 logger = logging.getLogger("agent.clients.server_client")
 
-HTTP_SERVER = "http://127.0.0.1:5050"
+HTTP_SERVER = "http://127.0.0.1:5000"
 
 def execute_python_command(command: str) -> None:
     """
