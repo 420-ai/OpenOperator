@@ -15,6 +15,7 @@ from autogen_agentchat.messages import AgentEvent, ChatMessage
 from autogen_core import CancellationToken
 from autogen_agentchat.base import Response
 from autogen_core import Image
+from autogen_core.models import UserMessage
 
 logger = logging.getLogger("agent.me")
 
@@ -92,5 +93,7 @@ class OOMeAgent(AssistantAgent):
         # Add the parsed image to the final messages
         final_messages.append(Image.from_pil(parsed_image_resized))
 
-        async for response in super().on_messages_stream(final_messages, cancellation_token):
+        user_message = UserMessage(content=final_messages, source="user")
+
+        async for response in super().on_messages_stream([user_message], cancellation_token):
             yield response

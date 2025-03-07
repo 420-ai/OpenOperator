@@ -1,8 +1,5 @@
 from autogen_agentchat.ui import Console
 import asyncio
-from agent.agent_planner import OOPlannerAgent
-from agent.agent_me import OOMeAgent
-from agent.agent_me2 import agent
 from agent.team import team
 import logging.config
 import os
@@ -88,15 +85,7 @@ TASK = 'Please open Notepad, create a new file named "draft.txt", type "This is 
 
 # Main function
 async def main() -> None:
-
-    # agent_planner = OOPlannerAgent()
-    # agent_me = OOMeAgent()
-
     stream = team.run_stream(task=TASK)
     await Console(stream)
-
-    # Message as string
-    # result = await team.run(task=TASK)
-    # print(result.messages[len(result.messages) - 1].content)
 
 asyncio.run(main())

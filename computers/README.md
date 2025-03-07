@@ -8,11 +8,11 @@ Computers based on Windows can be deployed into Docker and into Parallels as VM.
 
 ### 1.1 Docker
 
-Windows in Docker
+Windows in Docker. Steps to run it are [here](./windows/docker/README.md).
 
 ### 1.2 VM (Parallels)
 
-Windows in VM (Parallels)
+Windows in VM (Parallels). Steps to run it are [here](./windows/parallels-vm/README.md).
 
 ## 2. MacOS
 
