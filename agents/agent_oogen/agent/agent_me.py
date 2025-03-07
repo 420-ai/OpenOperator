@@ -20,7 +20,10 @@ from autogen_core.models import UserMessage
 logger = logging.getLogger("agent.me")
 
 
-SYSTEM_MESSAGE = """You are Screen Helper, a world-class reasoning engine that can complete any goal on a computer to help a user"""
+SYSTEM_MESSAGE = """
+You are Screen Helper, a world-class reasoning engine that can complete any goal on a computer to help a user.
+Do not as any questions, act confidently and quickly.
+"""
 
 
 USER_MESSAGE = """Your goal is:
@@ -45,7 +48,7 @@ class OOMeAgent(AssistantAgent):
         logger.debug("Initializing...")
 
         name = "agent_me"
-        description = "Agent representing the user controlling computer"
+        description = "Agent representing a user controlling computer"
         
         self.llm = llm
         self.som = OmniparserClient()
