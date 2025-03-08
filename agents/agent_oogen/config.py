@@ -22,3 +22,33 @@ class OOConfig:
     @property
     def instruction(self) -> str:
         return self.config.get("instruction", "")
+    
+    @property
+    def SYSTEM_MESSAGE(self) -> str:
+        return self._get_nested_value_as_string("messages.SYSTEM_MESSAGE")
+
+    @property
+    def USER_MESSAGE(self) -> str:
+        return self._get_nested_value_as_string("messages.USER_MESSAGE")
+
+    @property
+    def PARSED_UI_ELEMENTS_MESSAGE(self) -> str:
+        return self._get_nested_value_as_string("messages.PARSED_UI_ELEMENTS_MESSAGE")
+
+    def _get_nested_value_as_string(self, key_path: str, separator: str = "\n", default="") -> str:
+        """Helper function to retrieve nested dictionary values and join lists into a string."""
+        value = self._get_nested_value(key_path, default)
+        if isinstance(value, list):
+            return separator.join(value)
+        return value if isinstance(value, str) else default
+
+    def _get_nested_value(self, key_path: str, default=None):
+        """Helper function to retrieve nested dictionary values using dot notation."""
+        keys = key_path.split(".")
+        value = self.config
+        for key in keys:
+            if isinstance(value, dict) and key in value:
+                value = value[key]
+            else:
+                return default
+        return value

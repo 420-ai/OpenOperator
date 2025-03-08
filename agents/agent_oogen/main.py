@@ -13,13 +13,13 @@ configure_logging(tracker.result_dir)
 
 # Configuration object for agent
 config = OOConfig()
-config.load("notepad", "scenario-1")
+config.load("teams", "scenario-2")
 tracker.save_config(config)
 
 # Main function
 async def main() -> None:
     try:
-        team = init_team(tracker)
+        team = init_team(config, tracker)
 
         logger.info("Starting task execution...")
         tracker.start_recording()
@@ -27,6 +27,15 @@ async def main() -> None:
         # Run the task with the team
         stream = team.run_stream(task=config.instruction)
         await Console(stream)
+
+        while True:
+            # Get user input from the console.
+            user_input = input("Enter a message (type 'exit' to leave): ")
+            if user_input.strip().lower() == "exit":
+                break
+            # Run the team and stream messages to the console.
+            stream = team.run_stream(task=user_input)
+            await Console(stream)
 
     except asyncio.CancelledError:
         logger.warning("Task was cancelled.")

@@ -30,5 +30,7 @@ async def _mouse_scroll_fce(
 
 mouse_scroll = FunctionTool(
     _mouse_scroll_fce, 
-    description="Scrolls the screen in the specified direction."
+    description="Performs a scrolling action in the specified direction ('up', 'down', 'left', or 'right'). "
+                "Use this tool whenever scrolling is needed to navigate through content that is not fully visible on the screen. "
+                "The scroll amount controls the intensity, and steps allow for smooth scrolling."
 )
