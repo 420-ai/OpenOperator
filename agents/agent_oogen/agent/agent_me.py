@@ -16,6 +16,13 @@ from autogen_core import CancellationToken
 from autogen_agentchat.base import Response
 from autogen_core import Image
 from autogen_core.models import UserMessage
+from tracker import Tracker
+
+from autogen_agentchat.messages import ThoughtEvent, ToolCallRequestEvent, ToolCallExecutionEvent
+from autogen_agentchat.base._chat_agent import Response as ChatAgentResponse
+
+from autogen_agentchat.messages import BaseAgentEvent, BaseChatMessage
+from autogen_core.models import UserMessage, AssistantMessage, SystemMessage, FunctionExecutionResult, FunctionExecutionResultMessage
 
 logger = logging.getLogger("agent.me")
 
@@ -44,7 +51,7 @@ If you want to click on the element, calculate the center of the element using t
 
 
 class OOMeAgent(AssistantAgent):
-    def __init__(self):
+    def __init__(self, tracker: Tracker):
         logger.debug("Initializing...")
 
         name = "agent_me"
@@ -63,6 +70,9 @@ class OOMeAgent(AssistantAgent):
         ]
 
         self.step_counter = 0
+        self.tracker = tracker
+
+        tracker.save_system_message(SYSTEM_MESSAGE)
 
         super().__init__(
             name=name, 
@@ -75,15 +85,89 @@ class OOMeAgent(AssistantAgent):
     async def on_messages_stream(
         self, messages: Sequence[ChatMessage], cancellation_token: CancellationToken
     ) -> AsyncGenerator[AgentEvent | ChatMessage | Response, None]:
+        
+        # Increment the step counter
+        self.step_counter += 1
+        # Log the current step
+        logger.debug("=================================")
+        logger.debug(f"Step: {self.step_counter}")
+        logger.debug("=================================")
+        self.tracker.set_step(self.step_counter)
+
+
+        # ------------------------------------------
+        # All history messages
+        # ------------------------------------------
+        # try:
+        #     history_messages = await self._model_context.get_messages()
+
+        #     print("-----------------------------------")
+        #     print("History messages:")
+        #     # print(history_messages)
+        #     for message in history_messages:
+        #         if isinstance(message, BaseAgentEvent):
+        #             print("Message is a BaseAgentEvent instance")
+        #             print(type(message))
+        #         elif isinstance(message, BaseChatMessage):
+        #             print("Message is a BaseChatMessage instance")
+        #             print(type(message))
+
+        #         elif isinstance(message, SystemMessage):
+        #             print("Message is a SystemMessage instance")
+        #             print(type(message))
+        #         elif isinstance(message, UserMessage):
+        #             print("Message is a UserMessage instance")
+        #             print(type(message))
+        #         elif isinstance(message, AssistantMessage):
+        #             print("Message is an AssistantMessage instance")
+        #             print(type(message))
+        #         elif isinstance(message, FunctionExecutionResult):
+        #             print("Message is a FunctionExecutionResult instance")
+        #             print(type(message))
+        #         elif isinstance(message, FunctionExecutionResultMessage):
+        #             print("Message is a FunctionExecutionResultMessage instance")
+        #             print(type(message))
+
+        #         else:
+        #             print("Message type not recognized!")
+        #     print("-----------------------------------")
+
+        # except Exception as e:
+        #     logger.error(f"Failed to save history messages: {e}")
+
+
+        # ------------------------------------------
+        # Memory
+        # ------------------------------------------
+        # memory_file_path = os.path.join(self.run_dir, "memory.txt")
+        # try:
+            
+        #     print("-----------------------------------")
+        #     print("Memory:")
+        #     print(self._memory)
+        #     print("-----------------------------------")
+
+        #     # memory_content = ""
+        #     # if self._memory:
+        #     #     for memory in self._memory:
+        #     #         mem_state = await memory.save_state()
+        #     #         memory_content += json.dumps(mem_state, indent=4) + "\n"
+        #     # save_txt(memory_content, STEP_DIR, "memory.txt")
+        # except Exception as e:
+        #     logger.error(f"Failed to save memory: {e}")
+
 
         # Take a screenshot
         screenshot = get_screenshot()
+        self.tracker.save_origin_screenshot(screenshot)
 
         # Analyse the screenshot
         screenshot_analysis = self.som.analyze_image(screenshot)
+        self.tracker.save_screenshot_analysis(screenshot_analysis)
 
         # Resize and compress the screenshot
         parsed_image_resized = resize_and_compress_image(screenshot_analysis["parsed_image"])
+        self.tracker.save_resized_screenshot(parsed_image_resized)
 
         final_messages = []
         if(len(messages) > 0):
@@ -98,5 +182,14 @@ class OOMeAgent(AssistantAgent):
 
         user_message = UserMessage(content=final_messages, source="user")
 
+        self.tracker.save_user_message(user_message)
+
+        response_counter = 0
         async for response in super().on_messages_stream([user_message], cancellation_token):
+            
+            # Increment the response counter
+            response_counter += 1
+
+            self.tracker.save_response(response, response_counter)
+
             yield response

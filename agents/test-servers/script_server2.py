@@ -73,6 +73,12 @@ def test_start_end_recording():
     else:
         print("Failed to download recording:", resp_get.json())
 
+def end_recording():
+    resp_end = requests.post(f"{BASE_URL}/end_recording")
+    if resp_end.status_code == 200:
+        print("Recording ended successfully.")
+    else:
+        print("Failed to end recording. Status code:", resp_end.status_code)
 
 def test_activate_window():
     resp = requests.post(f"{BASE_URL}/setup/activate_window", json={"window_name": "Notepad"})
@@ -90,7 +96,8 @@ if __name__ == "__main__":
     # test_execute_command_windows()
     # test_list_directory()
     # test_capture_screen_with_cursor()
-    test_start_end_recording()
+    # test_start_end_recording()
+    end_recording()
     # test_activate_window()
     # Uncomment the line below if you are sure you want to close all windows.
     # test_close_all_windows()
