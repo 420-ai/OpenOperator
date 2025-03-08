@@ -94,68 +94,8 @@ class OOMeAgent(AssistantAgent):
         logger.debug("=================================")
         self.tracker.set_step(self.step_counter)
 
-
-        # ------------------------------------------
-        # All history messages
-        # ------------------------------------------
-        # try:
-        #     history_messages = await self._model_context.get_messages()
-
-        #     print("-----------------------------------")
-        #     print("History messages:")
-        #     # print(history_messages)
-        #     for message in history_messages:
-        #         if isinstance(message, BaseAgentEvent):
-        #             print("Message is a BaseAgentEvent instance")
-        #             print(type(message))
-        #         elif isinstance(message, BaseChatMessage):
-        #             print("Message is a BaseChatMessage instance")
-        #             print(type(message))
-
-        #         elif isinstance(message, SystemMessage):
-        #             print("Message is a SystemMessage instance")
-        #             print(type(message))
-        #         elif isinstance(message, UserMessage):
-        #             print("Message is a UserMessage instance")
-        #             print(type(message))
-        #         elif isinstance(message, AssistantMessage):
-        #             print("Message is an AssistantMessage instance")
-        #             print(type(message))
-        #         elif isinstance(message, FunctionExecutionResult):
-        #             print("Message is a FunctionExecutionResult instance")
-        #             print(type(message))
-        #         elif isinstance(message, FunctionExecutionResultMessage):
-        #             print("Message is a FunctionExecutionResultMessage instance")
-        #             print(type(message))
-
-        #         else:
-        #             print("Message type not recognized!")
-        #     print("-----------------------------------")
-
-        # except Exception as e:
-        #     logger.error(f"Failed to save history messages: {e}")
-
-
-        # ------------------------------------------
-        # Memory
-        # ------------------------------------------
-        # memory_file_path = os.path.join(self.run_dir, "memory.txt")
-        # try:
-            
-        #     print("-----------------------------------")
-        #     print("Memory:")
-        #     print(self._memory)
-        #     print("-----------------------------------")
-
-        #     # memory_content = ""
-        #     # if self._memory:
-        #     #     for memory in self._memory:
-        #     #         mem_state = await memory.save_state()
-        #     #         memory_content += json.dumps(mem_state, indent=4) + "\n"
-        #     # save_txt(memory_content, STEP_DIR, "memory.txt")
-        # except Exception as e:
-        #     logger.error(f"Failed to save memory: {e}")
-
+        # all history messages
+        await self.tracker.save_messages(self._model_context)
 
         # Take a screenshot
         screenshot = get_screenshot()
@@ -181,7 +121,6 @@ class OOMeAgent(AssistantAgent):
         final_messages.append(Image.from_pil(parsed_image_resized))
 
         user_message = UserMessage(content=final_messages, source="user")
-
         self.tracker.save_user_message(user_message)
 
         response_counter = 0

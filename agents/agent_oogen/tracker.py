@@ -5,10 +5,10 @@ from helpers import get_timestamp, save_txt, save_json, save_image
 from agent.clients.computer.server_client import start_recording, end_recording, get_recording
 from PIL import Image
 from autogen_core import Image as AutogenImage
-from autogen_core.models import UserMessage
+from autogen_core.models import UserMessage, AssistantMessage, FunctionExecutionResultMessage
 from autogen_agentchat.messages import ThoughtEvent, ToolCallRequestEvent, ToolCallExecutionEvent
 from autogen_agentchat.base._chat_agent import Response as ChatAgentResponse
-
+from autogen_core.model_context import ChatCompletionContext
 
 class Tracker:
     def __init__(self):
@@ -78,5 +78,44 @@ class Tracker:
             print(type(response))
 
         save_txt(result_str, self.step_dir, f"response_{response_counter}.txt")
+
+    async def save_messages(self, model_context: ChatCompletionContext):
+        messages = await model_context.get_messages()
+
+        result_str = ""
+
+        for message in messages:
+            if isinstance(message, UserMessage):
+                if isinstance(message.content, list):
+                    content_list = []
+                    for item in message.content:
+                        if isinstance(item, AutogenImage):
+                            content_list.append("<Image>")
+                        else:
+                            content_list.append(str(item))
+                    content_str = "---\n".join(content_list)
+                else:
+                    content_str = message.content
+                result_str += f"User ({message.source}): {content_str}"
+            elif isinstance(message, AssistantMessage):    
+                if isinstance(message.content, list):
+                    content_str = " | ".join(str(fc) for fc in message.content)
+                else:
+                    content_str = message.content
+                result_str += f"Assistant ({message.source}): {content_str}"
+                if message.thought:
+                    result_str += f"\nThought: {message.thought}"
+            elif isinstance(message, FunctionExecutionResultMessage):
+                results_str = "\n".join(
+                    f"Function ({result.name}, ID: {result.call_id}): {'Error: ' if result.is_error else 'Result: '}{result.content}"
+                    for result in message.content
+                )
+                result_str += results_str
+            else:
+                print("Message type not recognized!")
+
+            result_str += "\n-----------------------------------\n"
+
+        save_txt(result_str, self.step_dir, "history_messages.txt")
 
         
