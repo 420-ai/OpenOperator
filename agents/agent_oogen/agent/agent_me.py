@@ -17,46 +17,18 @@ from autogen_agentchat.base import Response
 from autogen_core import Image
 from autogen_core.models import UserMessage
 from tracker import Tracker
-
-from autogen_agentchat.messages import ThoughtEvent, ToolCallRequestEvent, ToolCallExecutionEvent
-from autogen_agentchat.base._chat_agent import Response as ChatAgentResponse
-
-from autogen_agentchat.messages import BaseAgentEvent, BaseChatMessage
-from autogen_core.models import UserMessage, AssistantMessage, SystemMessage, FunctionExecutionResult, FunctionExecutionResultMessage
+from config import OOConfig
 
 logger = logging.getLogger("agent.me")
 
-
-SYSTEM_MESSAGE = """
-You are Screen Helper, a world-class reasoning engine that can complete any goal on a computer to help a user.
-Do not as any questions, act confidently and quickly.
-"""
-
-
-USER_MESSAGE = """Your goal is:
-!!!!
-{objective}
-!!!!
-"""
-
-
-MESSAGE_PARSED_UI_ELEMENTS = """
-Here are parsed UI elements including their coordinates from the image (attached):
-=======================================
-{parsed_ui_elements}
-=======================================
-
-If you want to click on the element, calculate the center of the element using the formula: centerX = x + (width / 2), centerY = y + (height / 2)
-"""
-
-
 class OOMeAgent(AssistantAgent):
-    def __init__(self, tracker: Tracker):
+    def __init__(self, config: OOConfig, tracker: Tracker, **kwargs):
         logger.debug("Initializing...")
 
         name = "agent_me"
         description = "Agent representing a user controlling computer"
         
+        self.config = config
         self.llm = llm
         self.som = OmniparserClient()
 
@@ -72,14 +44,13 @@ class OOMeAgent(AssistantAgent):
         self.step_counter = 0
         self.tracker = tracker
 
-        tracker.save_system_message(SYSTEM_MESSAGE)
-
         super().__init__(
             name=name, 
             description=description,
             model_client=llm, 
             tools=tools, 
-            system_message=SYSTEM_MESSAGE
+            system_message=config.SYSTEM_MESSAGE,
+            **kwargs
         )
 
     async def on_messages_stream(
@@ -112,11 +83,11 @@ class OOMeAgent(AssistantAgent):
         final_messages = []
         if(len(messages) > 0):
             # Get the original user task
-            user_task = messages[0].content
-            final_messages.append(USER_MESSAGE.format(objective=user_task))
-        
+            user_feedback = messages[0].content
+            final_messages.append(user_feedback)
+
         # Add the parsed UI elements and image to the final messages
-        final_messages.append(MESSAGE_PARSED_UI_ELEMENTS.format(parsed_ui_elements=screenshot_analysis["parsed_content_list"]))
+        final_messages.append(self.config.PARSED_UI_ELEMENTS_MESSAGE.format(parsed_ui_elements=screenshot_analysis["parsed_content_list"]))
         # Add the parsed image to the final messages
         final_messages.append(Image.from_pil(parsed_image_resized))
 
