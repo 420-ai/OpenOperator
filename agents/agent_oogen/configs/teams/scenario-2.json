@@ -1,0 +1,3 @@
+{
+  "instruction": "Open MS Teams application, login as user 'oo-test-user-1@outlook.com' with password 'Some_Very-Secret_Password..?', and send message to yourself with text 'Hello from AI agent!'."
+}

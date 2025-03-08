@@ -2,6 +2,8 @@ import base64
 from io import BytesIO
 from PIL import Image
 import io
+import os
+import json
 
 def encode_image(image):
     buffered = BytesIO()
@@ -31,5 +33,3 @@ def resize_and_compress_image(image: Image.Image, max_size=(1024, 1024)) -> Imag
     # Return the compressed image
     return Image.open(img_bytes)
 
-
-        

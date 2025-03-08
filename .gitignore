@@ -14,8 +14,9 @@ dist
 **/evaluation_examples_windows/results
 
 **/tmp/*
-**/logs/*
+logs
 *.log
+recordings
 
 **/test-servers/recordings/
 **/test-servers/screenshots/

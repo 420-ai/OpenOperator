@@ -43,3 +43,35 @@ def get_screenshot() -> Optional[Image.Image]:
         else:
             logger.error("Failed to get screenshot. Status code: %d", response.status_code)
             return None
+
+def start_recording() -> None:
+    """
+    Starts recording the screen.
+    """
+    resp_start = requests.post(f"{HTTP_SERVER}/start_recording")
+    if resp_start.status_code == 200:
+        logger.debug("Recording started successfully.")
+    else:
+        logger.error("Failed to start recording. Status code: %d", resp_start.status_code)
+
+def end_recording() -> None:
+    """
+    Ends the recording and saves the video.
+    """
+    resp_end = requests.post(f"{HTTP_SERVER}/end_recording")
+    if resp_end.status_code == 200:
+        logger.debug("Recording ended successfully.")
+    else:
+        logger.error("Failed to end recording. Status code: %d", resp_end.status_code)
+
+def get_recording(file_path:str) -> None:
+    """
+    Gets the recording from the server.
+    """
+    resp = requests.get(f"{HTTP_SERVER}/get_recording")
+    if resp.status_code == 200:
+        with open(file_path, "wb") as f:
+            f.write(resp.content)
+        logger.debug("Recording saved successfully.")
+    else:
+        logger.error("Failed to get recording. Status code: %d", resp.status_code)
