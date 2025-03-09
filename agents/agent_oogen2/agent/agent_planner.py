@@ -10,9 +10,10 @@ from autogen_core.models import UserMessage, SystemMessage
 from autogen_core import Image
 from agent.helpers import encode_image, resize_and_compress_image
 from autogen_agentchat.utils import content_to_str
+from tracker import Tracker
+from config import OOConfig
 
 logger = logging.getLogger("agent.planner")
-
 
 SYSTEM_MESSAGE = """You are an AI assistant designed to generate precise, actionable, and step-by-step plans for automating tasks in Microsoft Teams. Your role is to help another AI agent execute these plans efficiently by providing clear instructions for each action.
 
@@ -54,20 +55,34 @@ USER_MESSAGE = """Your objective is: {objective}. Please create a simple, step-b
 
 class OOPlannerAgent(BaseChatAgent):
 
-    def __init__(self):
+    def __init__(self, config: OOConfig, tracker: Tracker):
         logger.debug("Initializing...")
 
         name = "agent_planner"
         description = "Agent responsible for planning"
-        super().__init__(name, description)
-        
+
+        self.config = config
         self.llm = llm
+        self.tracker = tracker
+
+        super().__init__(
+            name, 
+            description,
+        )
+        
 
     @property
     def produced_message_types(self) -> Sequence[type[ChatMessage]]:
         return (TextMessage,)
 
     async def _inner_on_messages(self, messages: Sequence[ChatMessage], cancellation_token: CancellationToken) -> Any:
+        self.tracker.set_entity_step(self.name)
+        
+        # Log the current step
+        logger.debug("=================================")
+        logger.debug(f"Entity: {self.name} - Step: {self.tracker.step_counter}")
+        logger.debug("=================================")
+
         logger.info("Predicting ...")
 
         # Get the user task
@@ -75,24 +90,32 @@ class OOPlannerAgent(BaseChatAgent):
         
         # Take a screenshot
         screenshot = get_screenshot()
+        self.tracker.save_origin_screenshot(screenshot)
 
         # Resize and compress the screenshot
         screenshot_resized = resize_and_compress_image(screenshot)
+        self.tracker.save_resized_screenshot(screenshot_resized)
 
         # Define new messages
-        new_messages = [
-            SystemMessage(content=SYSTEM_MESSAGE),
-            UserMessage(content=[
-                USER_MESSAGE.format(objective=user_task), 
-                Image.from_pil(screenshot_resized)
-            ], source="user")
-        ]
+        system_message = SystemMessage(content=SYSTEM_MESSAGE)
+        self.tracker.save_system_message(system_message)
 
+        user_message = UserMessage(content=[
+            USER_MESSAGE.format(objective=user_task), 
+            Image.from_pil(screenshot_resized)
+        ], source="user")
+        self.tracker.save_user_message(user_message)
+        
         # Call LLM
-        result = await self.llm.create(messages=new_messages)
+        result = await self.llm.create(messages=[
+            system_message,
+            user_message,
+        ])
 
         # Construct response message
         response_message = TextMessage(content=result.content, source=self.name)
+        self.tracker.save_response(response_message)
+
         return response_message
 
     async def on_messages(self, messages: Sequence[ChatMessage], cancellation_token: CancellationToken) -> Response:
@@ -108,7 +131,9 @@ class OOPlannerAgent(BaseChatAgent):
             inner_messages=[],
         )
     
-    async def on_reset(self, cancellation_token: CancellationToken) -> None:
-        pass
 
+def init_agent_planner(config: OOConfig, tracker: Tracker) -> OOPlannerAgent:
+    logger.debug("Initializing agent-planner...")
 
+    agent = OOPlannerAgent(config, tracker)
+    return agent

@@ -1,102 +1,67 @@
+from tracker import Tracker
+from config import OOConfig
+from logging_setup import configure_logging
 from autogen_agentchat.ui import Console
-import asyncio
-from agent.agent_planner import OOPlannerAgent
-from agent.agent_me import OOMeAgent
+from agent.agent_planner import OOPlannerAgent, init_agent_planner
+from agent.agent_me import OOMeAgent, init_agent_me
 from agent.agent_me2 import agent
-from agent.team import team
-import logging.config
-import os
-
-CURRENT_FOLDER = os.path.dirname(os.path.abspath(__file__))
-# -------------------------------------------------------
-# -------------------------------------------------------
-# Logging
-
-LOG_DIR = os.path.join(CURRENT_FOLDER, "logs")
-os.makedirs(LOG_DIR, exist_ok=True)  # Ensure the directory exists
-LOG_FILE = os.path.join(LOG_DIR, "app.log")
-
-LOGGING_CONFIG = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "detailed": {
-            "format": "%(asctime)s - %(levelname)s - %(name)s - %(funcName)s - %(message)s",
-            "datefmt": "%Y-%m-%d %H:%M:%S",
-        }
-    },
-    "handlers": {
-        "file": {
-            "class": "logging.FileHandler",
-            "filename": LOG_FILE,
-            "formatter": "detailed",
-            "level": "DEBUG",
-        },
-        "console": {
-            "class": "logging.StreamHandler",
-            "formatter": "detailed",
-            "level": "DEBUG",
-        },
-    },
-    "root": {
-        "handlers": ["console", "file"],
-        "level": "INFO",
-    },
-    "loggers": {
-        "urllib3": {  
-            "level": "INFO",
-            "propagate": False,
-        },
-        "PIL": {  
-            "level": "INFO",
-            "propagate": False,
-        },
-        "openai": {  
-            "level": "INFO",
-            "propagate": False,
-        },
-        "httpcore": {
-            "level": "INFO",
-            "propagate": False,
-        },
-        "autogen_core": {
-            "level": "ERROR",
-            "propagate": False,
-        },
-        "httpx": {
-            "level": "ERROR",
-            "propagate": False,
-        },
-        "autogen_agentchat": {
-            "level": "ERROR",
-            "propagate": False,
-        },
-        "asyncio": {
-            "level": "ERROR",
-            "propagate": False,
-        },
-    },
-}
-
-logging.config.dictConfig(LOGGING_CONFIG)
+from agents.agent_oogen2.agent.agent_me_team import init_team
+import asyncio
+import logging
 logger = logging.getLogger("main")
 
-# -------------------------------------------------------
-# -------------------------------------------------------
+# Tracker object to log images, messages, config and other data
+tracker = Tracker()
+configure_logging(tracker.result_dir)
 
-TASK = 'Please open Notepad, create a new file named "draft.txt", type "This is a draft.", and save it to the Documents folder.'
+# Configuration object for agent
+config = OOConfig()
+config.load("teams", "scenario-2")
+tracker.save_config(config)
 
 # Main function
 async def main() -> None:
+    try:
+        
 
-    # agent_planner = OOPlannerAgent()
-    # agent_me = OOMeAgent()
+        logger.info("Starting task execution...")
+        tracker.start_recording()
 
-    stream = team.run_stream(task=TASK)
-    await Console(stream)
+        # -----------------------
+        # Agent Planner
+        # -----------------------
+        agent_planner = init_agent_planner(config, tracker)
 
-    # Message as string
-    # result = await team.run(task=TASK)
-    # print(result.messages[len(result.messages) - 1].content)
+        plan = await agent_planner.run(task=config.instruction)
 
-asyncio.run(main())
+
+        # -----------------------
+        # Agent ME
+        # -----------------------
+        agent_me = init_agent_me(config, tracker)
+
+        # Run the task with the team
+        stream = agent_me.run_stream(task=config.instruction)
+        await Console(stream)
+
+        while True:
+            # Get user input from the console.
+            user_input = input("Enter a message (type 'exit' to leave): ")
+            if user_input.strip().lower() == "exit":
+                break
+            # Run the team and stream messages to the console.
+            stream = agent_me.run_stream(task=user_input)
+            await Console(stream)
+
+    except asyncio.CancelledError:
+        logger.warning("Task was cancelled.")
+    
+    finally:
+        logger.info("Stopping recording and saving the file...")
+        tracker.end_recording()
+
+if __name__ == "__main__":
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        logger.info("KeyboardInterrupt received. Cleaning up before exit...")
