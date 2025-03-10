@@ -35,14 +35,6 @@ GOAL: You are tasked with executing **ONLY** the step: {task}
 
 FINISH: Once this task is done, please return the result. Do not continue with other steps in the plan."""
 
-# PARSED_UI_ELEMENTS_MESSAGE = """
-# Here are the detected UI elements on the screen, including their coordinates:
-# IMPORTANT: To click an element, use 'center_x' and 'center_y' coordinates.
-# =======================================
-# {parsed_ui_elements}
-# =======================================
-# """
-
 PARSED_UI_ELEMENTS_MESSAGE = """
 For given task, find relevant UI elements on the picture, and based on ID from the picture, use 'center_x' and 'center_y' coordinates.
 =======================================
