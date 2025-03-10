@@ -1,6 +1,8 @@
 # OO Agent
 
-Open Operator agent. Based on Autogen.
+Open Operator agent.
+[Autogen](https://github.com/microsoft/autogen) framework.
+[ReAct](https://arxiv.org/abs/2210.03629) style agent.
 
 ### Azure OpenAI
 
