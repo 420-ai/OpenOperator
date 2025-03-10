@@ -31,7 +31,7 @@ Install Windows manually from the `iso` file you downloaded. Choose `Windows 11 
 
 ## 1.4 Port forwarding
 
-On the `VM` is running an `open-operator server` on port `5050`. You can test that it is running correctly by opening browser with url `http://localhost:5000/probe`, you should see response as
+On the `VM` is running an `open-operator server` on port `5000`. You can test it is running correctly by opening browser with url `http://localhost:5000/probe`, you should see response as
 
 ```
 {
@@ -71,3 +71,5 @@ Now you can test that you can access the server from host by running command `cu
 }
 * Closing connection
 ```
+
+You should also change a port that is used in agent's server client -> ex. `agent_oogen/agent/clients/computer/server_client.py`

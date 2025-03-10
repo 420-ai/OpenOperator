@@ -15,7 +15,7 @@ from config import OOConfig
 
 logger = logging.getLogger("agent.planner")
 
-SYSTEM_MESSAGE = """You are an AI assistant designed to generate precise, actionable, and step-by-step plans for automating tasks in Microsoft Teams. Your role is to help another AI agent execute these plans efficiently by providing clear instructions for each action.
+SYSTEM_MESSAGE = """You are an AI assistant designed to generate precise, actionable, and step-by-step plans for automating tasks. Your role is to help another AI agent execute these plans efficiently by providing clear instructions for each action.
 
 ### Core Principles:
 1. **Clarity**: Each step must be specific, unambiguous, and self-contained.
@@ -31,26 +31,42 @@ The agent has access to the following tools:
 - **Mouse Double Click**: To perform a double-click with the mouse.
 - **Mouse Scroll**: To scroll the mouse wheel up or down.
 - **Keyboard**: To type text, press keys, or execute hotkey combinations.
-- **Python REPL**: To run Python code for calculations or other logic.
-- **Capture State**: Captures a screenshot of the current UI state before any action is performed. Useful for reference or comparison purposes.
-- **Validate Outcome**: Confirms whether an action achieved the intended result by analyzing a screenshot.
-- **Analyze UI Elements**: Captures and analyzes the screen to identify UI elements, their properties, and coordinates.
 
 ### Planner Instructions:
 1. **Interpret the User's Objective**: Understand the task and break it down into logical, sequential actions.
-2. **Generate Step-by-Step Actions**: Write concise steps that align with the agent’s capabilities. Ensure each step is actionable and self-contained.
+2. **Generate Step-by-Step Actions**: 
+    - Write concise steps that align with the agent’s capabilities. Ensure each step is actionable and self-contained.
+    - Each step must be fully self-contained and should not include substeps (e.g., a, b, c).
+    - Each numbered step must describe a complete action, including necessary interactions (e.g., moving the mouse, clicking, typing).
+    - Avoid breaking a single logical action into multiple substeps—ensure each step is atomic but complete.
 3. **Avoid Explicit Capture or Validation**: Assume the agent will handle capture and validation phases internally. Focus solely on specifying the required action.
 4. **Be Direct and Unambiguous**: Clearly define the action, the target UI element, and the intended result.
 5. **Minimize Complexity**: Provide only the essential steps to complete the task without unnecessary elaboration.
 
 ### Output Format:
-Provide the plan as a numbered list, with each step written as a clear, actionable instruction. Avoid adding explanations, as the output will be consumed directly by the agent.
+1. **Visual Description**: Provide a concise description of what is visible in the screenshot.
+2. **Action**: Choose one of the following:
+   - **Plan**: Provide the plan as a numbered list, with each step written as a clear, actionable instruction. No substeps.
+   - **Response**: Provide the final answer if the objective has been **fully** achieved.
+
+Follow the output format strictly. Example of output:
+=====
+### Visual Description:  
+<VISUAL_DESCRIPTION>
+
+### Action:  
+
+**Plan**:  
+1. <STEP_1>  
+2. <STEP_2> 
+3. <STEP_3>
+=====
 """
 
 USER_MESSAGE = """Your objective is: {objective}. Please create a simple, step-by-step plan that an AI agent with the listed tools can follow to complete the objective.
                      
 **Screenshot**:  
-[Image Included: A screenshot with the mouse's current position highlighted as a red circle (20px).]
+[Image Included: A screenshot with the mouse's current position.]
 """
 
 class OOPlannerAgent(BaseChatAgent):
@@ -80,7 +96,7 @@ class OOPlannerAgent(BaseChatAgent):
         
         # Log the current step
         logger.debug("=================================")
-        logger.debug(f"Entity: {self.name} - Step: {self.tracker.step_counter}")
+        logger.debug(f"Entity: {self.name} - Global Step: {self.tracker.step_counter}")
         logger.debug("=================================")
 
         logger.info("Predicting ...")
@@ -130,6 +146,9 @@ class OOPlannerAgent(BaseChatAgent):
             chat_message=result,
             inner_messages=[],
         )
+
+    async def on_reset(self, cancellation_token):
+        return await super().on_reset(cancellation_token)
     
 
 def init_agent_planner(config: OOConfig, tracker: Tracker) -> OOPlannerAgent:

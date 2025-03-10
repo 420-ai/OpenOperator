@@ -13,7 +13,7 @@ from agent.tools.mouse_double_click import mouse_double_click
 from autogen_agentchat.agents import AssistantAgent
 from autogen_agentchat.messages import AgentEvent, ChatMessage
 from autogen_agentchat.teams import RoundRobinGroupChat
-from autogen_agentchat.conditions import TextMessageTermination, HandoffTermination
+from autogen_agentchat.conditions import TextMessageTermination, HandoffTermination, MaxMessageTermination
 from autogen_agentchat.base import Handoff
 from autogen_core import CancellationToken
 from autogen_agentchat.base import Response
@@ -24,8 +24,34 @@ from config import OOConfig
 
 logger = logging.getLogger("agent.me")
 
+SYSTEM_MESSAGE = """"
+"You are `AgentME`, an AI agent responsible for executing actions within a UI automation task.
+"""
+
+USER_MESSAGE = """For the following plan:
+{plan_str}
+
+GOAL: You are tasked with executing **ONLY** the step: {task}
+
+FINISH: Once this task is done, please return the result. Do not continue with other steps in the plan."""
+
+# PARSED_UI_ELEMENTS_MESSAGE = """
+# Here are the detected UI elements on the screen, including their coordinates:
+# IMPORTANT: To click an element, use 'center_x' and 'center_y' coordinates.
+# =======================================
+# {parsed_ui_elements}
+# =======================================
+# """
+
+PARSED_UI_ELEMENTS_MESSAGE = """
+For given task, find relevant UI elements on the picture, and based on ID from the picture, use 'center_x' and 'center_y' coordinates.
+=======================================
+{parsed_ui_elements}
+=======================================
+"""
+
 class OOMeAgent(AssistantAgent):
-    def __init__(self, config: OOConfig, tracker: Tracker, **kwargs):
+    def __init__(self, config: OOConfig, tracker: Tracker, plan: str, **kwargs):
         logger.debug("Initializing...")
 
         name = "agent_me"
@@ -34,6 +60,8 @@ class OOMeAgent(AssistantAgent):
         self.config = config
         self.llm = llm
         self.som = OmniparserClient()
+
+        self.plan = plan
 
         tools = [
             keyboard_type,
@@ -52,21 +80,22 @@ class OOMeAgent(AssistantAgent):
             description=description,
             model_client=llm, 
             tools=tools, 
-            system_message=config.SYSTEM_MESSAGE,
+            system_message=SYSTEM_MESSAGE,
             **kwargs
         )
 
     async def on_messages_stream(
         self, messages: Sequence[ChatMessage], cancellation_token: CancellationToken
     ) -> AsyncGenerator[AgentEvent | ChatMessage | Response, None]:
-        
-        # Increment the step counter
+        self.tracker.set_entity_step(self.name)
         self.step_counter += 1
+        
         # Log the current step
         logger.debug("=================================")
-        logger.debug(f"Step: {self.step_counter}")
+        logger.debug(f"Entity: {self.name} - Global Step: {self.tracker.step_counter} | Local Step: {self.step_counter}")
         logger.debug("=================================")
-        self.tracker.set_step(self.step_counter)
+
+        logger.info("Predicting ...")
 
         # all history messages
         await self.tracker.save_messages(self._model_context)
@@ -86,11 +115,10 @@ class OOMeAgent(AssistantAgent):
         final_messages = []
         if(len(messages) > 0):
             # Get the original user task
-            user_feedback = messages[0].content
-            final_messages.append(user_feedback)
-
+            final_messages.append(USER_MESSAGE.format(plan_str=self.plan, task=messages[0].content))
+        
         # Add the parsed UI elements and image to the final messages
-        final_messages.append(self.config.PARSED_UI_ELEMENTS_MESSAGE.format(parsed_ui_elements=screenshot_analysis["parsed_content_list"]))
+        final_messages.append(PARSED_UI_ELEMENTS_MESSAGE.format(parsed_ui_elements=screenshot_analysis["parsed_content_list"]))
         # Add the parsed image to the final messages
         final_messages.append(Image.from_pil(parsed_image_resized))
 
@@ -107,22 +135,23 @@ class OOMeAgent(AssistantAgent):
 
             yield response
 
-def init_agent_me(config: OOConfig, tracker: Tracker) -> RoundRobinGroupChat:
+def init_agent_me(config: OOConfig, tracker: Tracker, plan: str) -> RoundRobinGroupChat:
     logger.debug("Initializing agent-me team...")
 
     # Agent
     agent_me = OOMeAgent(
         config=config, 
         tracker=tracker,
-        handoffs=[Handoff(target="user", message="Transfer to user.")],
+        plan=plan,
     )
 
-    handoff_termination = HandoffTermination(target="user")
+    max_messages_termination = MaxMessageTermination(max_messages=5)
     text_termination = TextMessageTermination(agent_me.name)
+    termination = max_messages_termination | text_termination
 
     # Team 
     team = RoundRobinGroupChat(
             [agent_me],
-            termination_condition=text_termination | handoff_termination,
+            termination_condition=termination
         )
     return team

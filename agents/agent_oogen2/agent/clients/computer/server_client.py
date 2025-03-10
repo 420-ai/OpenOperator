@@ -7,7 +7,7 @@ import io
 
 logger = logging.getLogger("agent.clients.server_client")
 
-HTTP_SERVER = "http://127.0.0.1:5000"
+HTTP_SERVER = "http://127.0.0.1:5050"
 
 def execute_python_command(command: str) -> None:
     """
@@ -24,10 +24,10 @@ def execute_python_command(command: str) -> None:
 
     try:
         response = requests.post(HTTP_SERVER + "/execute", headers=headers, data=payload, timeout=90)
-        if response.status_code == 200:
-            logger.debug("Command executed successfully: %s", response.text)
-        else:
+
+        if response.status_code != 200:
             logger.error("Failed to execute command. Status code: %d", response.status_code)
+            
         return response.json()
     except requests.exceptions.RequestException as e:
         logger.error("An error occurred while trying to execute the command: %s", e)
