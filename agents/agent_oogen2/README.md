@@ -1,6 +1,8 @@
 # OO Agent
 
-Open Operator agent. Based on Autogen.
+Open Operator agent.
+[Autogen](https://github.com/microsoft/autogen) framework.
+[Plan and solve](https://arxiv.org/abs/2305.04091) style agent.
 
 ### Azure OpenAI
 
@@ -20,3 +22,9 @@ AZURE_OPENAI_API_VERSION=2024-05-01-preview
 ## Run
 
 `uv run main.py`
+
+# TODO
+
+- Screenshot with current position of mouse - highlighted ??
+
+- Implement Screenshot before action -> action -> screenshot after action -> Validate if action was done

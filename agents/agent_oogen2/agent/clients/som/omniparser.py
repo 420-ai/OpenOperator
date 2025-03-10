@@ -59,6 +59,7 @@ class OmniparserClient:
         formatted_output = []
         for i, item in enumerate(response["parsed_content_list"]):
             formatted_output.append({
+                "id": i,
                 "from": "omniparser",
                 "type": item["type"],
                 "text": item["content"],
@@ -69,6 +70,8 @@ class OmniparserClient:
                     "width": int((item["bbox"][2] * w) - (item["bbox"][0] * w)),
                     # We need to calculate height as difference between y and y2
                     "height": int((item["bbox"][3] * h) - (item["bbox"][1] * h)),
+                    "center_x": int((item["bbox"][0] + item["bbox"][2]) * w / 2), 
+                    "center_y": int((item["bbox"][1] + item["bbox"][3]) * h / 2),
                 },
                 "interactivity": item["interactivity"],
             })
