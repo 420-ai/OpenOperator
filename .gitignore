@@ -17,6 +17,7 @@ dist
 logs
 *.log
 recordings
+**/test/out/
 
 **/test-servers/recordings/
 **/test-servers/screenshots/

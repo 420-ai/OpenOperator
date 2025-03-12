@@ -22,3 +22,8 @@ AZURE_OPENAI_API_VERSION=2024-05-01-preview
 ## Run
 
 `uv run main.py`
+
+# Problems
+
+Plan-solve pattern.
+This agent is taking too many unecessary steps.

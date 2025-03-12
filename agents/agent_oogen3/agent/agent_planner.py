@@ -60,6 +60,11 @@ To ensure an optimal solution, follow this structured reasoning process:
 ### Expected Outcome:
 - <Describe the final UI state after execution.>
 ```
+
+---
+
+HINTS:
+- if you need to open application, rather search for it, than trying to locate its icon on the desktop.
 """
 
 USER_MESSAGE = """Your objective is: {objective}. Please create a **structured step-by-step plan** that an AI agent can follow using its available tools.

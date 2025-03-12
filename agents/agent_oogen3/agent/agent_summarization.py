@@ -95,10 +95,10 @@ class OOSummarizationAgent(BaseChatAgent):
             user_message,
         ])
 
-        print("==================")
-        print("Result:")
-        print(result)
-        print("==================")
+        # print("==================")
+        # print("Result:")
+        # print(result)
+        # print("==================")
 
         # Construct response message
         response_message = TextMessage(content=result.content, source=self.name)

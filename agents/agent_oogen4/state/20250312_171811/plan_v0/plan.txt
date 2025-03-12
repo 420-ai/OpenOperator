@@ -1,0 +1,20 @@
+```plaintext
+### Visual Description:
+The screenshot shows a Microsoft Teams chat window featuring a conversation with "Casey Bennett." Visible messages include discussions about hobbies, with Casey mentioning an interest in photography (specifically landscapes and cityscapes) and describing a favorite viewpoint. The user shares an interest in cycling and discusses its benefits. The chat interface includes typical Teams elements, such as navigation on the left sidebar (for Chat, Meet, Calendar, etc.) and a message input field at the bottom.
+
+### Plan Phase:
+To generate a summary of the conversation, the agent needs to:
+1. **Access and Analyze Visible Chat Messages**: Review the visible portion of the exchange to extract key points discussed.
+2. **Scroll to Review Additional Messages**: If the conversation scrolls beyond the currently visible content, ensure all messages are reviewed.
+3. **Compile and Summarize**: Synthesize key topics and themes from the discussion into a concise summary.
+
+### Execution Plan:
+1. Begin at the start of the chat interface with Casey Bennett.
+2. Read and extract content from visible messages.
+3. Scroll upward (if possible) to check for earlier messages; repeat the extraction process.
+4. Scroll downward (if necessary) to confirm if additional messages exist and extract their content.
+5. Combine all extracted messages into a high-level summary covering key points of the conversation.
+
+### Expected Outcome:
+- The conversation is summarized concisely, capturing Casey Bennett's interest in landscape and cityscape photography, their mention of a favorite viewpoint (a skyline at sunset), the user's cycling hobby, and a discussion about long rides versus casual cycling.
+```

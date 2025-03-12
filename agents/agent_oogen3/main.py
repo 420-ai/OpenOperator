@@ -97,6 +97,7 @@ async def main() -> None:
 
             summary = await agent_summarization.run(task=plan_tasks[0])
             print(format_autogen_message(summary))
+            summary_str = summary.messages[-1].content
 
             # -----------------------
             # Agent Replanner
