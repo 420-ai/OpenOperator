@@ -22,3 +22,7 @@ AZURE_OPENAI_API_VERSION=2024-05-01-preview
 ## Run
 
 `uv run main.py`
+
+# Problems
+
+ReAct pattern "remembers" all steps taken, and soon he run out of context length of LLM.

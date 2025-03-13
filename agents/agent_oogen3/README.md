@@ -23,7 +23,8 @@ AZURE_OPENAI_API_VERSION=2024-05-01-preview
 
 `uv run main.py`
 
-# Problems
+# TODO
 
-Plan-solve pattern.
-This agent is taking too many unecessary steps.
+- Screenshot with current position of mouse - highlighted ??
+
+- Implement Screenshot before action -> action -> screenshot after action -> Validate if action was done
