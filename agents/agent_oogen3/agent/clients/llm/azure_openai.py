@@ -12,8 +12,25 @@ AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT")
 AZURE_OPENAI_API_VERSION = os.getenv("AZURE_OPENAI_API_VERSION")
 
 # LLM
-llm = AzureOpenAIChatCompletionClient(
-    model=AZURE_OPENAI_DEPLOYMENT,
+llm_o3_mini = AzureOpenAIChatCompletionClient(
+    model="o3-mini",
+    azure_deployment="o3-mini-deployment",
+    azure_endpoint=AZURE_OPENAI_BASEURL,
+    api_version=AZURE_OPENAI_API_VERSION,
+    api_key=AZURE_API_KEY, 
+)
+
+llm_gpt4o = AzureOpenAIChatCompletionClient(
+    model="gpt-4o-2024-11-20",
+    azure_deployment="gpt-4o-deployment",
+    azure_endpoint=AZURE_OPENAI_BASEURL,
+    api_version=AZURE_OPENAI_API_VERSION,
+    api_key=AZURE_API_KEY, 
+)
+
+llm_gpt4o_mini = AzureOpenAIChatCompletionClient(
+    model="gpt-4o-mini",
+    azure_deployment="gpt-4o-mini-deployment",
     azure_endpoint=AZURE_OPENAI_BASEURL,
     api_version=AZURE_OPENAI_API_VERSION,
     api_key=AZURE_API_KEY, 

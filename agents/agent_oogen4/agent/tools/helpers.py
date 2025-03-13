@@ -18,11 +18,11 @@ def save_txt(content: str, file_path: str, file_name: str):
     with open(txt_file, "w", encoding="utf-8") as f:
         f.write(content)
 
-def save_system_message(system_message: SystemMessage):
-        save_txt(system_message.content, ".", "system_message.txt")
+def save_system_message(system_message: SystemMessage, file_path: str):
+        save_txt(system_message.content, file_path, "system_message.txt")
 
-def save_user_message(user_message: UserMessage):
+def save_user_message(user_message: UserMessage, file_path: str):
     filtered_messages = [msg for msg in user_message.content if not isinstance(msg, AutogenImage)]
     filtered_messages_str = "\n".join([str(msg) for msg in filtered_messages])
-    save_txt(filtered_messages_str, ".", "user_message.txt")
+    save_txt(filtered_messages_str, file_path, "user_message.txt")
     

@@ -5,7 +5,6 @@ from logging_setup import configure_logging
 from agent.agent_planner import init_agent_planner
 from agent.agent_me import init_agent_me
 from agent.agent_replanner import init_agent_replanner
-from agent.agent_summarization import init_agent_summarization
 from agent.helpers import format_autogen_message
 import asyncio
 import logging
@@ -32,26 +31,63 @@ async def main() -> None:
         # -----------------------
         # Agent Planner
         # -----------------------
-        agent_planner = init_agent_planner(config, tracker, state)
+        agent_planner = init_agent_planner(config, state)
 
         plan = await agent_planner.run(task=config.instruction)
         print(format_autogen_message(plan))
         plan_str = plan.messages[-1].content
 
+        # ----------------------
+        # ----------------------
+        # PLAN LOOP
+        # ----------------------
+        # ----------------------
+        planVersion = 0
+        planResult = False
 
-        # -----------------------
-        # Agent ME
-        # -----------------------
-        agent_me = init_agent_me(config, state)
-        result = await agent_me.run()
-        print("Agent ME result:")
-        print(result)
+        while planResult == False and planVersion < config.workflow_settings["max_plan_versions"]:
+            planVersion += 1
+
+            # -----------------------
+            # Agent ME
+            # -----------------------
+            agent_me = init_agent_me(config, state)
+            result = await agent_me.run()
+            print("Agent ME result:")
+            print(result)
+
+            # -----------------------
+            # Agent Replanner
+            # -----------------------
+            agent_replanner = init_agent_replanner(config, state)
+            result = await agent_replanner.run()
+            print("Agent Replanner result:")
+            print(result)
+            
+            if result == "ALL DONE":
+                planResult = True
+                break
 
 
-        # -----------------------
-        # Agent Replanner
-        # -----------------------
-        # TBD
+        # Save the plan step result to the state
+        if planResult == True:
+            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            print("PLAN FINISHED SUCCESSFULLY")
+            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        else:
+            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            print("PLAN REACHED MAX VERSIONS")
+            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+
+        logger.info("PLAN LOOP END")
 
 
     except asyncio.CancelledError:

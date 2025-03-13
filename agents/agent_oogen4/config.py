@@ -6,8 +6,7 @@ class OOConfig:
         self.config = {}
 
     def load(self, domain: str, scenario: str):
-        print(os.getcwd())
-        config_path = os.path.join(os.getcwd(), "configs", domain, f"{scenario}.json")
+        config_path = os.path.join(os.path.dirname(__file__), "configs", domain, f"{scenario}.json")
         
         if not os.path.exists(config_path):
             raise FileNotFoundError(f"Configuration file not found: {config_path}")

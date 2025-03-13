@@ -4,10 +4,10 @@ from agent.clients.llm.azure_openai import llm_gpt4o_mini
 from autogen_core import Image as AutogenImage
 from autogen_core.models import UserMessage, SystemMessage
 import logging
-logger = logging.getLogger("agent.me-node.is_step_done")
+logger = logging.getLogger("agent.me-node.is_step_done_by_validation")
 
 SYSTEM_MESSAGE = """
-You are AI agent responsible for deciding, if the step is already done, based on the screenshot.
+You are AI agent responsible for deciding, if the step is already done, based on the provided validation.
 
 Output:
 Return "TRUE" if the step is already done or can be skipped.
@@ -15,14 +15,12 @@ Return "FALSE" if the step we can proceed with the step
 """
 
 USER_MESSAGE = """
-Here is the step that agent should do, is the step already done?
+Here is the validation summary.
 
-{plan_step}
-
-Attached is current state of the UI.
+{validation}
 """
 
-class NodeIsStepDone:
+class NodeIsStepDoneByValidation:
     """
     Check if the step is done.
     """
@@ -35,20 +33,16 @@ class NodeIsStepDone:
 
         self.llm = llm_gpt4o_mini
 
-    async def execute(self) -> bool:
+    async def execute(self, validation: str) -> bool:
         logger.debug("Executing...")
         
-        plan_step = self.state.current_plan_data["plan_step"]["text"]
-        screenshot_t0 = self.state.get_current_plan_image("t0")
-
-        first_step = await self.llm.create(
+        isDone = await self.llm.create(
             messages=[
                 SystemMessage(content=SYSTEM_MESSAGE),
                 UserMessage(content=[
-                    USER_MESSAGE.format(plan_step=plan_step),
-                    AutogenImage.from_pil(screenshot_t0) 
+                    USER_MESSAGE.format(validation=validation),
                 ], source="user")
             ]
         )
         
-        return first_step.content
+        return isDone.content

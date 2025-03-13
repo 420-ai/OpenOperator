@@ -1,6 +1,6 @@
 import logging
 from typing import Any, AsyncGenerator, List, Sequence
-from agent.clients.llm.azure_openai import llm
+from agent.clients.llm.azure_openai import llm_gpt4o
 from agent.clients.computer.server_client import get_screenshot
 from autogen_agentchat.agents import BaseChatAgent
 from autogen_agentchat.messages import AgentEvent, ChatMessage, TextMessage, MultiModalMessage
@@ -10,7 +10,7 @@ from autogen_core.models import UserMessage, SystemMessage
 from autogen_core import Image
 from agent.helpers import encode_image, resize_and_compress_image
 from autogen_agentchat.utils import content_to_str
-from tracker import Tracker
+from state import State
 from config import OOConfig
 import re
 
@@ -75,15 +75,15 @@ USER_MESSAGE = """Your objective is: {objective}. Please create a **structured s
 
 class OOPlannerAgent(BaseChatAgent):
 
-    def __init__(self, config: OOConfig, tracker: Tracker):
+    def __init__(self, config: OOConfig, state: State):
         logger.debug("Initializing...")
 
         name = "agent_planner"
         description = "Agent responsible for planning"
 
         self.config = config
-        self.llm = llm
-        self.tracker = tracker
+        self.llm = llm_gpt4o
+        self.state = state
 
         super().__init__(
             name, 
@@ -96,13 +96,11 @@ class OOPlannerAgent(BaseChatAgent):
         return (TextMessage,)
 
     async def _inner_on_messages(self, messages: Sequence[ChatMessage], cancellation_token: CancellationToken) -> Any:
-        self.tracker.set_entity_step(self.name)
         
         # Log the current step
         logger.debug("=================================")
-        logger.debug(f"Entity: {self.name} - Global Step: {self.tracker.step_counter}")
+        logger.debug(f"Entity: {self.name}")
         logger.debug("=================================")
-
         logger.info("Predicting ...")
 
         # Get the user task
@@ -110,31 +108,29 @@ class OOPlannerAgent(BaseChatAgent):
         
         # Take a screenshot
         screenshot = get_screenshot()
-        self.tracker.save_origin_screenshot(screenshot)
 
         # Resize and compress the screenshot
         screenshot_resized = resize_and_compress_image(screenshot)
-        self.tracker.save_resized_screenshot(screenshot_resized)
 
         # Define new messages
         system_message = SystemMessage(content=SYSTEM_MESSAGE)
-        self.tracker.save_system_message(system_message)
 
         user_message = UserMessage(content=[
             USER_MESSAGE.format(objective=user_task), 
             Image.from_pil(screenshot_resized)
         ], source="user")
-        self.tracker.save_user_message(user_message)
         
         # Call LLM
         result = await self.llm.create(messages=[
             system_message,
             user_message,
         ])
+        self.state.create_new_plan_version()
+        self.state.save_plan_text(result.content)
+        self.state.save_plan_image(screenshot_resized, "t0.png")
 
         # Construct response message
         response_message = TextMessage(content=result.content, source=self.name)
-        self.tracker.save_response(response_message)
 
         return response_message
 
@@ -155,8 +151,8 @@ class OOPlannerAgent(BaseChatAgent):
         return await super().on_reset(cancellation_token)
     
 
-def init_agent_planner(config: OOConfig, tracker: Tracker) -> OOPlannerAgent:
+def init_agent_planner(config: OOConfig, state: State) -> OOPlannerAgent:
     logger.debug("Initializing agent-planner...")
 
-    agent = OOPlannerAgent(config, tracker)
+    agent = OOPlannerAgent(config, state)
     return agent

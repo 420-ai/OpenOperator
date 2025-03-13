@@ -1,9 +1,0 @@
-
-Find the UI element in the screenshot and return its ID.
-If you cannot find the UI element return -1.
-
-Find UI element based on this description:
-vertical scroll bar in the chat window with Casey Bennett
-
-Output format:
-ID=1
