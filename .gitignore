@@ -32,3 +32,4 @@ models/vision
 models/magma/video/*.png
 
 **/node_modules
+Zone.Identifier
