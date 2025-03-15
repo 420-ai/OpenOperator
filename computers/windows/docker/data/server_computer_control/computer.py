@@ -385,41 +385,41 @@ def test_computer_with_clipboard(img_path):
     time.sleep(1.0)
 
 
-def main():
+# def main():
 
-    open_apps = WindowManager()  
-    app_names = open_apps.find_open_applications()  
-    for app in app_names:
-        print(app)
-    print(open_apps)  
-    open_apps.switch_to_application("Spotify Premium")
+#     open_apps = WindowManager()  
+#     app_names = open_apps.find_open_applications()  
+#     for app in app_names:
+#         print(app)
+#     print(open_apps)  
+#     open_apps.switch_to_application("Spotify Premium")
 
-    screenshot_img, window_title, window_rect = screen_utils.capture_screenshot()
+#     screenshot_img, window_title, window_rect = screen_utils.capture_screenshot()
 
-    # fake rectangles
-    rects = [[0, 0, 100, 100], [200, 20, 400, 60]]
+#     # fake rectangles
+#     rects = [[0, 0, 100, 100], [200, 20, 400, 60]]
 
-    computer = Computer(rects, window_rect, screenshot_img, scale=(1.0, 1.0), swap_ctrl_alt=True) 
+#     computer = Computer(rects, window_rect, screenshot_img, scale=(1.0, 1.0), swap_ctrl_alt=True) 
 
-    computer.os.open_program("msedge")
+#     computer.os.open_program("msedge")
 
-    computer.mouse.move(id=1) 
+#     computer.mouse.move(id=1) 
 
-    time.sleep(2)
-    computer.mouse.move_abs(0.5, 0.5)
-
-
-    time.sleep(2)
-    computer.mouse.scroll(dir="down")
-    time.sleep(2)
-    computer.mouse.scroll(dir="up")
-    # computer.mouse.right_click()
-
-    computer.mouse.click()  
-    computer.keyboard.write("amazon.com")  
-    computer.keyboard.press("enter")
+#     time.sleep(2)
+#     computer.mouse.move_abs(0.5, 0.5)
 
 
+#     time.sleep(2)
+#     computer.mouse.scroll(dir="down")
+#     time.sleep(2)
+#     computer.mouse.scroll(dir="up")
+#     # computer.mouse.right_click()
 
-if __name__ == "__main__":
-    main()
+#     computer.mouse.click()  
+#     computer.keyboard.write("amazon.com")  
+#     computer.keyboard.press("enter")
+
+
+
+# if __name__ == "__main__":
+#     main()

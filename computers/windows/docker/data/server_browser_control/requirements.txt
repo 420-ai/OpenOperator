@@ -1,0 +1,4 @@
+flask
+setproctitle
+playwright
+webdriver-manager

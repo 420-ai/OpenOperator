@@ -32,15 +32,18 @@ from computer import Computer, WindowManager
 from human import Human
 from uuid import uuid4
 import getpass
+import setproctitle
 
 # Setup logging
-# log_file = os.path.join(".", "logs", "server_2.log")
-log_file = r"C:\INSTALL\logs\server_2.log"
+log_file = os.path.join("\\\\host.lan\\Data", "logs", "server_computer_control.log")
 logging.basicConfig(
     filename=log_file,
     level=logging.INFO,
      format="%(asctime)s - %(levelname)s - %(funcName)s - %(message)s"
 )
+
+# Named the process for easier identification
+setproctitle.setproctitle("server_computer_control") 
 
 
 # logging.info("WORKING DIRECTORY 1")
@@ -58,16 +61,16 @@ logger.setLevel(logging.INFO)
 
 
 
-PORT=5000
 
-# parser = argparse.ArgumentParser()
-# parser.add_argument("--log_file", help="log file path", type=str,
-#                     default=os.path.join(os.path.dirname(__file__), "server.log"))
-# #port
-# parser.add_argument("--port", help="port", type=int, default=5000)
 
-# args = parser.parse_args()
-# log_file = args.log_file
+parser = argparse.ArgumentParser()
+parser.add_argument("--log_file", help="log file path", type=str,
+                    default=os.path.join(os.path.dirname(__file__), "server.log"))
+#port
+parser.add_argument("--port", help="port", type=int, default=5000)
+
+args = parser.parse_args()
+log_file = args.log_file
 
 
 platform_name: str = platform.system()
@@ -111,6 +114,15 @@ os.makedirs(recording_path, exist_ok=True)
 recording_path = os.path.join(recording_path, "recording.mp4")
 logging.info("recording dir set to " + recording_path)
 
+
+
+# ---------------------------
+# Healthcheck Endpoint
+# ---------------------------
+@app.route('/healthcheck', methods=['GET'])
+def healthcheck_endpoint():
+    # This endpoint simply returns a status 200 response with a custom message
+    return jsonify({"status": "Successful", "message": "Service is operational!"}), 200
 
 
 @app.errorhandler(Exception)
@@ -238,11 +250,6 @@ def _get_machine_architecture() -> str:
     else:
         return 'unknown'
 
-@app.route('/probe', methods=['GET'])
-def probe_endpoint():
-    # This endpoint simply returns a status 200 response with a custom message
-    return jsonify({"status": "Probe successful", "message": "Service is operational"}), 200
-
 # Used with the --prepare-image flag gracefully shutdown the VM at the first setup
 @app.route('/shutdown', methods=['POST'])
 def shutdown_endpoint():
@@ -313,7 +320,7 @@ def capture_screen_with_cursor():
         cursor_x, cursor_y = pyautogui.position()
         cursor = Image.open(cursor_path)
         # make the cursor smaller
-        # cursor = cursor.resize((int(cursor.width / 1.5), int(cursor.height / 1.5)))
+        cursor = cursor.resize((int(cursor.width / 1.5), int(cursor.height / 1.5)))
         screenshot.paste(cursor, (cursor_x, cursor_y), cursor)
         screenshot.save(file_path)
     elif user_platform == "Linux":
@@ -1786,13 +1793,10 @@ def get_check_if_world_clock_exists():
     else:
         return jsonify({'status': 'error', 'message': 'World clock does not exist'}), 400
 
-
+# ---------------------------
+# Run Server
+# ---------------------------
 if __name__ == '__main__':
     logging.info("Server started")
-    app.run(debug=True, host="0.0.0.0", port=PORT)
+    app.run(debug=True, host="0.0.0.0", port=args.port)
 
-
-# example command to test server. get platform
-# curl -X GET http://127.0.0.1:5000/platform
-# on windows:
-# Invoke-WebRequest -Uri http://127.0.0.1:5000/platform
