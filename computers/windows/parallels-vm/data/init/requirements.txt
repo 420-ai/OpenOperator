@@ -5,3 +5,4 @@ pyautogui
 pywin32
 opencv-python
 asyncio
+playwright

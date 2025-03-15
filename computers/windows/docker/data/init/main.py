@@ -141,7 +141,7 @@ def download_and_install(name, mirrors, tools_config):
     
     os.remove(installer_path)
 
-def start_installation():
+def start_software_installation():
     json_path = os.path.join(os.path.dirname(__file__), 'software.json')
     
     if not os.path.exists(json_path):
@@ -157,10 +157,19 @@ def start_installation():
 
     log('All tasks completed.')
 
+def install_playwright_chromium():
+    try:
+        subprocess.run([sys.executable, '-m', 'playwright', 'install', 'chromium'], check=True)
+        logging.info("Playwright Chromium installed successfully.")
+    except subprocess.CalledProcessError as e:
+        logging.error(f"Playwright Chromium installation failed: {e}")
+
 if __name__ == '__main__':
     try:
         logging.info("Starting Installer...")
-        start_installation()
+        start_software_installation()
+        install_playwright_chromium()
+        logging.info("Installation completed successfully.")
     except Exception as e:
         logging.error(f"Installation failed with error: {e}", exc_info=True)
     finally:

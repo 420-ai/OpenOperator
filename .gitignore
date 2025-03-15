@@ -22,11 +22,11 @@ recordings
 
 **/test-servers/recordings/
 **/test-servers/screenshots/
-**/server2/recordings/
-**/server2/screenshots/
+**/server_computer_control/recordings/
+**/server_computer_control/screenshots/
+**/server_browser_control/screenshots/
+**/server_browser_control/traces/
 **/agent_oogen/screenshots/
-
-
 
 models/vision
 models/magma/video/*.png

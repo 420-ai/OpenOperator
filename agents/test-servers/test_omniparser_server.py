@@ -5,6 +5,10 @@ import json
 from io import BytesIO
 from PIL import Image
 
+BASE_URL = "http://127.0.0.1:8000"
+
+testimg_dir = "test-img"
+
 def load_image_as_base64(image_path):
     """
     Loads an image from a file and returns it as a base64-encoded PNG string.
@@ -47,26 +51,25 @@ def save_json(data, filename):
     print(f"Saved JSON data to {filename}")
 
 if __name__ == "__main__":
-    # URL of the running Omniparser server
-    server_url = "http://localhost:8000"
-
     # Load image from file and convert it to base64
-    image_path = "./test/screenshot.png"
-    base64_image = load_image_as_base64(image_path)
+    file_path = os.path.join(testimg_dir, "screenshot.png")
+    base64_image = load_image_as_base64(file_path)
 
     # Send the image to the server for parsing
-    result = send_parse_request(server_url, base64_image)
+    result = send_parse_request(BASE_URL, base64_image)
 
     if result:
         # Save som_image_base64 into a PNG file
         if "som_image_base64" in result:
-            save_base64_to_png(result["som_image_base64"], "./test/som_image.png")
+            parsed_img_path = os.path.join(testimg_dir, "som_image.png")
+            save_base64_to_png(result["som_image_base64"], parsed_img_path)
         else:
             print("som_image_base64 not found in the response.")
 
         # Save parsed_content_list into a JSON file
         if "parsed_content_list" in result:
-            save_json(result["parsed_content_list"], "./test/parsed_content_list.json")
+            parsed_content_path = os.path.join(testimg_dir, "parsed_content_list.json")
+            save_json(result["parsed_content_list"], parsed_content_path)
         else:
             print("parsed_content_list not found in the response.")
     else:
