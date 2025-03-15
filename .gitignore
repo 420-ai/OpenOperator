@@ -26,6 +26,8 @@ recordings
 **/server_computer_control/screenshots/
 **/server_browser_control/screenshots/
 **/server_browser_control/traces/
+**/server_browser_control/user_data/
+**/test-servers/traces/
 **/agent_oogen/screenshots/
 
 models/vision
