@@ -63,17 +63,20 @@ echo Python script INITIALIZE executed. >> %LOGFILE%
 REM ---------------------------
 REM 4) Install Required Python Packages for SERVERS
 REM ---------------------------
-echo Installing Python libraries... >> "%LOGFILE%"
+echo Installing Python libraries for 'server computer control' ... >> "%LOGFILE%"
 "%PYTHON_PATH%" -m pip install -r "\\host.lan\Data\server_computer_control\requirements.txt" >> "%LOGFILE%" 2>&1
+echo Python libraries for 'server computer control' were installed >> "%LOGFILE%"
+
+echo Installing Python libraries for 'server browser control' ... >> "%LOGFILE%"
 "%PYTHON_PATH%" -m pip install -r "\\host.lan\Data\server_browser_control\requirements.txt" >> "%LOGFILE%" 2>&1
-echo Python libraries for servers were installed >> "%LOGFILE%"
+echo Python libraries for 'server browser control' were installed >> "%LOGFILE%"
 
 REM ---------------------------
 REM 5) Add Firewall Rules
 REM ---------------------------
 echo Adding firewall rules... >> "%LOGFILE%"
-netsh advfirewall firewall add rule name="SERVER_COMPUTER_CONTROL Flask" dir=in action=allow protocol=TCP localport=5000
-netsh advfirewall firewall add rule name="SERVER_BROWSER_CONTROL Flask" dir=in action=allow protocol=TCP localport=6000
+netsh advfirewall firewall add rule name="SERVER_COMPUTER_CONTROL" dir=in action=allow protocol=TCP localport=5000
+netsh advfirewall firewall add rule name="SERVER_BROWSER_CONTROL" dir=in action=allow protocol=TCP localport=6000
 REM Add firewall rule for Chrome DevTools (port 9222)
 netsh advfirewall firewall add rule name="Chrome Remote Debugging Port" dir=in action=allow protocol=TCP localport=9222
 echo Firewall rules added >> "%LOGFILE%"
