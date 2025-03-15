@@ -165,7 +165,7 @@ def start_software_installation():
 
 def install_playwright_chromium():
     try:
-        subprocess.run([sys.executable, '-m', 'playwright', 'install', 'chromium'], check=True)
+        subprocess.run([sys.executable, '-m', 'playwright', 'install'], check=True)
         logging.info("Playwright Chromium installed successfully.")
     except subprocess.CalledProcessError as e:
         logging.error(f"Playwright Chromium installation failed: {e}")
