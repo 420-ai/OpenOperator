@@ -1,10 +1,14 @@
 # OO Agent
 
 Open Operator agent.
-[Autogen](https://github.com/microsoft/autogen) framework.
 
-> Custom workflow !!!
-> Inspired by [Plan and solve](https://arxiv.org/abs/2305.04091)
+> Custom workflow
+>
+> Inspired by [Plan and solve](https://arxiv.org/abs/2305.04091).
+>
+> **No AI Agent** from Autogen, **only LLM calls** via [Autogen](https://github.com/microsoft/autogen).
+>
+> Using [Gymnasium](https://github.com/Farama-Foundation/Gymnasium) environment
 
 ### Azure OpenAI
 
