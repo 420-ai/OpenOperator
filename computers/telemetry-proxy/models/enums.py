@@ -1,0 +1,41 @@
+from enum import IntEnum
+
+class ValueKind(IntEnum):
+    VALUE_INT64 = 0
+    VALUE_UINT64 = 1
+    VALUE_INT32 = 2
+    VALUE_UINT32 = 3
+    VALUE_DOUBLE = 4
+    VALUE_STRING = 5
+    VALUE_BOOL = 6
+    VALUE_DATE_TIME = 7
+    VALUE_GUID = 8
+    VALUE_ARRAY_INT64 = 9
+    VALUE_ARRAY_UINT64 = 10
+    VALUE_ARRAY_INT32 = 11
+    VALUE_ARRAY_UINT32 = 12
+    VALUE_ARRAY_DOUBLE = 13
+    VALUE_ARRAY_STRING = 14
+    VALUE_ARRAY_BOOL = 15
+    VALUE_ARRAY_DATE_TIME = 16
+    VALUE_ARRAY_GUID = 17
+
+class PIIKind(IntEnum):
+    NOT_SET = 0
+    DISTINGUISHED_NAME = 1
+    GENERIC_DATA = 2
+    IPV4_ADDRESS = 3
+    IPV6_ADDRESS = 4
+    MAIL_SUBJECT = 5
+    PHONE_NUMBER = 6
+    QUERY_STRING = 7
+    SIP_ADDRESS = 8
+    SMTP_ADDRESS = 9
+    IDENTITY = 10
+    URI = 11
+    FQDN = 12
+    IPV4_ADDRESS_LEGACY = 13
+
+class CustomerContentKind(IntEnum):
+    NOT_SET = 0
+    GENERIC_CONTENT = 1
