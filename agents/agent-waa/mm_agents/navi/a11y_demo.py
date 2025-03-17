@@ -8,8 +8,8 @@ from anytree import Node, RenderTree
 import numpy as np
 
 # Hardcoded URLs
-A11Y_URL = "http://20.20.20.21:5000/accessibility?backend=uia"
-SCREENSHOT_URL = "http://20.20.20.21:5000/screenshot"
+A11Y_URL = "http://20.20.20.21:5050/accessibility?backend=uia"
+SCREENSHOT_URL = "http://20.20.20.21:5050/screenshot"
 CACHE_DIR = ".cache"
 
 def get_a11y(reuse=False):

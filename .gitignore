@@ -6,16 +6,32 @@ storage
 __pycache__
 .venv
 
-.env
 cache
 dist
+**/tmp/*
+*.log
+**/node_modules
+
+
+# Ignore all .env files
+.env
+!servers/server_browser_control/.env
+!servers/server_computer_control/.env
+!computers/windows/docker/data/init/.env
+!computers/windows/parallels_vm/data/init/.env
+
+# Ignore all logs
+logs
+!computers/windows/docker/data/logs
+!computers/windows/parallels_vm/data/logs
+
+
+computers/windows/parallels_vm/data/server_browser_control
+computers/windows/parallels_vm/data/server_computer_control
 
 **/results
 **/evaluation_examples_windows/results
 
-**/tmp/*
-logs
-*.log
 recordings
 **/test/out/
 **/state
@@ -32,5 +48,3 @@ recordings
 
 models/vision
 models/magma/video/*.png
-
-**/node_modules

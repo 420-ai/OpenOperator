@@ -6,12 +6,15 @@ import subprocess
 import logging
 import pythoncom
 import glob
+from dotenv import load_dotenv
+load_dotenv()
 
 # Ensure COM is properly initialized
 pythoncom.CoInitializeEx(pythoncom.COINIT_APARTMENTTHREADED)
 
 # Setup logging
-log_file = os.path.join("\\\\host.lan\\Data", "logs", "install_software.log")
+logs_path = os.getenv("LOG_PATH")
+log_file = os.path.join(logs_path, "install_software.log")
 logging.basicConfig(filename=log_file, level=logging.INFO, 
                     format="%(asctime)s - %(levelname)s - %(message)s")
 

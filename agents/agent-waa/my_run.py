@@ -34,7 +34,7 @@ screen_width = 1920
 screen_height = 1200
 headless = False
 observation_type = "screenshot_a11y_tree" # "a11y_tree", "screenshot_a11y_tree", "som"
-emulator_ip = "127.0.0.1" # Port :5000 => Server2 on computer ["windows VM in docker"]
+emulator_ip = "127.0.0.1" # Port :5050 => Server2 on computer ["windows VM in docker"]
 a11y_backend = "uia" # "uia" or "win32"
 
 # ????

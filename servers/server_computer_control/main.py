@@ -33,9 +33,16 @@ from human import Human
 from uuid import uuid4
 import getpass
 import setproctitle
+from dotenv import load_dotenv
+load_dotenv()
+
+# Port
+port = os.getenv("PORT")
+
 
 # Setup logging
-log_file = r"C:\INSTALL\logs\server_computer_control.log"
+logs_path = os.getenv("LOG_PATH")
+log_file = os.path.join(logs_path, "server_computer_control.log")
 logging.basicConfig(
     filename=log_file,
     level=logging.INFO,
@@ -48,6 +55,9 @@ setproctitle.setproctitle("server_computer_control")
 
 # logging.info("WORKING DIRECTORY 1")
 # logging.info(os.getcwd())
+# logging.info(__file__)
+# logging.info(os.path.dirname(__file__))
+
 # # Change working directory to the script's location
 # os.chdir(os.path.dirname(os.path.abspath(__file__)))
 # logging.info("WORKING DIRECTORY 2")
@@ -61,7 +71,7 @@ logger.setLevel(logging.INFO)
 
 
 
-PORT=5000
+
 
 # parser = argparse.ArgumentParser()
 # parser.add_argument("--log_file", help="log file path", type=str,
@@ -102,18 +112,208 @@ computer = Computer()
 recording_process = None  # fixme: this is a temporary solution for recording, need to be changed to support multiple-process
 
 
-
-logging.info(__file__)
-logging.info(os.path.dirname(__file__))
-
-logging.info(os.getcwd())
-
 recording_path = os.path.join(os.path.dirname(__file__), "recordings")
 # create tmp directory if not exists
 os.makedirs(recording_path, exist_ok=True)
 recording_path = os.path.join(recording_path, "recording.mp4")
 logging.info("recording dir set to " + recording_path)
 
+
+
+# ---------------------------
+# Healthcheck Endpoint
+# ---------------------------
+@app.route('/healthcheck', methods=['GET'])
+def healthcheck_endpoint():
+    # This endpoint simply returns a status 200 response with a custom message
+    return jsonify({"status": "Successful", "message": "Service is operational!"}), 200
+
+
+# ---------------------------
+# Execute Shell Command Endpoint
+# ---------------------------
+
+@app.route('/setup/execute', methods=['POST'])
+@app.route('/execute', methods=['POST'])
+def execute_command():
+    
+    data = request.json
+    # The 'command' key in the JSON request should contain the command to be executed.
+    shell = data.get('shell', False)
+    command = data.get('command', "" if shell else [])
+
+    if isinstance(command, str) and not shell:
+        command = shlex.split(command)
+
+    # Expand user directory
+    for i, arg in enumerate(command):
+        if arg.startswith("~/"):
+            command[i] = os.path.expanduser(arg)
+
+    # Execute the command without any safety checks.
+    try:
+        result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=shell, text=True, timeout=120)
+        return jsonify({
+            'status': 'success',
+            'output': result.stdout,
+            'error': result.stderr,
+            'returncode': result.returncode
+        })
+    except Exception as e:
+        logging.error("\n" + traceback.format_exc() + "\n")
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
+        # return jsonify({
+        #     'status': 'error',
+        #     'message': str(e),
+        #     'shell': str(shell),
+        #     'command': command,
+        #     'data': data
+        # }), 500    
+
+
+# ---------------------------
+# Screenshot Endpoint
+# ---------------------------
+
+
+@app.route('/screenshot', methods=['GET'])
+def capture_screen_with_cursor():
+    # DEPRECATED: if you want to capture the cursor, use the vm_controller.py screen capture function instead
+
+    file_path = os.path.join(os.path.dirname(__file__), "screenshots", "screenshot.png")
+    user_platform = platform.system()
+
+    # Ensure the screenshots directory exists
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
+    # fixme: This is a temporary fix for the cursor not being captured on Windows and Linux
+    if user_platform == "Windows":
+        cursor_path = os.path.join(os.path.dirname(__file__), "cursor.png")
+        screenshot = pyautogui.screenshot()
+        cursor_x, cursor_y = pyautogui.position()
+        cursor = Image.open(cursor_path)
+        # make the cursor smaller
+        cursor = cursor.resize((int(cursor.width / 1.5), int(cursor.height / 1.5)))
+        screenshot.paste(cursor, (cursor_x, cursor_y), cursor)
+        screenshot.save(file_path)
+    elif user_platform == "Linux":
+        cursor_obj = Xcursor()
+        imgarray = cursor_obj.getCursorImageArrayFast()
+        cursor_img = Image.fromarray(imgarray)
+        screenshot = pyautogui.screenshot()
+        cursor_x, cursor_y = pyautogui.position()
+        screenshot.paste(cursor_img, (cursor_x, cursor_y), cursor_img)
+        screenshot.save(file_path)
+    elif user_platform == "Darwin":  # (Mac OS)
+        # Use the screencapture utility to capture the screen with the cursor
+        subprocess.run(["screencapture", "-C", file_path])
+    else:
+        logging.warning(f"The platform you're using ({user_platform}) is not currently supported")
+
+    return send_file(file_path, mimetype='image/png')
+
+
+# ---------------------------
+# Recordings Endpoint
+# ---------------------------
+
+
+@app.route('/start_recording', methods=['POST'])
+def start_recording():
+    try:
+
+        global recording_process
+        if recording_process:
+            return jsonify({'status': 'error', 'message': 'Recording is already in progress.'}), 400
+
+        if platform_name == 'Linux':
+            d = display.Display()
+            screen_width = d.screen().width_in_pixels
+            screen_height = d.screen().height_in_pixels
+
+            start_command = f"ffmpeg -y -f x11grab -draw_mouse 1 -s {screen_width}x{screen_height} -i :0.0 -pix_fmt yuv420p -c:v libx264 -r 30 '{recording_path}'"
+
+            recording_process = subprocess.Popen(shlex.split(start_command), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        elif platform_name == 'Windows':
+            screen_width, screen_height = pyautogui.size()
+            start_command = f"ffmpeg -y -f gdigrab -draw_mouse 1 -video_size {screen_width}x{screen_height} -i desktop -pix_fmt yuv420p -c:v libx264 -r 30 '{recording_path}'"
+
+            recording_process = subprocess.Popen(
+                shlex.split(start_command), 
+                stdin=subprocess.PIPE, 
+                stdout=subprocess.DEVNULL, 
+                stderr=subprocess.DEVNULL,
+                creationflags=subprocess.CREATE_NO_WINDOW)
+        else:
+            return jsonify({'status': 'error', 'message': 'Recording is not supported on this platform.'}), 400
+        
+        return jsonify({'status': 'success', 'message': f'Started recording to: {recording_path}.\nCOMMAND: {start_command}'})
+
+    except Exception as e:
+        logging.error(f"Error starting recording: {e}")
+        logging.error("\n" + traceback.format_exc() + "\n")
+
+        return jsonify({'status': 'error', 'message': f'Failed to start recording: {e}'}), 500
+
+@app.route('/end_recording', methods=['POST'])
+def end_recording():
+    try:
+
+        global recording_process
+
+        if not recording_process:
+            return jsonify({'status': 'error', 'message': 'No recording in progress to stop.'}), 400
+
+
+        logging.info(f"Recording process: {recording_process}")
+
+        # recording_process.send_signal(signal.SIGINT)
+        # ps_childrend = recording_process.children()
+        # logging.info(f"Children: {ps_childrend}")
+
+        # for c in ps_childrend:
+        #     c.send_signal(signal.CTRL_C_EVENT)
+        # os.killpg(os.getpgid(recording_process.pid), signal.SIGTERM)
+        # os.kill(recording_process.pid, signal.CTRL_C_EVENT)
+        recording_process.communicate(b'q') 
+        # os.kill(recording_process.pid, signal.SIGINT)
+        # os.kill(recording_process.pid, signal.SIGINT)
+        code = recording_process.wait()
+        recording_process.terminate()
+        # if recording_process.poll() is None:  
+        #     # Forcefully kill the process if it did not terminate  
+        #     recording_process.kill()
+        recording_process = None
+        # return recording video file
+
+        if os.path.exists(recording_path):
+            return  jsonify({'status': 'success', 'message': f'record saved to: {recording_path}'}), 200
+        else:
+            return abort(404, description="Recording failed")
+        
+    except Exception as e:
+        logging.error(f"Error starting recording: {e}")
+        logging.error("\n" + traceback.format_exc() + "\n")
+
+        return jsonify({'status': 'error', 'message': f'Failed to start recording: {e}'}), 500
+
+@app.route('/get_recording', methods=['GET'])
+def get_recording():
+
+    if os.path.exists(recording_path):
+        return send_file(recording_path, as_attachment=True)
+    else:
+        return jsonify({'status': 'error', 'message': 'Recording file not found.'}), 404
+
+
+
+
+# ---------------------------
+# Other Endpoints
+# ---------------------------
 
 
 @app.errorhandler(Exception)
@@ -189,47 +389,6 @@ def execute_command_windows():
             'message': str(e)  
         }), 500  
     
-@app.route('/setup/execute', methods=['POST'])
-@app.route('/execute', methods=['POST'])
-def execute_command():
-    
-    data = request.json
-    # The 'command' key in the JSON request should contain the command to be executed.
-    shell = data.get('shell', False)
-    command = data.get('command', "" if shell else [])
-
-    if isinstance(command, str) and not shell:
-        command = shlex.split(command)
-
-    # Expand user directory
-    for i, arg in enumerate(command):
-        if arg.startswith("~/"):
-            command[i] = os.path.expanduser(arg)
-
-    # Execute the command without any safety checks.
-    try:
-        result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=shell, text=True, timeout=120)
-        return jsonify({
-            'status': 'success',
-            'output': result.stdout,
-            'error': result.stderr,
-            'returncode': result.returncode
-        })
-    except Exception as e:
-        logging.error("\n" + traceback.format_exc() + "\n")
-        return jsonify({
-            'status': 'error',
-            'message': str(e)
-        }), 500
-        # return jsonify({
-        #     'status': 'error',
-        #     'message': str(e),
-        #     'shell': str(shell),
-        #     'command': command,
-        #     'data': data
-        # }), 500    
-
-
 def _get_machine_architecture() -> str:
     """ Get the machine architecture, e.g., x86_64, arm64, aarch64, i386, etc.
     """
@@ -292,43 +451,6 @@ def launch_app():
                         'command': command,
                         'data': data
                         }), 500    
-
-
-@app.route('/screenshot', methods=['GET'])
-def capture_screen_with_cursor():
-    # DEPRECATED: if you want to capture the cursor, use the vm_controller.py screen capture function instead
-
-    file_path = os.path.join(os.path.dirname(__file__), "screenshots", "screenshot.png")
-    user_platform = platform.system()
-
-    # Ensure the screenshots directory exists
-    os.makedirs(os.path.dirname(file_path), exist_ok=True)
-
-    # fixme: This is a temporary fix for the cursor not being captured on Windows and Linux
-    if user_platform == "Windows":
-        cursor_path = os.path.join(os.path.dirname(__file__), "cursor.png")
-        screenshot = pyautogui.screenshot()
-        cursor_x, cursor_y = pyautogui.position()
-        cursor = Image.open(cursor_path)
-        # make the cursor smaller
-        # cursor = cursor.resize((int(cursor.width / 1.5), int(cursor.height / 1.5)))
-        screenshot.paste(cursor, (cursor_x, cursor_y), cursor)
-        screenshot.save(file_path)
-    elif user_platform == "Linux":
-        cursor_obj = Xcursor()
-        imgarray = cursor_obj.getCursorImageArrayFast()
-        cursor_img = Image.fromarray(imgarray)
-        screenshot = pyautogui.screenshot()
-        cursor_x, cursor_y = pyautogui.position()
-        screenshot.paste(cursor_img, (cursor_x, cursor_y), cursor_img)
-        screenshot.save(file_path)
-    elif user_platform == "Darwin":  # (Mac OS)
-        # Use the screencapture utility to capture the screen with the cursor
-        subprocess.run(["screencapture", "-C", file_path])
-    else:
-        logging.warning(f"The platform you're using ({user_platform}) is not currently supported")
-
-    return send_file(file_path, mimetype='image/png')
 
 
 def _has_active_terminal(desktop: Accessible) -> bool:
@@ -1508,94 +1630,6 @@ def close_window():
 
     return "Window closed successfully.", 200
 
-
-@app.route('/start_recording', methods=['POST'])
-def start_recording():
-    try:
-
-        global recording_process
-        if recording_process:
-            return jsonify({'status': 'error', 'message': 'Recording is already in progress.'}), 400
-
-        if platform_name == 'Linux':
-            d = display.Display()
-            screen_width = d.screen().width_in_pixels
-            screen_height = d.screen().height_in_pixels
-
-            start_command = f"ffmpeg -y -f x11grab -draw_mouse 1 -s {screen_width}x{screen_height} -i :0.0 -pix_fmt yuv420p -c:v libx264 -r 30 '{recording_path}'"
-
-            recording_process = subprocess.Popen(shlex.split(start_command), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        elif platform_name == 'Windows':
-            screen_width, screen_height = pyautogui.size()
-            start_command = f"ffmpeg -y -f gdigrab -draw_mouse 1 -video_size {screen_width}x{screen_height} -i desktop -pix_fmt yuv420p -c:v libx264 -r 30 '{recording_path}'"
-
-            recording_process = subprocess.Popen(
-                shlex.split(start_command), 
-                stdin=subprocess.PIPE, 
-                stdout=subprocess.DEVNULL, 
-                stderr=subprocess.DEVNULL,
-                creationflags=subprocess.CREATE_NO_WINDOW)
-        else:
-            return jsonify({'status': 'error', 'message': 'Recording is not supported on this platform.'}), 400
-        
-        return jsonify({'status': 'success', 'message': f'Started recording to: {recording_path}.\nCOMMAND: {start_command}'})
-
-    except Exception as e:
-        logging.error(f"Error starting recording: {e}")
-        logging.error("\n" + traceback.format_exc() + "\n")
-
-        return jsonify({'status': 'error', 'message': f'Failed to start recording: {e}'}), 500
-
-@app.route('/end_recording', methods=['POST'])
-def end_recording():
-    try:
-
-        global recording_process
-
-        if not recording_process:
-            return jsonify({'status': 'error', 'message': 'No recording in progress to stop.'}), 400
-
-
-        logging.info(f"Recording process: {recording_process}")
-
-        # recording_process.send_signal(signal.SIGINT)
-        # ps_childrend = recording_process.children()
-        # logging.info(f"Children: {ps_childrend}")
-
-        # for c in ps_childrend:
-        #     c.send_signal(signal.CTRL_C_EVENT)
-        # os.killpg(os.getpgid(recording_process.pid), signal.SIGTERM)
-        # os.kill(recording_process.pid, signal.CTRL_C_EVENT)
-        recording_process.communicate(b'q') 
-        # os.kill(recording_process.pid, signal.SIGINT)
-        # os.kill(recording_process.pid, signal.SIGINT)
-        code = recording_process.wait()
-        recording_process.terminate()
-        # if recording_process.poll() is None:  
-        #     # Forcefully kill the process if it did not terminate  
-        #     recording_process.kill()
-        recording_process = None
-        # return recording video file
-
-        if os.path.exists(recording_path):
-            return  jsonify({'status': 'success', 'message': f'record saved to: {recording_path}'}), 200
-        else:
-            return abort(404, description="Recording failed")
-        
-    except Exception as e:
-        logging.error(f"Error starting recording: {e}")
-        logging.error("\n" + traceback.format_exc() + "\n")
-
-        return jsonify({'status': 'error', 'message': f'Failed to start recording: {e}'}), 500
-
-@app.route('/get_recording', methods=['GET'])
-def get_recording():
-
-    if os.path.exists(recording_path):
-        return send_file(recording_path, as_attachment=True)
-    else:
-        return jsonify({'status': 'error', 'message': 'Recording file not found.'}), 404
-
 @app.route('/save_state', methods=['POST'])
 def save_state():
     # creates a system snapshot with the name provided
@@ -1784,13 +1818,10 @@ def get_check_if_world_clock_exists():
     else:
         return jsonify({'status': 'error', 'message': 'World clock does not exist'}), 400
 
-
+# ---------------------------
+# Run Server
+# ---------------------------
 if __name__ == '__main__':
     logging.info("Server started")
-    app.run(debug=True, host="0.0.0.0", port=PORT)
+    app.run(debug=True, host="0.0.0.0", port=port)
 
-
-# example command to test server. get platform
-# curl -X GET http://127.0.0.1:5000/platform
-# on windows:
-# Invoke-WebRequest -Uri http://127.0.0.1:5000/platform

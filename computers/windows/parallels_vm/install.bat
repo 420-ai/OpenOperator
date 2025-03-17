@@ -11,15 +11,14 @@ if "%~1"=="" (
 )
 
 echo Using username: %USERNAME%
-
 echo Temp folder: %TEMP%
 echo Current folder: %~dp0
-
 
 REM ---------------------------
 REM 1) Set up logging
 REM ---------------------------
-set "LOGFILE=C:\INSTALL\logs\install_bat.txt"
+set "LOGFILE=C:\INSTALL\data\logs\install_bat.txt"
+
 echo ================================================= >> "%LOGFILE%"
 echo Installation started at %date% %time% >> "%LOGFILE%"
 echo ================================================= >> "%LOGFILE%"
@@ -53,17 +52,18 @@ REM 3) Install software
 REM ---------------------------
 
 REM Update pip
+echo Updating pip... >> "%LOGFILE%"
 "%PYTHON_PATH%" -m pip install --upgrade pip >> "%LOGFILE%" 2>&1
 
 REM Install Python libraries for INITIALIZE
-echo Installing Python libraries for INITIALIZE... >> %LOGFILE%
+echo Installing Python libraries for INITIALIZE... >> "%LOGFILE%"
 "%PYTHON_PATH%" -m pip install -r "C:\INSTALL\data\init\requirements.txt" >> "%LOGFILE%" 2>&1
-echo Python libraries for INITIALIZE installed successfully! >> %LOGFILE%
+echo Python libraries for INITIALIZE installed successfully! >> "%LOGFILE%"
 
 REM Run INITIALIZE Python script from network path
-echo Running Python script INITIALIZE from network... >> %LOGFILE%
+echo Running Python script INITIALIZE from network... >> "%LOGFILE%"
 "%PYTHON_PATH%" "C:\INSTALL\data\init\main.py" >> "%LOGFILE%" 2>&1
-echo Python script INITIALIZE executed. >> %LOGFILE%
+echo Python script INITIALIZE executed. >> "%LOGFILE%"
 
 REM ---------------------------
 REM 4) Install Required Python Packages for SERVERS
@@ -117,4 +117,4 @@ echo 'Scheduled tasks' for servers started >> "%LOGFILE%"
 
 echo Installation completed at %date% %time% >> "%LOGFILE%"
 echo Installation complete. Servers will start automatically on reboot.
-exit
+pause

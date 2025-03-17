@@ -1,3 +1,4 @@
+setproctitle
 python3-xlib==0.15
 PyAutoGUI==0.9.54
 Pillow
@@ -19,3 +20,4 @@ pathlib
 comtypes
 PyQt5
 uuid
+python-dotenv

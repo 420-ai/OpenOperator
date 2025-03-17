@@ -15,10 +15,16 @@ from playwright.async_api import async_playwright
 import platform
 import pyautogui
 import logging
+from dotenv import load_dotenv
 from logging_setup import configure_logging
+load_dotenv()
+
+
+# Port
+port = os.getenv("PORT")
 
 # Setup logging
-logs_path = r"C:\INSTALL\logs\server_browser_control.log"
+logs_path = os.getenv("LOG_PATH")
 configure_logging(logs_path)
 logger = logging.getLogger("server_browser_control")
 
@@ -49,7 +55,10 @@ browser_lock = asyncio.Lock()  # helps to ensure thread safety if multiple reque
 # ---------------------------
 @app.get('/healthcheck')
 def healthcheck_endpoint():
-    return {"status": "Successful", "message": "Service is operational!"}
+    return {
+        "status": "Successful", 
+        "message": "Service is operational!"
+    }
 
 # ---------------------------
 # Browser Lifecycle Management
@@ -200,7 +209,6 @@ async def cursor_position():
 # Run Server
 # ---------------------------
 if __name__ == "__main__":
-    port = 6000
     logger.info(f"Server started on port {port} at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     try:
         uvicorn.run(
