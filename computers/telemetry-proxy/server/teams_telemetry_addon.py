@@ -8,7 +8,7 @@ from kusto_decoder import decode_kusto_request
 
 ## TODO just have this script to run the proxy server for us
 
-class CaptureTeamsEvents:
+class TeamsTelemetryAddon:
     def __init__(self):
         self.num = 0
 
@@ -45,6 +45,3 @@ class CaptureTeamsEvents:
                         logging.info("Request body: %s" % lines)
                     else:
                         logging.info("No request body found.")
-
-
-addons = [CaptureTeamsEvents()]
