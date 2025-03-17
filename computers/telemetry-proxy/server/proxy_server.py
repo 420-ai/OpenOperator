@@ -62,7 +62,7 @@ class ProxyServer:
             # web_host=self.web_host,
             # web_port=self.web_port,
             showhost=True,
-            mode=["local:ms-teams"],
+            mode=["local:msedgewebview2"], # add local:ms-teams if you want to capture shell events
         )
         return opts
 
