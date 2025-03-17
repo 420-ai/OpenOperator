@@ -1,3 +1,15 @@
 {
-    "terminal.integrated.allowChords": false
+    "terminal.integrated.allowChords": false,
+    "python-envs.pythonProjects": [
+        {
+            "path": "servers/server_network_proxy",
+            "envManager": "ms-python.python:venv",
+            "packageManager": "ms-python.python:pip"
+        },
+        {
+            "path": "servers/server_network_proxy/.venv",
+            "envManager": "ms-python.python:system",
+            "packageManager": "ms-python.python:pip"
+        }
+    ]
 }
