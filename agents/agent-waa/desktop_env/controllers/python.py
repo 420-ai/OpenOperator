@@ -15,7 +15,7 @@ A11Y_TIMEOUT = 300 # max 5 minutes to fetch the uia tree
 class PythonController:
     def __init__(self, vm_ip: str, pkgs_prefix: str = "import pyautogui; import time; pyautogui.FAILSAFE = False; {command}"):
         self.vm_ip = vm_ip
-        self.http_server = f"http://{vm_ip}:5000"
+        self.http_server = f"http://{vm_ip}:5050"
         self.pkgs_prefix = pkgs_prefix  # fixme: this is a hacky way to execute python commands. fix it and combine it with installation of packages
 
     def get_probe(self):

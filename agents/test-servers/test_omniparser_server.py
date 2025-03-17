@@ -8,6 +8,8 @@ from PIL import Image
 BASE_URL = "http://127.0.0.1:8000"
 
 testimg_dir = "test-img"
+parsed_dir = "parsed"
+os.makedirs(parsed_dir, exist_ok=True)
 
 def load_image_as_base64(image_path):
     """
@@ -61,14 +63,14 @@ if __name__ == "__main__":
     if result:
         # Save som_image_base64 into a PNG file
         if "som_image_base64" in result:
-            parsed_img_path = os.path.join(testimg_dir, "som_image.png")
+            parsed_img_path = os.path.join(parsed_dir, "som_image.png")
             save_base64_to_png(result["som_image_base64"], parsed_img_path)
         else:
             print("som_image_base64 not found in the response.")
 
         # Save parsed_content_list into a JSON file
         if "parsed_content_list" in result:
-            parsed_content_path = os.path.join(testimg_dir, "parsed_content_list.json")
+            parsed_content_path = os.path.join(parsed_dir, "parsed_content_list.json")
             save_json(result["parsed_content_list"], parsed_content_path)
         else:
             print("parsed_content_list not found in the response.")

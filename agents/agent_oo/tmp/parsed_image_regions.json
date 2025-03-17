@@ -1,0 +1,410 @@
+[
+    {
+        "from": "omniparser",
+        "type": "text",
+        "text": "Last step",
+        "shape": {
+            "x": 595,
+            "y": 442,
+            "width": 87,
+            "height": 27
+        },
+        "interactivity": false
+    },
+    {
+        "from": "omniparser",
+        "type": "text",
+        "text": "Finish setup",
+        "shape": {
+            "x": 555,
+            "y": 476,
+            "width": 54,
+            "height": 11
+        },
+        "interactivity": false
+    },
+    {
+        "from": "omniparser",
+        "type": "text",
+        "text": "mnest",
+        "shape": {
+            "x": 645,
+            "y": 480,
+            "width": 22,
+            "height": 5
+        },
+        "interactivity": false
+    },
+    {
+        "from": "omniparser",
+        "type": "text",
+        "text": "epior",
+        "shape": {
+            "x": 691,
+            "y": 480,
+            "width": 30,
+            "height": 7
+        },
+        "interactivity": false
+    },
+    {
+        "from": "omniparser",
+        "type": "text",
+        "text": "comnurities through Team:",
+        "shape": {
+            "x": 577,
+            "y": 490,
+            "width": 123,
+            "height": 13
+        },
+        "interactivity": false
+    },
+    {
+        "from": "omniparser",
+        "type": "text",
+        "text": "Windows\"",
+        "shape": {
+            "x": 1096,
+            "y": 703,
+            "width": 54,
+            "height": 13
+        },
+        "interactivity": false
+    },
+    {
+        "from": "omniparser",
+        "type": "text",
+        "text": "Enterprise Evaluation",
+        "shape": {
+            "x": 1164,
+            "y": 701,
+            "width": 112,
+            "height": 17
+        },
+        "interactivity": false
+    },
+    {
+        "from": "omniparser",
+        "type": "text",
+        "text": "Wndowe License",
+        "shape": {
+            "x": 1130,
+            "y": 719,
+            "width": 95,
+            "height": 13
+        },
+        "interactivity": false
+    },
+    {
+        "from": "omniparser",
+        "type": "text",
+        "text": "expired",
+        "shape": {
+            "x": 1236,
+            "y": 719,
+            "width": 40,
+            "height": 13
+        },
+        "interactivity": false
+    },
+    {
+        "from": "omniparser",
+        "type": "text",
+        "text": "Build Z6100,ge_release,240331-1435",
+        "shape": {
+            "x": 1089,
+            "y": 732,
+            "width": 187,
+            "height": 15
+        },
+        "interactivity": false
+    },
+    {
+        "from": "omniparser",
+        "type": "text",
+        "text": "40 F",
+        "shape": {
+            "x": 49,
+            "y": 761,
+            "width": 27,
+            "height": 13
+        },
+        "interactivity": false
+    },
+    {
+        "from": "omniparser",
+        "type": "text",
+        "text": "Search",
+        "shape": {
+            "x": 479,
+            "y": 769,
+            "width": 43,
+            "height": 15
+        },
+        "interactivity": false
+    },
+    {
+        "from": "omniparser",
+        "type": "text",
+        "text": "Cloudy",
+        "shape": {
+            "x": 49,
+            "y": 778,
+            "width": 42,
+            "height": 13
+        },
+        "interactivity": false
+    },
+    {
+        "from": "omniparser",
+        "type": "icon",
+        "text": "Finish setup ",
+        "shape": {
+            "x": 570,
+            "y": 512,
+            "width": 138,
+            "height": 30
+        },
+        "interactivity": true
+    },
+    {
+        "from": "omniparser",
+        "type": "icon",
+        "text": "VLC media player ",
+        "shape": {
+            "x": 2,
+            "y": 209,
+            "width": 70,
+            "height": 88
+        },
+        "interactivity": true
+    },
+    {
+        "from": "omniparser",
+        "type": "icon",
+        "text": "Google Chrome ",
+        "shape": {
+            "x": 5,
+            "y": 105,
+            "width": 62,
+            "height": 89
+        },
+        "interactivity": true
+    },
+    {
+        "from": "omniparser",
+        "type": "icon",
+        "text": "Recycle Bin ",
+        "shape": {
+            "x": 3,
+            "y": 7,
+            "width": 68,
+            "height": 76
+        },
+        "interactivity": true
+    },
+    {
+        "from": "omniparser",
+        "type": "icon",
+        "text": "1301 PM 3/17/2025 ",
+        "shape": {
+            "x": 1175,
+            "y": 758,
+            "width": 93,
+            "height": 36
+        },
+        "interactivity": true
+    },
+    {
+        "from": "omniparser",
+        "type": "icon",
+        "text": "Teams",
+        "shape": {
+            "x": 842,
+            "y": 755,
+            "width": 40,
+            "height": 41
+        },
+        "interactivity": true
+    },
+    {
+        "from": "omniparser",
+        "type": "icon",
+        "text": "Clover",
+        "shape": {
+            "x": 610,
+            "y": 759,
+            "width": 48,
+            "height": 33
+        },
+        "interactivity": true
+    },
+    {
+        "from": "omniparser",
+        "type": "icon",
+        "text": "Microsoft Office",
+        "shape": {
+            "x": 800,
+            "y": 757,
+            "width": 34,
+            "height": 39
+        },
+        "interactivity": true
+    },
+    {
+        "from": "omniparser",
+        "type": "icon",
+        "text": "Microsoft 365",
+        "shape": {
+            "x": 669,
+            "y": 759,
+            "width": 34,
+            "height": 32
+        },
+        "interactivity": true
+    },
+    {
+        "from": "omniparser",
+        "type": "icon",
+        "text": "Microsoft Edge browser",
+        "shape": {
+            "x": 757,
+            "y": 757,
+            "width": 37,
+            "height": 39
+        },
+        "interactivity": true
+    },
+    {
+        "from": "omniparser",
+        "type": "icon",
+        "text": "a folder.",
+        "shape": {
+            "x": 713,
+            "y": 761,
+            "width": 33,
+            "height": 25
+        },
+        "interactivity": true
+    },
+    {
+        "from": "omniparser",
+        "type": "icon",
+        "text": "Maximize",
+        "shape": {
+            "x": 676,
+            "y": 133,
+            "width": 39,
+            "height": 31
+        },
+        "interactivity": true
+    },
+    {
+        "from": "omniparser",
+        "type": "icon",
+        "text": "Close",
+        "shape": {
+            "x": 723,
+            "y": 132,
+            "width": 39,
+            "height": 32
+        },
+        "interactivity": true
+    },
+    {
+        "from": "omniparser",
+        "type": "icon",
+        "text": "Windows",
+        "shape": {
+            "x": 401,
+            "y": 759,
+            "width": 36,
+            "height": 37
+        },
+        "interactivity": true
+    },
+    {
+        "from": "omniparser",
+        "type": "icon",
+        "text": "Clipboard",
+        "shape": {
+            "x": 1084,
+            "y": 756,
+            "width": 32,
+            "height": 39
+        },
+        "interactivity": true
+    },
+    {
+        "from": "omniparser",
+        "type": "icon",
+        "text": "Delete",
+        "shape": {
+            "x": 1145,
+            "y": 759,
+            "width": 24,
+            "height": 32
+        },
+        "interactivity": true
+    },
+    {
+        "from": "omniparser",
+        "type": "icon",
+        "text": "Teams",
+        "shape": {
+            "x": 516,
+            "y": 135,
+            "width": 26,
+            "height": 28
+        },
+        "interactivity": true
+    },
+    {
+        "from": "omniparser",
+        "type": "icon",
+        "text": "Print",
+        "shape": {
+            "x": 1118,
+            "y": 758,
+            "width": 26,
+            "height": 32
+        },
+        "interactivity": true
+    },
+    {
+        "from": "omniparser",
+        "type": "icon",
+        "text": "Go to the next month month",
+        "shape": {
+            "x": 1056,
+            "y": 758,
+            "width": 25,
+            "height": 37
+        },
+        "interactivity": true
+    },
+    {
+        "from": "omniparser",
+        "type": "icon",
+        "text": "Minimize",
+        "shape": {
+            "x": 634,
+            "y": 132,
+            "width": 35,
+            "height": 33
+        },
+        "interactivity": true
+    },
+    {
+        "from": "omniparser",
+        "type": "icon",
+        "text": "System",
+        "shape": {
+            "x": 551,
+            "y": 268,
+            "width": 171,
+            "height": 166
+        },
+        "interactivity": true
+    }
+]

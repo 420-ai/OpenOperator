@@ -24,7 +24,7 @@ class ServerClient:
         """
         Queries the server probe endpoint to check if the VM is running.
         """
-        response = requests.get(self.http_server + "/probe")
+        response = requests.get(self.http_server + "/healthcheck")
         if response.status_code == 200:
             return True
         else:

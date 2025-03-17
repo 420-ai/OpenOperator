@@ -1,37 +1,58 @@
 .DS_Store
-iso
-weights
-storage
 .gradio
-__pycache__
 .venv
+__pycache__
 
-.env
-cache
 dist
+**/node_modules
 
-**/results
-**/evaluation_examples_windows/results
+# Ignore OS generated files
+Zone.Identifier
 
-**/tmp/*
+# Ignore all .env files
+.env
+!servers/server_browser_control/.env
+!servers/server_computer_control/.env
+!computers/windows/docker/data/init/.env
+!computers/windows/parallels_vm/data/init/.env
+
+# Ignore all logs
 logs
 *.log
-recordings
-**/test/out/
-**/state
 
-**/test-servers/recordings/
-**/test-servers/screenshots/
+# Computers
+!computers/windows/docker/data/logs
+computers/windows/docker/data/logs/*.txt
+computers/windows/docker/data/server_browser_control
+computers/windows/docker/data/server_computer_control
+!computers/windows/parallels_vm/data/logs
+computers/windows/parallels_vm/data/server_browser_control
+computers/windows/parallels_vm/data/server_computer_control
+computers/**/iso
+computers/**/storage
+
+# Servers
 **/server_computer_control/recordings/
 **/server_computer_control/screenshots/
 **/server_browser_control/screenshots/
 **/server_browser_control/traces/
 **/server_browser_control/user_data/
-**/test-servers/traces/
-**/agent_oogen/screenshots/
+servers/**/weights
 
-models/vision
+# Agents
+**/test-servers/recordings/
+**/test-servers/screenshots/
+**/test-servers/traces/
+**/test-servers/parsed/
+**/agent_oogen/screenshots/
+**/agent-waa/**/results
+**/agent-waa/**/cache
+**/agent-waa/**/tmp
+**/agent-waa/**/test
+**/state
+
+# Models
 models/magma/video/*.png
 
-**/node_modules
-Zone.Identifier
+# UI
+**/ui/**/recordings/
