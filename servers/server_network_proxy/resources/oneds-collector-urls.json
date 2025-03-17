@@ -1,0 +1,41 @@
+[
+  {
+    "tenantId": ["#EUDBTenants"],
+    "environment": ["prod"],
+    "ring": ["general"],
+    "value": "https://eu-teams.events.data.microsoft.com/OneCollector/1.0/"
+  },
+  {
+    "environment": ["gallatin"],
+    "ring": ["general"],
+    "value": "https://teams.events.data.microsoft.com/OneCollector/1.0/"
+  },
+  {
+    "environment": ["ag08"],
+    "ring": ["general"],
+    "value": "https://collector.azure.eaglex.ic.gov/OneCollector/1.0/"
+  },
+  {
+    "environment": ["ag09"],
+    "ring": ["general"],
+    "value": "https://collector.azure.microsoft.scloud/OneCollector/1.0/"
+  },
+  {
+    "environment": ["dod"],
+    "ring": ["general"],
+    "value": "https://pf.events.data.microsoft.com/OneCollector/1.0/"
+  },
+  {
+    "environment": ["gcchigh"],
+    "ring": ["general"],
+    "value": "https://tb.events.data.microsoft.com/OneCollector/1.0/"
+  },
+  {
+    "environment": ["gcc"],
+    "ring": ["general"],
+    "value": "https://us-teams.events.data.microsoft.com/OneCollector/1.0/"
+  },
+  {
+    "value": "https://teams.events.data.microsoft.com/OneCollector/1.0/"
+  }
+]

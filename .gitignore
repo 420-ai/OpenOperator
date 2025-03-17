@@ -6,6 +6,8 @@ __pycache__
 dist
 **/node_modules
 
+# Ignore OS generated files
+Zone.Identifier
 
 # Ignore all .env files
 .env
