@@ -23,6 +23,7 @@ dist
 # Ignore all logs
 logs
 !computers/windows/docker/data/logs
+computers/windows/docker/data/logs/*.txt
 !computers/windows/parallels_vm/data/logs
 
 
