@@ -1,7 +1,7 @@
 from typing import Tuple
-from bond.microsoft_bond import BondDataType, IProtocolReader
+from ...bond.microsoft_bond import BondDataType, IProtocolReader
 from ..utils.logger import Logger
-from models.sdk import Sdk
+from ...models.sdk import Sdk
 
 def deserialize_sdk(reader: IProtocolReader) -> dict:
     """

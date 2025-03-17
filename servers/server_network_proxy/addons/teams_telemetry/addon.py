@@ -3,7 +3,7 @@ import json
 import logging
 from mitmproxy.http import HTTPFlow
 from mitmproxy.net.encoding import decode_gzip
-from kusto_decoder import decode_kusto_request
+from .kusto_decoder import decode_kusto_request
 
 
 ## TODO make the intercepted data to be a list of host_headers (check the oneds-collector-urls.json)

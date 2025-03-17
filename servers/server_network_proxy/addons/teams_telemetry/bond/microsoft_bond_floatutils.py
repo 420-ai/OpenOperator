@@ -11,7 +11,7 @@ Note:
 2. If the buffer array passed to ConvertArrayToFloat() is an invalid NaN or Infinity value,
    an exception will be raised.
 """
-from bond.microsoft_bond_exception import Exception as BondException
+from ..bond.microsoft_bond_exception import Exception as BondException
 
 class FloatUtils:
     _float_zero = [0x00, 0x00, 0x00, 0x00]

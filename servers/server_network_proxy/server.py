@@ -8,7 +8,7 @@ import sys
 import signal
 import platform
 
-from addons.teams_telemetry_addon import TeamsTelemetryAddon
+from addons.teams_telemetry import TeamsTelemetryAddon
 
 app = FastAPI(title="Mitmproxy Controller")
 

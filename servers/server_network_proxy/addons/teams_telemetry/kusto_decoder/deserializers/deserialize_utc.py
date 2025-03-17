@@ -1,8 +1,8 @@
 from typing import Tuple
-from bond.bond_const import BondDataType
-from bond.microsoft_bond import IProtocolReader
+from ...bond.bond_const import BondDataType
+from ...bond.microsoft_bond import IProtocolReader
 from ..utils.logger import Logger
-from models.utc import Utc
+from ...models.utc import Utc
 
 def deserialize_utc(reader: IProtocolReader) -> dict:
     """

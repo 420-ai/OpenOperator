@@ -3,8 +3,8 @@ microsoft_bond_decoding.py
 Copyright: Microsoft 2016
 """
 import struct
-from bond.microsoft_bond_utils import EnvironmentChecker
-from bond.microsoft_bond_primitives import Int64, UInt64
+from .microsoft_bond_utils import EnvironmentChecker
+from .microsoft_bond_primitives import Int64, UInt64
 
 class Utf8:
     @staticmethod

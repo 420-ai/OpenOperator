@@ -1,8 +1,8 @@
-from bond.bond_const import BondDataType
-from bond.microsoft_bond import IProtocolReader
+from ...bond.bond_const import BondDataType
+from ...bond.microsoft_bond import IProtocolReader
 from ..utils.logger import Logger
-from models.value import Value
-from models.enums import ValueKind
+from ...models.value import Value
+from ...models.enums import ValueKind
 from .deserialize_attribute import deserialize_attribute
 
 def deserialize_value(reader: IProtocolReader) -> dict:

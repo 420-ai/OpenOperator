@@ -4,9 +4,9 @@ Copyright: Microsoft 2016
 """
 from abc import ABC, abstractmethod
 from typing import List, Dict, Any, TypeVar, Generic, Union
-from bond.bond_const import BondDataType
-import bond.microsoft_bond_decoding as Decoding
-from bond.microsoft_bond_primitives import Int64, UInt64, Number
+from ..bond.bond_const import BondDataType
+from . import microsoft_bond_decoding as Decoding
+from ..bond.microsoft_bond_primitives import Int64, UInt64, Number
 from logging import getLogger
 
 logger = getLogger("BondLogger")

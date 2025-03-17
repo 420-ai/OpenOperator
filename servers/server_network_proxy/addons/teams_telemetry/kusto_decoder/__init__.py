@@ -1,7 +1,7 @@
 from typing import List, Union
-from bond.microsoft_bond import CompactBinaryProtocolReader
+from ..bond.microsoft_bond import CompactBinaryProtocolReader
 from .client_to_collector_request import ClientToCollectorRequest
-from models.cs_record import CsRecord
+from ..models.cs_record import CsRecord
 
 def decode_kusto_request(request: Union[bytes, List[int]]) -> List[CsRecord]:
     records: List[CsRecord] = []

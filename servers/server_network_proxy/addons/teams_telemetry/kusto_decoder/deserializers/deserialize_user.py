@@ -1,8 +1,8 @@
 from typing import Tuple
-from bond.bond_const import BondDataType
-from bond.microsoft_bond import IProtocolReader
+from ...bond.bond_const import BondDataType
+from ...bond.microsoft_bond import IProtocolReader
 from ..utils.logger import Logger
-from models.user import User
+from ...models.user import User
 
 def deserialize_user(reader: IProtocolReader) -> dict:
     """

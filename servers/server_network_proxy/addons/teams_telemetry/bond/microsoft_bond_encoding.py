@@ -2,8 +2,8 @@
 microsoft_bond_encoding.py
 Copyright: Microsoft 2016
 """
-from bond.microsoft_bond_primitives import UInt64, Number
-from bond.microsoft_bond_utils import EnvironmentChecker
+from .microsoft_bond_primitives import UInt64, Number
+from .microsoft_bond_utils import EnvironmentChecker
 import struct
 
 class Utf8:

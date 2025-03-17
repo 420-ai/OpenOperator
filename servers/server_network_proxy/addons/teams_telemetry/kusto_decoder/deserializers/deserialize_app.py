@@ -1,7 +1,7 @@
-from bond.bond_const import BondDataType
-from bond.microsoft_bond import IProtocolReader
+from ...bond.bond_const import BondDataType
+from ...bond.microsoft_bond import IProtocolReader
 from ..utils.logger import Logger
-from models.app import App
+from ...models.app import App
 
 def deserialize_app(reader: IProtocolReader) -> dict:
     """

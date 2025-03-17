@@ -1,8 +1,8 @@
 from typing import Tuple
-from bond.bond_const import BondDataType
-from bond.microsoft_bond import IProtocolReader
+from ...bond.bond_const import BondDataType
+from ...bond.microsoft_bond import IProtocolReader
 from ..utils.logger import Logger
-from models.m365a import M365a
+from ...models.m365a import M365a
 
 
 def deserialize_m365a(reader: IProtocolReader) -> dict:

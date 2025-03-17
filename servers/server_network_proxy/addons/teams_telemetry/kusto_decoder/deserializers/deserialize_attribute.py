@@ -1,8 +1,7 @@
-from typing import Tuple
-from bond.bond_const import BondDataType
-from bond.microsoft_bond import IProtocolReader
+from ...bond.bond_const import BondDataType
+from ...bond.microsoft_bond import IProtocolReader
 from ..utils.logger import Logger
-from models.attribute import Attribute
+from ...models.attribute import Attribute
 from .deserialize_pii import deserialize_pii
 from .deserialize_customer_content import deserialize_customer_content
 

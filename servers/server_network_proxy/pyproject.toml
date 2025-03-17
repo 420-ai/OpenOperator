@@ -1,7 +1,7 @@
 [project]
-name = "telemetry-proxy"
+name = "server-network-proxy"
 version = "0.1.0"
-description = "Add your description here"
+description = "A simple MITM proxy server. It can be used to intercept and modify HTTP and HTTPS traffic."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

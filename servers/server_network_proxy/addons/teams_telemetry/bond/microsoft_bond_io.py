@@ -2,7 +2,7 @@
 microsoft_bond_io.py
 Copyright: Microsoft 2016
 """
-from bond.microsoft_bond_primitives import Number
+from .microsoft_bond_primitives import Number
 
 class Stream:
     """Interface for a stream that can be written to"""

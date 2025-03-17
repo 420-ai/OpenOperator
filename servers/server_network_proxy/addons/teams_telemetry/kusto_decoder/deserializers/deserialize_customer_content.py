@@ -1,8 +1,8 @@
 from typing import Tuple
-from bond.bond_const import BondDataType
-from bond.microsoft_bond import IProtocolReader
+from ...bond.bond_const import BondDataType
+from ...bond.microsoft_bond import IProtocolReader
 from ..utils.logger import Logger
-from models.enums import CustomerContentKind
+from ...models.enums import CustomerContentKind
 
 
 def deserialize_customer_content(reader: IProtocolReader) -> dict:

@@ -1,7 +1,7 @@
 from typing import Tuple
-from bond.microsoft_bond import BondDataType, IProtocolReader
+from ...bond.microsoft_bond import BondDataType, IProtocolReader
 from ..utils.logger import Logger
-from models.net import Net
+from ...models.net import Net
 
 
 def deserialize_net(reader: IProtocolReader) -> dict:
