@@ -77,8 +77,8 @@ REM ---------------------------
 REM 5) Add Firewall Rules
 REM ---------------------------
 echo Adding firewall rules... >> "%LOGFILE%"
-netsh advfirewall firewall add rule name="SERVER_COMPUTER_CONTROL" dir=in action=allow protocol=TCP localport=5000
-netsh advfirewall firewall add rule name="SERVER_BROWSER_CONTROL" dir=in action=allow protocol=TCP localport=6000
+netsh advfirewall firewall add rule name="SERVER_COMPUTER_CONTROL" dir=in action=allow protocol=TCP localport=5050
+netsh advfirewall firewall add rule name="SERVER_BROWSER_CONTROL" dir=in action=allow protocol=TCP localport=5051
 REM Add firewall rule for Chrome DevTools (port 9222)
 netsh advfirewall firewall add rule name="Chrome Remote Debugging Port" dir=in action=allow protocol=TCP localport=9222
 echo Firewall rules added >> "%LOGFILE%"

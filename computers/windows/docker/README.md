@@ -43,3 +43,51 @@ We can run version with pre-builded docker container `lukaskellerstein/windows-c
 ### 1.5 RDP
 
 You can open the VM via `http://localhost:8006`
+
+### 1.6 Test in Docker
+
+On the `Windows 11` are running a open-operator servers:
+
+- server computer control on port `5050`
+- server browser control on port `5051`
+
+You can test them if they are running correctly by opening browser with urls:
+
+- `http://localhost:5050/healthcheck`
+- `http://localhost:5051/healthcheck`
+
+and you should see responses as
+
+```
+{
+  "status": "Successful"
+  "message": "Service is operational!",
+}
+```
+
+### 1.7 Test on host
+
+You can test the openoperator servers from host by running command `curl -v http://127.0.0.1:5050/healthcheck`, you should see response such as
+
+```
+*   Trying 127.0.0.1:5050...
+* Connected to 127.0.0.1 (127.0.0.1) port 5050
+> GET /probe HTTP/1.1
+> Host: 127.0.0.1:5050
+> User-Agent: curl/8.7.1
+> Accept: */*
+>
+* Request completely sent off
+< HTTP/1.1 200 OK
+< Server: Werkzeug/3.1.3 Python/3.10.0
+< Date: Tue, 04 Mar 2025 12:16:10 GMT
+< Content-Type: application/json
+< Content-Length: 74
+< Connection: close
+<
+{
+  "status": "Successful",
+  "message": "Service is operational!"
+}
+* Closing connection
+```

@@ -14,7 +14,14 @@ pythoncom.CoInitializeEx(pythoncom.COINIT_APARTMENTTHREADED)
 
 # Setup logging
 logs_path = os.getenv("LOG_PATH")
+print(f"Logs path:")
+print(logs_path)
+
 log_file = os.path.join(logs_path, "install_software.log")
+
+print(f"Log file:")
+print(log_file)
+
 logging.basicConfig(filename=log_file, level=logging.INFO, 
                     format="%(asctime)s - %(levelname)s - %(message)s")
 
