@@ -1,15 +1,28 @@
 import click
 import time
-
+import sys
 from fastapi import FastAPI
 from pydantic import BaseModel
 from os import path
 from typing import TypedDict
+from download import download_omniparser
+import os
 
 from util.omniparser import Omniparser
 
-root_dir = path.join(path.dirname(path.dirname(path.dirname(path.abspath(__file__)))))
+# root_dir = path.join(path.dirname(path.dirname(path.dirname(path.abspath(__file__)))))
 
+# print(__file__)
+# print(path.dirname(__file__))
+
+root_dir = path.dirname(__file__)
+weights_dir = path.join(root_dir, 'weights')
+
+if path.exists(weights_dir) == False:
+    os.makedirs(weights_dir, exist_ok=True)
+    print('weights folder not found, downloading models...')
+    download_omniparser(weights_dir)
+    print('models downloaded successfully!')
 
 class Config(TypedDict):
     som_model_path: str
@@ -24,9 +37,9 @@ class ParseRequest(BaseModel):
 
 
 config: Config = {
-    'som_model_path': path.join(root_dir, 'models/vision/omniparser/icon_detect/model.pt'),
+    'som_model_path': path.join(weights_dir, 'icon_detect/model.pt'),
     'caption_model_name': 'florence2',
-    'caption_model_path': path.join(root_dir, 'models/vision/omniparser/icon_caption_florence'),
+    'caption_model_path': path.join(weights_dir, 'icon_caption_florence'),
     'device': 'cpu',
     'BOX_TRESHOLD': 0.05,
 }

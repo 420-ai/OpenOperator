@@ -2,10 +2,11 @@
 
 ## Structure
 
-- `models/*`: all packages related to downloading models and simple servers that provide access to local versions of a model
 - `agents/*`: agents that are used in the repo
+- `computers/*`: computers that are controlled by agents
+- `models/*`: models used in the repo
+- `servers/*`: all servers deployed locally or in the computers
 - `ui`: a Web-based UI to help facilitate the usage of these agents
-- `computer`: VMs and automation server
 
 ## Setup
 
@@ -48,21 +49,19 @@ You can update all dependencies using:
 
 To run computer that agent controls follows documentation [here](./computers/README.md).
 
-In case you want default way (Works on Windows and Linux) run `docker-compose up` in folder `./computers/windows/docker`.
+In case you want default way (Works on Windows and Linux):
+
+```
+$ cd computers/windows/docker
+$ docker compose up
+```
 
 ## OmniParser
 
-### Model Download
+Start the OmniParser server.
 
 ```
-$ cd models/downloader
-$ uv run download.py omniparser
-```
-
-### Start the OmniParser server
-
-```
-$ cd models/server-omniparser
+$ cd servers/server_omniparser
 $ uv run server.py
 ```
 

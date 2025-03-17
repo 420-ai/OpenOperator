@@ -90,13 +90,13 @@ echo Creating .bat files for servers >> "%LOGFILE%"
 set "STARTUP_SERVER_BROWSER_CONTROL_BAT=%~dp0start_server_browser_control.bat"
 (
     echo @echo off
-    echo start /b "" "%PYTHONW_PATH%" "C:\INSTALL\data\server_browser_control\main.py"
+    echo start /b "" "%PYTHONW_PATH%" "C:\INSTALL\data\server_browser_control\server.py"
 ) > "%STARTUP_SERVER_BROWSER_CONTROL_BAT%"
 
 set "STARTUP_SERVER_COMPUTER_CONTROL_BAT=%~dp0start_server_computer_control.bat"
 (
     echo @echo off
-    echo start /b "" "%PYTHONW_PATH%" "C:\INSTALL\data\server_computer_control\main.py"
+    echo start /b "" "%PYTHONW_PATH%" "C:\INSTALL\data\server_computer_control\server.py"
 ) > "%STARTUP_SERVER_COMPUTER_CONTROL_BAT%"
 echo .bat files for servers created >> "%LOGFILE%"
 

@@ -1,4 +1,5 @@
 version = 1
+revision = 1
 requires-python = ">=3.12"
 resolution-markers = [
     "python_full_version >= '3.13' and sys_platform == 'darwin'",
@@ -289,6 +290,7 @@ dependencies = [
     { name = "easyocr" },
     { name = "einops" },
     { name = "fastapi" },
+    { name = "huggingface-hub" },
     { name = "numpy" },
     { name = "openai" },
     { name = "opencv-python" },
@@ -310,6 +312,7 @@ requires-dist = [
     { name = "easyocr", specifier = ">=1.7.2" },
     { name = "einops", specifier = ">=0.8.1" },
     { name = "fastapi", specifier = ">=0.115.10" },
+    { name = "huggingface-hub", specifier = ">=0.29.1" },
     { name = "numpy", specifier = "==1.26.4" },
     { name = "openai", specifier = ">=1.64.0" },
     { name = "opencv-python", specifier = ">=4.8.1.78" },
