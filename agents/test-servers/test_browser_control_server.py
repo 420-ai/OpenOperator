@@ -72,7 +72,7 @@ def test_stop_tracing():
 def test_download_trace(trace_file):
     resp = requests.get(f"{BASE_URL}/browser/download_trace", params={"trace_file": trace_file})
     if resp.status_code == 200:
-        trace_path = os.path.join(traces_dir, os.path.basename(trace_file))
+        trace_path = os.path.join(traces_dir, "trace.zip")
         with open(trace_path, "wb") as f:
             f.write(resp.content)
         print("Trace file saved at", trace_path)
@@ -89,21 +89,21 @@ def test_cursor_position():
 
 if __name__ == "__main__":
     test_healthcheck()
-    # test_launch_browser(headless=False)
-    # time.sleep(2)
-    # page_id = test_open_page("https://arxiv.org/abs/1706.03762")
-    # if page_id:
-    #     time.sleep(3)
-    #     test_screenshot(page_id)
-    #     test_get_cookies(page_id)
-    #     test_get_local_storage(page_id)
-    #     test_execute_js(page_id, "document.title")
-    #     test_cdp(page_id, "Page.getFrameTree", {})
-    # test_get_platform()
-    # test_cursor_position()
-    # test_start_tracing()
-    # time.sleep(5)
-    # trace_file = test_stop_tracing()
-    # if trace_file:
-    #     test_download_trace(trace_file)
-    # test_close_browser()
+    test_launch_browser(headless=False)
+    time.sleep(2)
+    page_id = test_open_page("https://arxiv.org/abs/1706.03762")
+    if page_id:
+        time.sleep(3)
+        test_screenshot(page_id)
+        test_get_cookies(page_id)
+        test_get_local_storage(page_id)
+        test_execute_js(page_id, "document.title")
+        test_cdp(page_id, "Page.getFrameTree", {})
+    test_get_platform()
+    test_cursor_position()
+    test_start_tracing()
+    time.sleep(5)
+    trace_file = test_stop_tracing()
+    if trace_file:
+        test_download_trace(trace_file)
+    test_close_browser()
