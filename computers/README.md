@@ -16,4 +16,6 @@ Windows in VM (Parallels). Steps to run it are [here](./windows/parallels_vm/REA
 
 ## 2. MacOS
 
-TBD
+### 2.1 Docker
+
+MacOS in Docker. Steps to run it are [here](./macos/docker/README.md).
