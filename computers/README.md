@@ -12,7 +12,7 @@ Windows in Docker. Steps to run it are [here](./windows/docker/README.md).
 
 ### 1.2 VM (Parallels)
 
-Windows in VM (Parallels). Steps to run it are [here](./windows/parallels-vm/README.md).
+Windows in VM (Parallels). Steps to run it are [here](./windows/parallels_vm/README.md).
 
 ## 2. MacOS
 
