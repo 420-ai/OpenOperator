@@ -1,9 +1,11 @@
 # OO Agent
 
 Open Operator agent.
+
 [Autogen](https://github.com/microsoft/autogen) framework.
 
 > Custom workflow !!!
+>
 > Inspired by [Plan and solve](https://arxiv.org/abs/2305.04091)
 
 ### Azure OpenAI

@@ -1,7 +1,9 @@
 # OO Agent
 
-Open Operator agent.
+Open Operator agent. + Human in the loop
+
 [Autogen](https://github.com/microsoft/autogen) framework.
+
 [ReAct](https://arxiv.org/abs/2210.03629) style agent.
 
 ### Azure OpenAI
