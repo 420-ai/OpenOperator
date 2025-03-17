@@ -75,8 +75,8 @@ REM ---------------------------
 REM 5) Add Firewall Rules
 REM ---------------------------
 echo Adding firewall rules... >> "%LOGFILE%"
-netsh advfirewall firewall add rule name="SERVER_COMPUTER_CONTROL" dir=in action=allow protocol=TCP localport=5000
-netsh advfirewall firewall add rule name="SERVER_BROWSER_CONTROL" dir=in action=allow protocol=TCP localport=6000
+netsh advfirewall firewall add rule name="SERVER_COMPUTER_CONTROL" dir=in action=allow protocol=TCP localport=5050
+netsh advfirewall firewall add rule name="SERVER_BROWSER_CONTROL" dir=in action=allow protocol=TCP localport=5051
 REM Add firewall rule for Chrome DevTools (port 9222)
 netsh advfirewall firewall add rule name="Chrome Remote Debugging Port" dir=in action=allow protocol=TCP localport=9222
 echo Firewall rules added >> "%LOGFILE%"
@@ -88,13 +88,13 @@ echo Creating .bat files for servers >> "%LOGFILE%"
 set "STARTUP_SERVER_COMPUTER_CONTROL_BAT=%~dp0start_server_computer_control.bat"
 (
     echo @echo off
-    echo start /b "" "%PYTHONW_PATH%" "\\host.lan\Data\server_computer_control\main.py"
+    echo start /b "" "%PYTHONW_PATH%" "\\host.lan\Data\server_computer_control\server.py"
 ) > "%STARTUP_SERVER_COMPUTER_CONTROL_BAT%"
 
 set "STARTUP_SERVER_BROWSER_CONTROL_BAT=%~dp0start_server_browser_control.bat"
 (
     echo @echo off
-    echo start /b "" "%PYTHONW_PATH%" "\\host.lan\Data\server_browser_control\main.py"
+    echo start /b "" "%PYTHONW_PATH%" "\\host.lan\Data\server_browser_control\server.py"
 ) > "%STARTUP_SERVER_BROWSER_CONTROL_BAT%"
 echo .bat files for servers created >> "%LOGFILE%"
 

@@ -1,0 +1,142 @@
+
+<style>
+    html { font-family: sans-serif; }
+    summary { cursor: text; }
+    details details>summary { padding-left: 0.5em; }
+    #theme-selector { float: right; text-align: center; opacity: 0.5; }
+    
+    :root {
+        --background-color: #ffffff;
+        --text-color: #000000;
+        --summary-hover: #f0f0f0;
+        --summary-open: #ececec;
+        --link-color: #1e90ff;
+        --link-hover-color: #104e8b;
+    }
+    
+    [data-theme='dark'] {
+        --background-color: #000000;
+        --text-color: #d4d4d4;
+        --summary-hover: #1e1e1e;
+        --summary-open: #1e1e1e;
+        --link-color: #1e90ff;
+        --link-hover-color: #63a4ff;
+    }
+    
+    html, select {
+        background: var(--background-color);
+        color: var(--text-color);
+    }
+    summary:hover { background: var(--summary-hover); }
+    details[open] > summary { background: var(--summary-open); }
+    a { color: var(--link-color); }
+    a:hover { color: var(--link-hover-color); }
+    select { border: 1px solid var(--text-color); }
+</style>
+<details>
+    <summary>config
+        <select id='theme-selector' onchange='setTheme(this.value)'>
+            <option value='' disabled selected>Theme</option>
+            <option value='auto'>auto</option>
+            <option value='light'>light</option>
+            <option value='dark'>dark</option>
+        </select>
+        <script>
+            function setTheme(theme) {
+                if (theme === 'auto') {
+                    document.documentElement.removeAttribute('data-theme');
+                } else {
+                    document.documentElement.setAttribute('data-theme', theme);
+                }
+            }
+            (function() {
+                const theme = localStorage.getItem('theme') || 'auto';
+                document.getElementById('theme-selector').value = theme;
+                setTheme(theme);
+                document.getElementById('theme-selector').addEventListener('change', function() {
+                    localStorage.setItem('theme', this.value);
+                });
+            })();
+        </script>
+    </summary>
+    <pre>
+{
+  "id": "366de66e-cbae-4d72-b042-26390db2b145-WOS",
+  "snapshot": "notepad",
+  "instruction": "Please open Notepad, create a new file named \"draft.txt\", type \"This is a draft.\", and save it to the Documents folder.",
+  "source": "",
+  "_comments": "",
+  "config": [],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "notepad"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "open",
+        "parameters": {
+          "path": "C:\\Users\\Docker\\Documents\\draft.txt"
+        }
+      },
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "draft.txt - Notepad"
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": [
+      "exact_match",
+      "compare_text_file"
+    ],
+    "result": [
+      {
+        "type": "vm_file_exists_in_vm_folder",
+        "folder_name": "C:\\Users\\Docker\\Documents",
+        "file_name": "draft.txt"
+      },
+      {
+        "type": "vm_file",
+        "path": "C:\\Users\\Docker\\Documents\\draft.txt",
+        "dest": "draft.txt"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "expected": 1.0
+        }
+      },
+      {
+        "type": "cloud_file",
+        "path": "https://raw.githubusercontent.com/rogeriobonatti/winarenafiles/main/task_files/notepad/366de66e-cbae-4d72-b042-26390db2b145-WOS/eval/draft.txt",
+        "dest": "draft_gold.txt"
+      }
+    ]
+  }
+}
+    </pre>
+</details><pre>
+Please open Notepad, create a new file named "draft.txt", type "This is a draft.", and save it to the Documents folder.
+</pre><details><summary>env.reset(config)</summary><details><summary>screenshot</summary><img style='max-width: 100%' src='screenshot-step_reset_action__20250317@140133.png'/></details><details><summary>instruction</summary><pre>
+Please open Notepad, create a new file named &quot;draft.txt&quot;, type &quot;This is a draft.&quot;, and save it to the Documents folder.
+</pre></details><details><summary>window_image</summary><img style='max-width: 100%' src='window_image-step_reset_action__20250317@140133.png'/></details><details><summary>window_title</summary><pre>
+Desktop
+</pre></details><details><summary>window_rect</summary><pre>
+[0, 0, 1280, 800]
+</pre></details><details><summary>window_names_str</summary><pre>
+Program Manager
+</pre></details><details><summary>computer_clipboard</summary><pre>
+key: computer_clipboard: &lt;class &#x27;NoneType&#x27;&gt; not saved
+</pre></details><details><summary>human_input</summary><pre>
+Question: No question asked yet
+Answer: No answer given yet
+</pre></details></details><img style='max-width: 100%' onclick='window.open(this.src, "_blank")' src='screenshot-step_reset_action__20250317@140133.png'/>
