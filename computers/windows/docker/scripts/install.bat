@@ -2,6 +2,12 @@
 setlocal EnableDelayedExpansion
 
 REM ---------------------------
+REM 0) Set Username
+REM ---------------------------
+set "USERNAME=Docker"
+echo Using username: %USERNAME%
+
+REM ---------------------------
 REM 1) Set up logging
 REM ---------------------------
 set "LOGFILE=\\host.lan\Data\logs\install_bat.txt"
@@ -57,41 +63,56 @@ echo Python script INITIALIZE executed. >> %LOGFILE%
 REM ---------------------------
 REM 4) Install Required Python Packages for SERVERS
 REM ---------------------------
-echo Installing Python libraries... >> "%LOGFILE%"
-"%PYTHON_PATH%" -m pip install -r "\\host.lan\Data\server1\requirements.txt" >> "%LOGFILE%" 2>&1
-"%PYTHON_PATH%" -m pip install -r "\\host.lan\Data\server2\requirements.txt" >> "%LOGFILE%" 2>&1
+echo Installing Python libraries for 'server computer control' ... >> "%LOGFILE%"
+"%PYTHON_PATH%" -m pip install -r "\\host.lan\Data\server_computer_control\requirements.txt" >> "%LOGFILE%" 2>&1
+echo Python libraries for 'server computer control' were installed >> "%LOGFILE%"
+
+echo Installing Python libraries for 'server browser control' ... >> "%LOGFILE%"
+"%PYTHON_PATH%" -m pip install -r "\\host.lan\Data\server_browser_control\requirements.txt" >> "%LOGFILE%" 2>&1
+echo Python libraries for 'server browser control' were installed >> "%LOGFILE%"
 
 REM ---------------------------
 REM 5) Add Firewall Rules
 REM ---------------------------
 echo Adding firewall rules... >> "%LOGFILE%"
-netsh advfirewall firewall add rule name="SERVER1 Flask" dir=in action=allow protocol=TCP localport=6000
-netsh advfirewall firewall add rule name="SERVER2 Flask" dir=in action=allow protocol=TCP localport=5000
+netsh advfirewall firewall add rule name="SERVER_COMPUTER_CONTROL" dir=in action=allow protocol=TCP localport=5000
+netsh advfirewall firewall add rule name="SERVER_BROWSER_CONTROL" dir=in action=allow protocol=TCP localport=6000
+REM Add firewall rule for Chrome DevTools (port 9222)
+netsh advfirewall firewall add rule name="Chrome Remote Debugging Port" dir=in action=allow protocol=TCP localport=9222
+echo Firewall rules added >> "%LOGFILE%"
 
 REM ---------------------------
 REM 6) Create Startup Script
 REM ---------------------------
-set "STARTUP_SERVER1_BAT=%~dp0start_server_1.bat"
+echo Creating .bat files for servers >> "%LOGFILE%"
+set "STARTUP_SERVER_COMPUTER_CONTROL_BAT=%~dp0start_server_computer_control.bat"
 (
     echo @echo off
-    echo start /b "" "%PYTHONW_PATH%" "\\host.lan\Data\server1\main.py"
-) > "%STARTUP_SERVER1_BAT%"
+    echo start /b "" "%PYTHONW_PATH%" "\\host.lan\Data\server_computer_control\main.py"
+) > "%STARTUP_SERVER_COMPUTER_CONTROL_BAT%"
 
-set "STARTUP_SERVER2_BAT=%~dp0start_server_2.bat"
+set "STARTUP_SERVER_BROWSER_CONTROL_BAT=%~dp0start_server_browser_control.bat"
 (
     echo @echo off
-    echo start /b "" "%PYTHONW_PATH%" "\\host.lan\Data\server2\main.py"
-) > "%STARTUP_SERVER2_BAT%"
+    echo start /b "" "%PYTHONW_PATH%" "\\host.lan\Data\server_browser_control\main.py"
+) > "%STARTUP_SERVER_BROWSER_CONTROL_BAT%"
+echo .bat files for servers created >> "%LOGFILE%"
+
 
 REM ---------------------------
 REM 7) Schedule Startup Task
 REM ---------------------------
 REM Without /IT, the task will not run interactively = will not be able to catch screenshots and record videos
 REM Without /DELAY is needed in order to wait until network storage is available and user is logged in
-schtasks /Create /TN "StartServer1" /SC ONSTART /TR "\"%STARTUP_SERVER1_BAT%\"" /RU "Docker" /RL HIGHEST /IT /DELAY 0000:30 /F
-schtasks /Create /TN "StartServer2" /SC ONSTART /TR "\"%STARTUP_SERVER2_BAT%\"" /RU "Docker" /RL HIGHEST /IT /DELAY 0000:30 /F
-schtasks /Run /TN "StartServer1"
-schtasks /Run /TN "StartServer2"
+echo Creating 'scheduled tasks' for servers >> "%LOGFILE%"
+schtasks /Create /TN "StartServer-ComputerControl" /SC ONSTART /TR "\"%STARTUP_SERVER_COMPUTER_CONTROL_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /DELAY 0000:30 /F
+schtasks /Create /TN "StartServer-BrowserControl" /SC ONSTART /TR "\"%STARTUP_SERVER_BROWSER_CONTROL_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /DELAY 0000:30 /F
+echo 'Scheduled tasks' for servers created >> "%LOGFILE%"
+
+echo Triggering 'scheduled tasks' for servers >> "%LOGFILE%"
+schtasks /Run /TN "StartServer-ComputerControl"
+schtasks /Run /TN "StartServer-BrowserControl"
+echo 'Scheduled tasks' for servers started >> "%LOGFILE%"
 
 echo Installation completed at %date% %time% >> "%LOGFILE%"
 echo Installation complete. Servers will start automatically on reboot.

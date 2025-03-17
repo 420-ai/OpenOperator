@@ -2,13 +2,19 @@ import requests
 import base64
 import os
 
-# Base URL of the Flask server
 BASE_URL = "http://127.0.0.1:5000"
 
 screenshots_dir = "screenshots"
 os.makedirs(screenshots_dir, exist_ok=True)
 recordings_dir = "recordings"
 os.makedirs(recordings_dir, exist_ok=True)
+
+def test_healthcheck():
+    resp = requests.get(f"{BASE_URL}/healthcheck")
+    if resp.status_code == 200:
+        print("Healthcheck passed:", resp.json())
+    else:
+        print("Healthcheck failed:", resp.status_code, resp.text)
 
 def test_platform():
     resp = requests.get(f"{BASE_URL}/platform")
@@ -89,6 +95,7 @@ def test_close_all_windows():
     print("Close All Windows:", resp.text)
 
 if __name__ == "__main__":
+    test_healthcheck()
     # test_platform()
     # test_cursor_position()
     # test_screen_size()
@@ -97,7 +104,7 @@ if __name__ == "__main__":
     # test_list_directory()
     # test_capture_screen_with_cursor()
     # test_start_end_recording()
-    end_recording()
+    # end_recording()
     # test_activate_window()
     # Uncomment the line below if you are sure you want to close all windows.
     # test_close_all_windows()

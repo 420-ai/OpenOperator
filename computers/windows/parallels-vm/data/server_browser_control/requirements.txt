@@ -1,0 +1,7 @@
+setproctitle
+playwright
+webdriver-manager
+asyncio
+uvicorn
+fastapi
+pyautogui
