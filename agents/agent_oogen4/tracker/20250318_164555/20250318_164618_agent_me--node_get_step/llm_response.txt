@@ -1,0 +1,6 @@
+====== CreateResult ======
+Usage: RequestUsage(prompt_tokens=525, completion_tokens=31)
+Content:
+ The first step of the plan is: **Open Microsoft Teams**: Click on the "Microsoft Teams" icon in the Start menu's Recent section.  
+
+========================

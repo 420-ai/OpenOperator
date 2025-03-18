@@ -1,18 +1,17 @@
 import logging
-from typing import Any, AsyncGenerator, List, Sequence
-from workflow.clients.llm.azure_openai import llm_gpt4o
-from workflow.clients.computer.server_client import get_screenshot
+from typing import Any, AsyncGenerator, Sequence
+from clients.llm import llm_gpt4o, calculate_cost
+from clients.computer import computer
 from autogen_agentchat.agents import BaseChatAgent
-from autogen_agentchat.messages import AgentEvent, ChatMessage, TextMessage, MultiModalMessage
+from autogen_agentchat.messages import AgentEvent, ChatMessage, TextMessage
 from autogen_core import CancellationToken
 from autogen_agentchat.base import Response
 from autogen_core.models import UserMessage, SystemMessage
-from autogen_core import Image
-from workflow.helpers import encode_image, resize_and_compress_image
-from autogen_agentchat.utils import content_to_str
+from autogen_core import Image as AutogenImage
 from state import State
 from config import OOConfig
-import re
+from tracker import Tracker
+from helpers import format_autogen_message, resize_and_compress_image
 
 logger = logging.getLogger("agent.planner")
 
@@ -75,15 +74,17 @@ USER_MESSAGE = """Your objective is: {objective}. Please create a **structured s
 
 class OOPlannerAgent(BaseChatAgent):
 
-    def __init__(self, config: OOConfig, state: State):
+    def __init__(self, config: OOConfig, state: State, tracker: Tracker):
         logger.debug("Initializing...")
 
         name = "agent_planner"
         description = "Agent responsible for planning"
 
         self.config = config
-        self.llm = llm_gpt4o
         self.state = state
+        self.tracker = tracker
+
+        self.llm = llm_gpt4o
 
         super().__init__(
             name, 
@@ -107,32 +108,52 @@ class OOPlannerAgent(BaseChatAgent):
         user_task = messages[0].content
         
         # Take a screenshot
-        screenshot = get_screenshot()
+        screenshot = computer.get_screenshot()
 
         # Resize and compress the screenshot
         screenshot_resized = resize_and_compress_image(screenshot)
 
         # Define new messages
         system_message = SystemMessage(content=SYSTEM_MESSAGE)
-
         user_message = UserMessage(content=[
             USER_MESSAGE.format(objective=user_task), 
-            Image.from_pil(screenshot_resized)
+            AutogenImage.from_pil(screenshot_resized)
         ], source="user")
+
+        # region Log + State + Tracker
+        self.tracker.save(self.name, [
+            ("screenshot_resized", screenshot_resized),
+            ("system_message", system_message),
+            ("user_message", user_message)
+        ])
+        # endregion
         
         # Call LLM
         result = await self.llm.create(messages=[
             system_message,
             user_message,
         ])
+
+        # ---- COST CALCULATION ----
+        total_cost = calculate_cost(result.usage, self.llm._resolved_model, self.config)
+        # ---- END COST CALCULATION ----
+
+        # region Log + State + Tracker
+        logger.debug(f"Total cost: {total_cost}$")
+        logger.debug(format_autogen_message(result))
+
         self.state.create_new_plan_version()
         self.state.save_plan_text(result.content)
         self.state.save_plan_image(screenshot_resized, "t0.png")
 
-        # Construct response message
-        response_message = TextMessage(content=result.content, source=self.name)
+        self.tracker.save(self.name, [
+            ("llm_response", result),
+            ("cost", f"{total_cost}$"),
+        ])
+        # endregion
 
-        return response_message
+        # [Not needed] Construct response message - 
+        return TextMessage(content=result.content, source=self.name)
 
     async def on_messages(self, messages: Sequence[ChatMessage], cancellation_token: CancellationToken) -> Response:
         result = await self._inner_on_messages(messages, cancellation_token)
@@ -151,8 +172,6 @@ class OOPlannerAgent(BaseChatAgent):
         return await super().on_reset(cancellation_token)
     
 
-def init_agent_planner(config: OOConfig, state: State) -> OOPlannerAgent:
+def init_agent_planner(config: OOConfig, state: State, tracker: Tracker) -> OOPlannerAgent:
     logger.debug("Initializing agent-planner...")
-
-    agent = OOPlannerAgent(config, state)
-    return agent
+    return OOPlannerAgent(config, state, tracker)

@@ -1,12 +1,13 @@
-import logging
 from config import OOConfig
 from state import State
+from tracker import Tracker
 from workflow.agent_replanner.node_summarize_plan_versions import NodeSummarizeAllPlanVersions
 from workflow.agent_replanner.node_replan import NodeReplan
-from workflow.clients.computer.server_client import get_screenshot
-from workflow.helpers import encode_image, format_autogen_message, resize_and_compress_image
+from clients.computer import computer
+from helpers import resize_and_compress_image
 
-logger = logging.getLogger("agent.replanner")
+import logging
+logger = logging.getLogger("agent_replanner")
 
 class OOAgentReplanner:
     """
@@ -14,7 +15,7 @@ class OOAgentReplanner:
     It handler reviewing the plan step and replanning if needed.
     """
 
-    def __init__(self, config: OOConfig, state: State):
+    def __init__(self, config: OOConfig, state: State, tracker: Tracker):
         logger.debug("Initializing...")
 
         self.name = "agent_replanner"
@@ -22,9 +23,12 @@ class OOAgentReplanner:
 
         self.config = config
         self.state = state
+        self.tracker = tracker
 
-        self.nodeSummarizeAllPlanVersions = NodeSummarizeAllPlanVersions(config, state)
-        self.nodeReplan = NodeReplan(config, state)
+        self.computer = computer
+
+        self.nodeSummarizeAllPlanVersions = NodeSummarizeAllPlanVersions(config, state, tracker)
+        self.nodeReplan = NodeReplan(config, state, tracker)
 
     async def run(self) -> str:
 
@@ -35,7 +39,7 @@ class OOAgentReplanner:
         logger.debug("Running...")
 
         # Take a screenshot of the current UI state
-        screenshot = get_screenshot()
+        screenshot = computer.get_screenshot()
         # Resize and compress the screenshot
         screenshot_resized = resize_and_compress_image(screenshot)
         # Save into state
@@ -69,8 +73,6 @@ class OOAgentReplanner:
         return result
 
 
-def init_agent_replanner(config: OOConfig, state: State) -> OOAgentReplanner:
+def init_agent_replanner(config: OOConfig, state: State, tracker: Tracker) -> OOAgentReplanner:
     logger.debug("Initializing agent-replanner...")
-
-    agent = OOAgentReplanner(config, state)
-    return agent
+    return OOAgentReplanner(config, state, tracker)

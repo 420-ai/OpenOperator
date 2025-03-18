@@ -1,0 +1,13 @@
+------ UserMessage - user --------
+User Message:
+
+Here is the step that agent should do, is the step already done?
+
+The first step of the plan is:
+
+1. Click on the "Microsoft Teams" icon in the Start Menu to open the application.
+
+Attached is current state of the UI.
+
+<autogen_core._image.Image object at 0x7f6898061640>
+------------------------

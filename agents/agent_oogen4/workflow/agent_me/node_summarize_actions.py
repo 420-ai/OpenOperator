@@ -1,11 +1,13 @@
 from typing import Any
 from config import OOConfig
 from state import State
-from workflow.clients.llm.local_ollama import llm_phi4
-from autogen_core import Image as AutogenImage
+from tracker import Tracker
+from clients.llm import llm_phi4, calculate_cost
 from autogen_core.models import UserMessage, SystemMessage
+from helpers import format_autogen_message
+
 import logging
-logger = logging.getLogger("agent.me-node.summarize_actions")
+logger = logging.getLogger("agent_me--node_summarize_actions")
 
 SYSTEM_MESSAGE = """
 You are AI assistant that is helping summarize actions.
@@ -22,24 +24,52 @@ class NodeSummarizeActions:
     Summarize actions
     """
 
-    def __init__(self, config: OOConfig, state: State):
+    def __init__(self, config: OOConfig, state: State, tracker: Tracker):
         logger.debug("Initializing...")
+
+        self.name = "agent_me--node_summarize_actions"
+        self.description = "Summarize actions."
 
         self.state = state
         self.config = config
+        self.tracker = tracker
 
         self.llm = llm_phi4
 
     async def execute(self, messages: Any) -> bool:
         logger.debug("Executing...")
         
-        summarization = await self.llm.create(
+        system_message = SystemMessage(content=SYSTEM_MESSAGE)
+        user_message = UserMessage(content=[
+            USER_MESSAGE.format(messages=messages),
+        ], source="user")
+
+        # region Log + State + Tracker
+        self.tracker.save(self.name, [
+            ("system_message", system_message),
+            ("user_message", user_message)
+        ])
+        # endregion
+
+        result = await self.llm.create(
             messages=[
-                SystemMessage(content=SYSTEM_MESSAGE),
-                UserMessage(content=[
-                    USER_MESSAGE.format(messages=messages),
-                ], source="user")
+                system_message,
+                user_message
             ]
         )
+
+        # ---- COST CALCULATION ----
+        total_cost = calculate_cost(result.usage, self.llm._resolved_model, self.config)
+        # ---- END COST CALCULATION ----
+
+        # region Log + State + Tracker
+        logger.debug(f"Total cost: {total_cost}$")
+        logger.debug(format_autogen_message(result))
+
+        self.tracker.save(self.name, [
+            ("llm_response", result),
+            ("cost", f"{total_cost}$"),
+        ])
+        # endregion
         
-        return summarization.content
+        return result.content

@@ -1,9 +1,12 @@
 from config import OOConfig
 from state import State
-from workflow.clients.llm.local_ollama import llm_phi4
+from tracker import Tracker
+from clients.llm import llm_phi4, calculate_cost
 from autogen_core.models import UserMessage, SystemMessage
+from helpers import format_autogen_message
+
 import logging
-logger = logging.getLogger("agent.me-node.get_step")
+logger = logging.getLogger("agent_me--node_get_step")
 
 SYSTEM_MESSAGE = """
 You are a helpful assistant that helps the user to get the first step of the plan. Do not elaborate on the plan, just return the first step.
@@ -19,11 +22,15 @@ class NodeGetStep:
     Get the first step from the plan.
     """
 
-    def __init__(self, config: OOConfig, state: State):
+    def __init__(self, config: OOConfig, state: State, tracker: Tracker):
         logger.debug("Initializing...")
+
+        self.name = "agent_me--node_get_step"
+        self.description = "Get the first step from the plan."
 
         self.state = state
         self.config = config
+        self.tracker = tracker
 
         self.llm = llm_phi4
 
@@ -33,28 +40,39 @@ class NodeGetStep:
         # Get the plan from state
         plan = self.state.current_plan_data["plan_text"]
 
-        # Log the plan
-        logger.debug("-------------------")
-        logger.debug("Plan:")
-        logger.debug(plan)
-        logger.debug("-------------------")
+        system_message = SystemMessage(content=SYSTEM_MESSAGE)
+        user_message = UserMessage(content=[
+            USER_MESSAGE.format(plan=plan),
+        ], source="user")
+
+        # region Log + State + Tracker
+        self.tracker.save(self.name, [
+            ("system_message", system_message),
+            ("user_message", user_message)
+        ])
+        # endregion
 
         # LLM call
-        first_step = await self.llm.create(
+        result = await self.llm.create(
             messages=[
-                SystemMessage(content=SYSTEM_MESSAGE),
-                UserMessage(content=[
-                    USER_MESSAGE.format(plan=plan), 
-                ], source="user")
+                system_message,
+                user_message
             ]
         )
 
-        # Log the first step
-        logger.debug("-------------------")
-        logger.debug("First step:")
-        logger.debug(first_step.content)
-        logger.debug("-------------------")
+        # ---- COST CALCULATION ----
+        total_cost = calculate_cost(result.usage, self.llm._resolved_model, self.config)
+        # ---- END COST CALCULATION ----
 
-        # Save the first step in the state
-        self.state.save_plan_step_text(first_step.content)
+        # region Log + State + Tracker
+        logger.debug(f"Total cost: {total_cost}$")
+        logger.debug(format_autogen_message(result))
+
+        self.state.save_plan_step_text(result.content)
+
+        self.tracker.save(self.name, [
+            ("llm_response", result),
+            ("cost", f"{total_cost}$"),
+        ])
+        # endregion
         

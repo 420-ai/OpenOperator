@@ -5,22 +5,29 @@ from logging_setup import configure_logging
 from workflow.agent_planner import init_agent_planner
 from workflow.agent_me import init_agent_me
 from workflow.agent_replanner import init_agent_replanner
-from workflow.helpers import format_autogen_message
+from environment.computer.env import ComputerEnv
 import asyncio
 import logging
-import re
+import sys
+import json
+from datetime import datetime
+
+t = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+# Logging
+configure_logging(t)
 logger = logging.getLogger("main")
 
-# Tracker object to log images, messages, config and other data
-tracker = Tracker()
-configure_logging(tracker.result_dir)
+# Tracker object to keep track of images, messages, config and other data
+tracker = Tracker(t)
+
+# State object to store the current state of the agent
+state = State(t)
 
 # Configuration object for agent
 config = OOConfig()
 config.load("teams", "scenario-2")
-tracker.save_config(config)
-
-state = State()
+# tracker.save_config(config)
 
 # Main function
 async def main() -> None:
@@ -28,14 +35,16 @@ async def main() -> None:
         logger.info("Starting task execution...")
         # tracker.start_recording()
 
+         # Initialize Windows VM environment
+        env = ComputerEnv(config, state, tracker)
+        _, _ = env.reset()  
+
         # -----------------------
         # Agent Planner
         # -----------------------
-        agent_planner = init_agent_planner(config, state)
-
-        plan = await agent_planner.run(task=config.instruction)
-        print(format_autogen_message(plan))
-        plan_str = plan.messages[-1].content
+        agent_planner = init_agent_planner(config, state, tracker)
+        _ = await agent_planner.run(task=config.instruction)
+        
 
         # ----------------------
         # ----------------------
@@ -45,16 +54,16 @@ async def main() -> None:
         planVersion = 0
         planResult = False
 
-        while planResult == False and planVersion < config.workflow_settings["max_plan_versions"]:
+        while planResult == False and planVersion < config.workflow.params.max_plan_versions:
             planVersion += 1
 
             # -----------------------
             # Agent ME
             # -----------------------
-            agent_me = init_agent_me(config, state)
-            result = await agent_me.run()
-            print("Agent ME result:")
-            print(result)
+            agent_me = init_agent_me(config, state, tracker, env)
+            _ = await agent_me.run()
+
+            sys.exit(0)
 
             # -----------------------
             # Agent Replanner
@@ -89,6 +98,9 @@ async def main() -> None:
 
         logger.info("PLAN LOOP END")
 
+    except Exception as e:
+        logger.error(f"An error occurred: {e}")
+        logger.exception(e)
 
     except asyncio.CancelledError:
         logger.warning("Task was cancelled.")

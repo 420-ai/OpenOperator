@@ -1,8 +1,7 @@
 from typing import Any
 from config import OOConfig
 from state import State
-from workflow.clients.llm.azure_openai import llm_gpt4o
-from workflow.clients.computer.server_client import get_screenshot
+from clients.llm import llm_gpt4o
 from autogen_core import Image as AutogenImage
 from autogen_core.models import UserMessage, SystemMessage
 import logging
