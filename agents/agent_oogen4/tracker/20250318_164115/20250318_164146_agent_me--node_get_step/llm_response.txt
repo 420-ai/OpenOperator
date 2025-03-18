@@ -1,7 +1,0 @@
-====== CreateResult ======
-Usage: RequestUsage(prompt_tokens=464, completion_tokens=28)
-Content:
- The first step of the plan is:
-
-1. Click on the "Microsoft Teams" icon in the Start Menu to open the application.
-========================

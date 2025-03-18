@@ -1,5 +1,0 @@
-====== CreateResult ======
-Usage: RequestUsage(prompt_tokens=25620, completion_tokens=1)
-Content:
- TRUE
-========================

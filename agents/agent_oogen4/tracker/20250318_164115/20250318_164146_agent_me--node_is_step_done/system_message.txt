@@ -1,7 +1,0 @@
------- SystemMessage --------
-System Message: You are AI agent responsible for deciding, if the step is already done, based on the screenshot.
-
-Output:
-Return "TRUE" if the step is already done or can be skipped.
-Return "FALSE" if the step we can proceed with the step
-------------------------

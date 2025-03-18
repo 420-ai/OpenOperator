@@ -1,8 +1,0 @@
------- UserMessage - user --------
-User Message:
-Your objective is: Summarize the **whole** conversation with 'Casey Bennett' in MS Teams. Scroll through the chat history to ensure all messages are included in the summary. The summary should be concise and cover all key points discussed in the conversation.. Please create a **structured step-by-step plan** that an AI agent can follow using its available tools.
-
-**Screenshot:** [Image Included]
-
-<autogen_core._image.Image object at 0x7f010dc8e0c0>
-------------------------

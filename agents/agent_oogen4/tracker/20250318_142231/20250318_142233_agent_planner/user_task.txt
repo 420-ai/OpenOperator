@@ -1,1 +1,0 @@
-Summarize the **whole** conversation with 'Casey Bennett' in MS Teams. Scroll through the chat history to ensure all messages are included in the summary. The summary should be concise and cover all key points discussed in the conversation.
