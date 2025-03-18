@@ -48,6 +48,8 @@ servers/**/weights
 **/agent-waa/**/tmp
 **/agent-waa/**/test
 **/state
+**/logs
+**/traces
 
 # Models
 models/magma/video/*.png
