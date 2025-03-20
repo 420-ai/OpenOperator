@@ -1,6 +1,12 @@
 # WAA Agent
 
-WindowsAgentArena agent. Source: https://github.com/microsoft/WindowsAgentArena
+Original WindowsAgentArena agent. Source: https://github.com/microsoft/WindowsAgentArena
+
+| Param        | Value                                     |
+| ------------ | ----------------------------------------- |
+| AI Framework | No AI Agent framework.                    |
+| Agent Style  | [ReAct](https://arxiv.org/abs/2210.03629) |
+| RL           | No, but possible via using Gymnasium env  |
 
 ### Azure OpenAI
 

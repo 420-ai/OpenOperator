@@ -1,6 +1,6 @@
 import asyncio
 import os
-from agent.clients.som.omniparser import OmniparserClient
+from workflow.clients.som import omniparser
 from PIL import Image
 import json
 
@@ -8,9 +8,7 @@ async def test_omniparser():
     current_dir = os.path.dirname(__file__)
     img = Image.open(os.path.join(current_dir, 'img/test_desktop.png'))
 
-    som_client = OmniparserClient()
-
-    response = som_client.analyze_image(img)
+    response = omniparser.analyze_image(img)
 
     # Get parsed image and content
     parsed_image = response["parsed_image"]

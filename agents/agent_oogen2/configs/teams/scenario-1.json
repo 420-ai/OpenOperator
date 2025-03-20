@@ -1,3 +1,44 @@
 {
-  "instruction": "Open MS Teams application and send message 'Hi my friend :-)' to the Lukas Kellerstein"
+  "instruction": "Open MS Teams application and send message 'Hi my friend :-)' to the Lukas Kellerstein",
+  "workflow": {
+    "params": {
+      "max_plan_versions": 10,
+      "max_plan_step_actions": 5
+    },
+    "models": [
+      {
+        "name": "o3-mini",
+        "input": 1.1,
+        "output": 4.4
+      },
+      {
+        "name": "gpt-4o",
+        "input": 2.5,
+        "output": 10
+      },
+      {
+        "name": "gpt-4o-mini",
+        "input": 0.15,
+        "output": 0.6
+      },
+      {
+        "name": "phi4:latest",
+        "input": 0,
+        "output": 0
+      },
+      {
+        "name": "llama3.2-vision:latest",
+        "input": 0,
+        "output": 0
+      }
+    ]
+  },
+  "environment": {
+    "params": {
+      "server_ip": "http://127.0.0.1",
+      "computer_port": 5052,
+      "browser_port": 5053
+    }
+  },
+  "evaluation": {}
 }

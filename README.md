@@ -77,3 +77,21 @@ After activating the virtual environment:
 - On macOS/Linux: `source .venv/bin/activate`
 
 You can update all dependencies using:
+
+# TODO
+
+- Agent_OOGen4 --> Agent_oo4 = remove the Autogen parts
+
+  - oo + oo2 = custom AI agent + Gymansium env
+  - oogen1 + oogen2 + oogen3 = Autogen AI agents
+
+- Remove the oogen4 ??
+
+- Rename agents to nodes (ex. Agent planner -> Node planner)
+
+- Have a global config and reference not from state, but
+  `from config import config`
+
+- Finish implementation of Environment "start" and "end" functions
+
+- Add MCP

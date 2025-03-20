@@ -1,11 +1,8 @@
 import os
-import time
-import shutil
-from datetime import datetime
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 from PIL import Image
-
+import json
+from config import OOConfig
 
 class State:
     """
@@ -13,16 +10,12 @@ class State:
     Each run of the application uses a different subfolder with timestamp.
     """
     
-    def __init__(self, base_dir: str = "state"):
+    def __init__(self, timestamp: str):
         """
         Initialize the State object.
-        
-        Args:
-            base_dir: Base directory for storing state, defaults to "state"
         """
-        self.base_dir = os.path.join(os.path.dirname(__file__), base_dir)
+        self.base_dir = os.path.join(os.path.dirname(__file__), "state")
         # Create a timestamp-based run directory
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.run_dir = os.path.join(self.base_dir, timestamp)
         os.makedirs(self.run_dir, exist_ok=True)
         
@@ -30,21 +23,42 @@ class State:
         self.current_plan_version = None
         self.current_iteration = None
     
-    def create_plan_version(self, version: int) -> str:
-        """
-        Create a new plan version directory.
+    # ----------------------------------------------------
+    # General management
+    # ----------------------------------------------------
+
+    # Config
+    def save_config(self, config: OOConfig) -> None:
+        with open(os.path.join(self.run_dir, "config.json"), "w", encoding="utf-8") as f:
+            json.dump(config.config._to_dict(), f, indent=4)  
+
+    def get_config(self) -> OOConfig:
+        with open(os.path.join(self.run_dir, "config.json"), "r", encoding="utf-8") as f:
+            config_dict = json.load(f)
+
+        return OOConfig(config_dict)
+
+    # Environment
+    def save_initial_observation(self, observation: Dict[str, Any]) -> str:
+        env_dir = os.path.join(self.run_dir, f"environment")
+        os.makedirs(env_dir, exist_ok=True)
+
+        # Save the screenshot
+        observation["screenshot"].save(os.path.join(env_dir, "screenshot.png"))
+        # Save the ui elements
+        with open(os.path.join(env_dir, "ui_elements.json"), "w") as f:
+            json.dump(observation["ui_elements"], f, indent=4)
+
+    # Task
+    def save_task_result(self, task_result: str): 
+        with open(os.path.join(self.run_dir, "task_result.txt"), "w") as f:
+            f.write(task_result)
         
-        Args:
-            version: Version number of the plan
-            
-        Returns:
-            Path to the plan version directory
-        """
-        plan_dir = os.path.join(self.run_dir, f"plan_v{version}")
-        os.makedirs(plan_dir, exist_ok=True)
-        self.current_plan_version = version
-        return plan_dir
-    
+
+    # ----------------------------------------------------
+    # Plan version management
+    # ----------------------------------------------------
+
     def create_new_plan_version(self) -> str:
         """
         Create a new plan version directory with an incremented version number.
@@ -61,8 +75,11 @@ class State:
                 raise ValueError("Something is wrong - Current plan version does not match the latest version")
 
             new_version = self.current_plan_version + 1
-        
-        return self.create_plan_version(new_version)
+
+        plan_dir = os.path.join(self.run_dir, f"plan_v{new_version}")
+        os.makedirs(plan_dir, exist_ok=True)
+        self.current_plan_version = new_version
+        return plan_dir
     
     def _get_plan_version_dir(self, version: Optional[int] = None) -> str:
         """
@@ -100,25 +117,6 @@ class State:
         
         return file_path
     
-    def save_plan_validation(self, content: str, version: Optional[int] = None) -> str:
-        """
-        Save plan validation content to plan_validation.txt.
-        
-        Args:
-            content: Validation content to save
-            version: Plan version number, uses current if None
-            
-        Returns:
-            Path to the saved file
-        """
-        plan_dir = self._get_plan_version_dir(version)
-        file_path = os.path.join(plan_dir, "plan_validation.txt")
-        
-        with open(file_path, "w") as f:
-            f.write(content)
-        
-        return file_path
-    
     def save_plan_image(self, image: Image.Image, image_name: str, version: Optional[int] = None) -> str:
         """
         Save a PIL Image to the plan version directory.
@@ -141,6 +139,40 @@ class State:
         image.save(dest_path)
         return dest_path
     
+    
+    def list_plan_versions(self) -> List[str]:
+        """
+        List all plan versions in the current run.
+        
+        Returns:
+            List of plan version directories
+        """
+        if not os.path.exists(self.run_dir):
+            return []
+        
+        versions = [d for d in os.listdir(self.run_dir) if d.startswith("plan_v") and os.path.isdir(os.path.join(self.run_dir, d))]
+        versions.sort(key=lambda v: int(v.split("_v")[1]))
+        return versions
+    
+    def get_latest_plan_version(self) -> Optional[int]:
+        """
+        Get the latest plan version number.
+        
+        Returns:
+            Latest plan version number or None if no versions exist
+        """
+        versions = self.list_plan_versions()
+        if not versions:
+            return None
+        
+        version_numbers = [int(v.split("_v")[1]) for v in versions]
+        return max(version_numbers)
+    
+
+    # ----------------------------------------------------
+    # Plan step management
+    # ----------------------------------------------------
+
     def _get_plan_step_dir(self, version: Optional[int] = None) -> str:
         """
         Get the directory path for a plan step.
@@ -194,6 +226,11 @@ class State:
         
         return file_path
     
+
+    # ----------------------------------------------------
+    # Plan step - iteration - management
+    # ----------------------------------------------------
+
     def create_iteration(self, iteration_number: int, version: Optional[int] = None) -> str:
         """
         Create an iteration directory for a plan step.
@@ -210,7 +247,8 @@ class State:
         
         iteration_dir = os.path.join(plan_step_dir, f"iteration_{iteration_number}")
         os.makedirs(iteration_dir, exist_ok=True)
-        self.current_iteration = iteration_dir
+
+        self.current_iteration = iteration_number
         return iteration_dir
     
     def _get_iteration_dir(self, iteration_number: Optional[int] = None, version: Optional[int] = None) -> str:
@@ -227,7 +265,8 @@ class State:
         if iteration_number is None:
             if self.current_iteration is None:
                 raise ValueError("No iteration selected")
-            return self.current_iteration
+            else:
+                iteration_number = self.current_iteration
         
         plan_step_dir = self._get_plan_step_dir(version)
         return os.path.join(plan_step_dir, f"iteration_{iteration_number}")
@@ -253,7 +292,7 @@ class State:
         
         return file_path
     
-    def create_validation_dir(self, iteration_number: Optional[int] = None, version: Optional[int] = None) -> str:
+    def _create_iteration_validation_dir(self, iteration_number: Optional[int] = None, version: Optional[int] = None) -> str:
         """
         Create a validation directory for an iteration.
         
@@ -271,7 +310,7 @@ class State:
         os.makedirs(validation_dir, exist_ok=True)
         return validation_dir
     
-    def save_validation_result(self, content: str, iteration_number: Optional[int] = None, version: Optional[int] = None) -> str:
+    def save_iteration_validation_result(self, content: str, iteration_number: Optional[int] = None, version: Optional[int] = None) -> str:
         """
         Save validation result content to result.txt.
         
@@ -283,7 +322,7 @@ class State:
         Returns:
             Path to the saved file
         """
-        validation_dir = self.create_validation_dir(iteration_number, version)
+        validation_dir = self._create_iteration_validation_dir(iteration_number, version)
         file_path = os.path.join(validation_dir, "result.txt")
         
         with open(file_path, "w") as f:
@@ -291,7 +330,7 @@ class State:
         
         return file_path
     
-    def save_validation_image(self, image: Image.Image, image_name: str, iteration_number: Optional[int] = None, version: Optional[int] = None) -> str:
+    def save_iteration_validation_image(self, image: Image.Image, image_name: str, iteration_number: Optional[int] = None, version: Optional[int] = None) -> str:
         """
         Save a PIL Image to the validation directory.
         
@@ -304,50 +343,14 @@ class State:
         Returns:
             Path to the saved image
         """
-        validation_dir = self.create_validation_dir(iteration_number, version)
+        validation_dir = self._create_iteration_validation_dir(iteration_number, version)
         dest_path = os.path.join(validation_dir, image_name)
         
         # Save the image
         image.save(dest_path)
         return dest_path
     
-    def list_plan_versions(self) -> List[str]:
-        """
-        List all plan versions in the current run.
-        
-        Returns:
-            List of plan version directories
-        """
-        if not os.path.exists(self.run_dir):
-            return []
-        
-        versions = [d for d in os.listdir(self.run_dir) if d.startswith("plan_v") and os.path.isdir(os.path.join(self.run_dir, d))]
-        versions.sort(key=lambda v: int(v.split("_v")[1]))
-        return versions
-    
-    def get_latest_plan_version(self) -> Optional[int]:
-        """
-        Get the latest plan version number.
-        
-        Returns:
-            Latest plan version number or None if no versions exist
-        """
-        versions = self.list_plan_versions()
-        if not versions:
-            return None
-        
-        version_numbers = [int(v.split("_v")[1]) for v in versions]
-        return max(version_numbers)
-    
-    def get_run_dir(self) -> str:
-        """
-        Get the current run directory.
-        
-        Returns:
-            Path to the current run directory
-        """
-        return self.run_dir
-    
+
     # ----------------------------------------------------
     # Get data
     # ----------------------------------------------------

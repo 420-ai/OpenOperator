@@ -2,13 +2,11 @@
 
 Open Operator agent.
 
-> Custom workflow
->
-> Inspired by [Plan and solve](https://arxiv.org/abs/2305.04091).
->
-> **No AI Agent** from Autogen, **only LLM calls** via [Autogen](https://github.com/microsoft/autogen).
->
-> Using [Gymnasium](https://github.com/Farama-Foundation/Gymnasium) environment
+| Param        | Value                                                                            |
+| ------------ | -------------------------------------------------------------------------------- |
+| AI Framework | [Autogen](https://github.com/microsoft/autogen)                                  |
+| Agent Style  | Custom workflow - Inspired by [Plan and solve](https://arxiv.org/abs/2305.04091) |
+| RL           | No, but possible via using Gymnasium env                                         |
 
 ### Azure OpenAI
 
@@ -21,8 +19,7 @@ The agent needs `.env` file with data belo
 ```
 AZURE_API_KEY=<AZURE_OPENAI_API_KEY>
 AZURE_OPENAI_BASEURL=https://<AZURE_OPENAI_NAME>.openai.azure.com/
-AZURE_OPENAI_DEPLOYMENT=<GPT_MODEL_DEPLOYMENT>
-AZURE_OPENAI_API_VERSION=2024-05-01-preview
+AZURE_OPENAI_API_VERSION=2025-01-01-preview
 ```
 
 ## Run

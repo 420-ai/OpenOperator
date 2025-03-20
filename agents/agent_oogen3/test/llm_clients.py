@@ -1,8 +1,8 @@
 import asyncio
 import os
 from autogen_core.models import UserMessage
-from agent.clients.llm.azure_openai import llm_gpt4o, llm_gpt4o_mini, llm_o3_mini
-from agent.clients.llm.local_ollama import llm_phi4, llm_llama32_vision
+from workflow.clients.llm import llm_gpt4o, llm_gpt4o_mini, llm_o3_mini
+from workflow.clients.llm import llm_phi4, llm_llama32_vision
 from PIL import Image
 from autogen_core import Image as AutogenImage
 

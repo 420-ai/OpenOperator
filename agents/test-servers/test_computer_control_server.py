@@ -1,6 +1,7 @@
 import requests
 import base64
 import os
+import json
 
 BASE_URL = "http://127.0.0.1:5050"
 
@@ -19,6 +20,22 @@ def test_healthcheck():
 def test_platform():
     resp = requests.get(f"{BASE_URL}/platform")
     print("Platform:", resp.text)
+
+def test_move_mouse():
+    x, y = 100, 200  # Example coordinates
+    duration = 0.5  # Duration in seconds
+    command = f"pyautogui.moveTo({x}, {y}, {duration})"
+
+    pkgs_prefix: str = "import pyautogui; import time; pyautogui.FAILSAFE = False; {command}"
+    command_list = ["pythonw", "-c", pkgs_prefix.format(command=command)]
+    payload = json.dumps({"command": command_list, "shell": False})
+    headers = {'Content-Type': 'application/json'}
+
+    resp = requests.post(f"{BASE_URL}/execute", headers=headers, data=payload, timeout=90)
+    if resp.status_code == 200:
+        print("Mouse moved successfully.")
+    else:
+        print("Failed to move mouse:", resp.status_code, resp.text)
 
 def test_cursor_position():
     resp = requests.get(f"{BASE_URL}/cursor_position")
@@ -97,6 +114,7 @@ def test_close_all_windows():
 if __name__ == "__main__":
     test_healthcheck()
     test_platform()
+    test_move_mouse()
     test_cursor_position()
     test_screen_size()
     test_obs_winagent()

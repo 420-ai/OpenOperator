@@ -1,3 +1,9 @@
+# Users
+
+Test user for the solution.
+
+## MS Teams
+
 Oliver Schmidt
 oo-test-user-1@outlook.com
 Some_Very-Secret_Password..?
@@ -21,3 +27,11 @@ Some_Very-Secret_Password..?
 Charlie Benson
 charlie.benson.oo@outlook.com
 Some_Very-Secret_Password..?
+
+## MacOS
+
+No Apple account. Just local user
+
+Magnus Midtbo
+magnusmidtbo
+1234
