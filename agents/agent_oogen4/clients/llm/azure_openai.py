@@ -20,7 +20,7 @@ llm_o3_mini = AzureOpenAIChatCompletionClient(
 )
 
 llm_gpt4o = AzureOpenAIChatCompletionClient(
-    model="gpt-4o-2024-11-20",
+    model="gpt-4o",
     azure_deployment="gpt-4o-deployment",
     azure_endpoint=AZURE_OPENAI_BASEURL,
     api_version=AZURE_OPENAI_API_VERSION,

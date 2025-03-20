@@ -35,8 +35,10 @@
   "environment": {
     "params": {
       "server_ip": "http://127.0.0.1",
-      "computer_port": 5052,
-      "browser_port": 5053
+      "computer_port": 5050,
+      "browser_port": 5051,
+      "network_proxy_port": 5052,
+      "evaulator_port": 5053
     }
   },
   "evaluation": {}

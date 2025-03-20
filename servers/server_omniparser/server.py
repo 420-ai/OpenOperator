@@ -7,6 +7,7 @@ from os import path
 from typing import TypedDict
 from download import download_omniparser
 import os
+from torch import cuda
 
 from util.omniparser import Omniparser
 
@@ -40,7 +41,7 @@ config: Config = {
     'som_model_path': path.join(weights_dir, 'icon_detect/model.pt'),
     'caption_model_name': 'florence2',
     'caption_model_path': path.join(weights_dir, 'icon_caption_florence'),
-    'device': 'cpu',
+    'device': 'cuda' if cuda.is_available() else 'cpu',
     'BOX_TRESHOLD': 0.05,
 }
 

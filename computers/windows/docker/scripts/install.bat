@@ -96,8 +96,19 @@ set "STARTUP_SERVER_BROWSER_CONTROL_BAT=%~dp0start_server_browser_control.bat"
     echo @echo off
     echo start /b "" "%PYTHONW_PATH%" "\\host.lan\Data\server_browser_control\server.py"
 ) > "%STARTUP_SERVER_BROWSER_CONTROL_BAT%"
-echo .bat files for servers created >> "%LOGFILE%"
 
+set "STARTUP_SERVER_NETWORK_PROXY_BAT=%~dp0start_server_network_proxy.bat"
+(
+    echo @echo off
+    echo start /b "" "%PYTHONW_PATH%" "\\host.lan\Data\server_network_proxy\server.py"
+) > "%STARTUP_SERVER_NETWORK_PROXY_BAT%"
+
+set "STARTUP_SERVER_EVALUATOR=%~dp0start_server_evaluator.bat"
+(
+    echo @echo off
+    echo start /b "" "%PYTHONW_PATH%" "\\host.lan\Data\server_evaluator\server.py"
+) > "%STARTUP_SERVER_EVALUATOR%"
+echo .bat files for servers created >> "%LOGFILE%"
 
 REM ---------------------------
 REM 7) Schedule Startup Task
@@ -107,11 +118,15 @@ REM Without /DELAY is needed in order to wait until network storage is available
 echo Creating 'scheduled tasks' for servers >> "%LOGFILE%"
 schtasks /Create /TN "StartServer-ComputerControl" /SC ONSTART /TR "\"%STARTUP_SERVER_COMPUTER_CONTROL_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /DELAY 0000:30 /F
 schtasks /Create /TN "StartServer-BrowserControl" /SC ONSTART /TR "\"%STARTUP_SERVER_BROWSER_CONTROL_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /DELAY 0000:30 /F
+schtasks /Create /TN "StartServer-NetworkProxy" /SC ONSTART /TR "\"%STARTUP_SERVER_NETWORK_PROXY_BAT%\"" /RU system /RL HIGHEST /IT /DELAY 0000:30 /F
+schtasks /Create /TN "StartServer-Evaluator" /SC ONSTART /TR "\"%STARTUP_SERVER_EVALUATOR_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /DELAY 0000:30 /F
 echo 'Scheduled tasks' for servers created >> "%LOGFILE%"
 
 echo Triggering 'scheduled tasks' for servers >> "%LOGFILE%"
 schtasks /Run /TN "StartServer-ComputerControl"
 schtasks /Run /TN "StartServer-BrowserControl"
+schtasks /Run /TN "StartServer-NetworkProxy"
+schtasks /Run /TN "StartServer-Evaluator"
 echo 'Scheduled tasks' for servers started >> "%LOGFILE%"
 
 echo Installation completed at %date% %time% >> "%LOGFILE%"

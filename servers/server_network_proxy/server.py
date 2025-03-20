@@ -30,7 +30,7 @@ def run_proxy():
 
     opts = options.Options(
         listen_host="0.0.0.0",
-        listen_port=8080,
+        listen_port=5052,
         mode=["local:msedgewebview2"],
         ssl_insecure=True,
         showhost=True,

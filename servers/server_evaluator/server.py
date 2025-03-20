@@ -14,4 +14,4 @@ async def evaluate(request: EvaluationRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
-    uvicorn.run("server:app", host="0.0.0.0", port=5004, reload=True, timeout_graceful_shutdown=0)
+    uvicorn.run("server:app", host="0.0.0.0", port=5053, reload=True, timeout_graceful_shutdown=0)
