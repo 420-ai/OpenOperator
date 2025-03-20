@@ -11,5 +11,6 @@ dependencies = [
     "azure-core>=1.32.0",
     "azure-identity>=1.20.0",
     "gymnasium>=1.1.1",
+    "openai>=1.66.3",
     "python-dotenv>=1.0.1",
 ]

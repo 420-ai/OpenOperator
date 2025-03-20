@@ -61,11 +61,11 @@ class NodeGetStep:
         )
 
         # ---- COST CALCULATION ----
-        total_cost = calculate_cost(result.usage, self.llm._resolved_model, self.config)
+        model_name, total_cost = calculate_cost(result.usage, self.llm._resolved_model, self.config)
         # ---- END COST CALCULATION ----
 
         # region Log + State + Tracker
-        logger.debug(f"Total cost: {total_cost}$")
+        logger.debug(f"Model: {model_name}, Total cost: {total_cost}$")
         logger.debug(format_autogen_message(result))
 
         self.state.save_plan_step_text(result.content)

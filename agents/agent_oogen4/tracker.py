@@ -22,7 +22,7 @@ class Tracker:
 
     def save(self, name: str, objects: Union[Any, List[Tuple[str, Any]]]) -> str:
         """Save objects (text, images, JSON) into a timestamped folder with specified names."""
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S.%f")[:-3]
         folder_name = f"{timestamp}_{name}"
         save_path = self.run_dir / folder_name
         save_path.mkdir(parents=True, exist_ok=True)

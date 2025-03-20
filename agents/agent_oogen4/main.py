@@ -9,7 +9,6 @@ from environment.computer.env import ComputerEnv
 import asyncio
 import logging
 import sys
-import json
 from datetime import datetime
 
 t = datetime.now().strftime("%Y%m%d_%H%M%S")

@@ -40,13 +40,13 @@ servers/**/weights
 agents/**/recordings
 agents/**/traces
 agents/**/screenshots
+agents/**/tracker
 agents/**/parsed
 agents/**/results
 agents/**/test
 agents/**/tmp
 agents/**/state
 agents/**/logs
-agents/**/traces
 agents/**/cache
 
 # Models

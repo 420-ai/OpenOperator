@@ -1,12 +1,14 @@
+import base64
 import random
 import string
 from datetime import datetime
 import os
-from typing import Any
+from typing import Any, List
 from PIL import Image
 import os
 import json
 import io
+import copy
 
 # AUTOGEN related
 from autogen_agentchat.base import TaskResult
@@ -19,6 +21,11 @@ def random_string(length=5):
 
 def get_timestamp():
     return datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+def encode_image(image):
+    buffered = io.BytesIO()
+    image.save(buffered, format="PNG")
+    return base64.b64encode(buffered.getvalue()).decode("utf-8")
 
 
 def save_image(image: Image.Image, file_path: str,  file_name: str):
@@ -58,7 +65,17 @@ def resize_and_compress_image(image: Image.Image, max_size=(1024, 1024)) -> Imag
 
 
 
-
+# Custom related
+def format_messages(messages: list[dict]):
+    messages_copy = copy.deepcopy(messages)  # Create a deep copy to avoid modifying the original list
+    
+    for message in messages_copy:
+        if "content" in message and isinstance(message["content"], list):
+            for content_item in message["content"]:
+                if content_item.get("type") == "image_url" and "image_url" in content_item:
+                    content_item["image_url"]["url"] = "<BASE64_IMAGE>"
+    
+    return messages_copy
 
 # AUTOGEN related
 def format_autogen_message(message: AgentEvent | ChatMessage | TaskResult) -> str:
