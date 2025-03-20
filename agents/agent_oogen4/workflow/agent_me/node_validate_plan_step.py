@@ -72,22 +72,24 @@ class NodeValidatePlanStep:
     NodeValidatePlanStep is responsible for validating the current plan step.
     """
 
-    def __init__(self, config: OOConfig, state: State, tracker: Tracker):
+    def __init__(self, state: State, tracker: Tracker):
         logger.debug("Initializing...")
 
         self.name = "agent_me--node_validate_plan_step"
         self.description = "Validating the current plan step."
 
         self.state = state
-        self.config = config
+        self.config = state.get_config()
         self.tracker = tracker
 
         self.llm = llm_gpt4o
 
-    async def execute(self, actions_history: str, screenshot_t1: Image.Image, screenshot_t2: Image.Image) -> bool:
+    async def execute(self, actions_history: str) -> bool:
         logger.debug("Executing...")
         
         plan_step = self.state.current_plan_data["plan_step"]["text"]
+        screenshot_t1 = self.state.get_current_plan_image("t1_resized")
+        screenshot_t2 = self.state.get_current_plan_image("t2_resized")
 
         system_message = SystemMessage(content=SYSTEM_MESSAGE)
         user_message = UserMessage(content=[

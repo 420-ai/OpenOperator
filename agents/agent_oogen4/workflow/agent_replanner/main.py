@@ -1,9 +1,8 @@
-from config import OOConfig
 from state import State
 from tracker import Tracker
-from workflow.agent_replanner.node_summarize_plan_versions import NodeSummarizeAllPlanVersions
+from workflow.agent_replanner.node_format_plan_versions import NodeFormatAllPlanVersions
 from workflow.agent_replanner.node_replan import NodeReplan
-from clients.computer import computer
+from clients.computer import ComputerClient
 from helpers import resize_and_compress_image
 
 import logging
@@ -15,20 +14,20 @@ class OOAgentReplanner:
     It handler reviewing the plan step and replanning if needed.
     """
 
-    def __init__(self, config: OOConfig, state: State, tracker: Tracker):
+    def __init__(self, state: State, tracker: Tracker):
         logger.debug("Initializing...")
 
         self.name = "agent_replanner"
         self.description = "Agent responsible for replanning"
 
-        self.config = config
         self.state = state
+        self.config = state.get_config()
         self.tracker = tracker
 
-        self.computer = computer
+        self.computer = ComputerClient(server_url=f"{self.config.environment.params.server_ip}:{self.config.environment.params.computer_port}")
 
-        self.nodeSummarizeAllPlanVersions = NodeSummarizeAllPlanVersions(config, state, tracker)
-        self.nodeReplan = NodeReplan(config, state, tracker)
+        self.nodeFormatAllPlanVersions = NodeFormatAllPlanVersions(state, tracker)
+        self.nodeReplan = NodeReplan(state, tracker)
 
     async def run(self) -> str:
 
@@ -39,27 +38,21 @@ class OOAgentReplanner:
         logger.debug("Running...")
 
         # Take a screenshot of the current UI state
-        screenshot = computer.get_screenshot()
+        screenshot = self.computer.get_screenshot()
         # Resize and compress the screenshot
         screenshot_resized = resize_and_compress_image(screenshot)
-        # Save into state
+
         self.state.save_plan_image(screenshot_resized, "t3.png")
         
         # ----------------------
-        # Summarize all plan versions
+        # Format all plan versions
         # ----------------------
-        summarization = await self.nodeSummarizeAllPlanVersions.execute()
-
-        print("-------------------------")
-        print("Summarization of all plan versions:")
-        print(summarization)
-        print("-------------------------")
+        formatted_all_plan_versions = await self.nodeFormatAllPlanVersions.execute()
 
         # ----------------------
         # Replan
         # ----------------------
-        result = await self.nodeReplan.execute(history=summarization)
-
+        result = await self.nodeReplan.execute(history=formatted_all_plan_versions)
 
         # ----------------------
         # Create a new plan version, if the plan is not done
@@ -70,9 +63,18 @@ class OOAgentReplanner:
             self.state.save_plan_text(result)
             self.state.save_plan_image(screenshot_resized, "t0.png")
 
+        # region Log + State + Tracker
+        logger.debug(f"New plan: {result}")
+
+        self.tracker.save(self.name, [
+            ("screenshot_t3_resized", screenshot_resized),
+            ("new_plan", result),
+        ])
+        # endregion
+
         return result
 
 
-def init_agent_replanner(config: OOConfig, state: State, tracker: Tracker) -> OOAgentReplanner:
+def init_agent_replanner(state: State, tracker: Tracker) -> OOAgentReplanner:
     logger.debug("Initializing agent-replanner...")
-    return OOAgentReplanner(config, state, tracker)
+    return OOAgentReplanner(state, tracker)

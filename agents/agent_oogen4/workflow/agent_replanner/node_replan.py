@@ -1,12 +1,13 @@
 from typing import Any
-from config import OOConfig
 from state import State
-from clients.llm import llm_gpt4o
+from clients.llm import llm_gpt4o, calculate_cost
 from autogen_core import Image as AutogenImage
 from autogen_core.models import UserMessage, SystemMessage
-import logging
+from tracker import Tracker
+from helpers import format_autogen_message
 
-logger = logging.getLogger("agent.replanner-node.replan")
+import logging
+logger = logging.getLogger("agent_replanner--node_replan")
 
 SYSTEM_MESSAGE = """You are the `Replanner`, responsible for analyzing and updating the execution plan based on past results. Your goal is to ensure that the user’s objective is fully achieved by evaluating execution progress and refining the plan if needed.
 
@@ -85,11 +86,15 @@ class NodeReplan:
     Responsible for re-planning the execution steps based on past iterations.
     """
 
-    def __init__(self, config: OOConfig, state: State):
+    def __init__(self, state: State, tracker: Tracker):
         logger.debug("Initializing...")
 
+        self.name = "agent_replanner--node_replan"
+        self.description = "Responsible for re-planning the execution steps based on past iterations."
+
         self.state = state
-        self.config = config
+        self.config = state.get_config()
+        self.tracker = tracker
 
         self.llm = llm_gpt4o
 
@@ -99,22 +104,46 @@ class NodeReplan:
         objective = self.config.instruction
         last_plan = self.state.current_plan_data["plan_text"]
         screenshot_t3 = self.state.get_current_plan_image("t3")
+
+        system_message = SystemMessage(content=SYSTEM_MESSAGE)
+        user_message = UserMessage(content=[
+            USER_MESSAGE.format(
+                objective=objective,
+                last_plan=last_plan,
+                past_steps=history
+            ),
+            AutogenImage.from_pil(screenshot_t3)
+        ], source="user")
+
+        # region Log + State + Tracker
+        self.tracker.save(self.name, [
+            ("system_message", system_message),
+            ("user_message", user_message)
+        ])
+        # endregion
         
-        replan_result = await self.llm.create(
+        result = await self.llm.create(
             messages=[
-                SystemMessage(content=SYSTEM_MESSAGE),
-                UserMessage(content=[
-                    USER_MESSAGE.format(
-                        objective=objective,
-                        last_plan=last_plan,
-                        past_steps=history
-                    ),
-                    AutogenImage.from_pil(screenshot_t3)
-                ], source="user")
+                system_message,
+                user_message
             ]
         )
 
-        return replan_result.content
+        # ---- COST CALCULATION ----
+        model_name, total_cost = calculate_cost(result.usage, self.llm._resolved_model, self.config)
+        # ---- END COST CALCULATION ----
+
+        # region Log + State + Tracker
+        logger.debug(f"Model: {model_name}, Total cost: {total_cost}$")
+        logger.debug(format_autogen_message(result))
+
+        self.tracker.save(self.name, [
+            ("llm_response", result),
+            ("cost", f"{total_cost}$"),
+        ])
+        # endregion
+
+        return result.content
         
 
         

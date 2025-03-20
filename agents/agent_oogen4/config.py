@@ -21,22 +21,20 @@ class ConfigObject:
         return value
 
     def _to_dict(self):
-        """Convert the ConfigObject instance back to a dictionary recursively."""
+        """Ensure full conversion of nested ConfigObject instances to dictionaries."""
         result = {}
         for key, value in self.__dict__.items():
-            result[key] = value._to_dict() if isinstance(value, ConfigObject) else value
+            if isinstance(value, ConfigObject):  # Ensure recursion
+                result[key] = value._to_dict()
+            elif isinstance(value, list):  # Handle lists of objects
+                result[key] = [item._to_dict() if isinstance(item, ConfigObject) else item for item in value]
+            else:
+                result[key] = value
         return result
 
-    def __getitem__(self, key):
-        """Enable dictionary-like access."""
-        return getattr(self, key)
-
-    def __repr__(self):
-        return str(self.__dict__)
-
 class OOConfig:
-    def __init__(self):
-        self.config = ConfigObject({})  # Initialize with an empty config object
+    def __init__(self, dictionary: dict = {}):
+        self.config = ConfigObject(dictionary)  
 
     def load(self, domain: str, scenario: str):
         config_path = os.path.join(os.path.dirname(__file__), "configs", domain, f"{scenario}.json")

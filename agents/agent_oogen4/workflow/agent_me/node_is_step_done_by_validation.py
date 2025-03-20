@@ -27,14 +27,14 @@ class NodeIsStepDoneByValidation:
     Check if the step is done.
     """
 
-    def __init__(self, config: OOConfig, state: State, tracker: Tracker):
+    def __init__(self, state: State, tracker: Tracker):
         logger.debug("Initializing...")
 
         self.name = "agent_me--node_is_step_done_by_validation"
         self.description = "Check if the step is done by validation."
 
         self.state = state
-        self.config = config
+        self.config = state.get_config()
         self.tracker = tracker
 
         self.llm = llm_gpt4o_mini

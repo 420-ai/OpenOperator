@@ -4,6 +4,8 @@ from helpers import format_autogen_message, get_timestamp, save_txt, save_json, 
 from PIL import Image
 from datetime import datetime
 import json
+import os
+from clients.computer import ComputerClient
 
 # AUTOGEN related
 from autogen_agentchat.base import TaskResult
@@ -19,6 +21,17 @@ class Tracker:
         RUN_DIR.mkdir(parents=True, exist_ok=True)
         
         self.run_dir = RUN_DIR
+        # self.computer = ComputerClient()
+
+    # def start_recording(self):
+    #     # Start recording
+    #     self.computer.start_recording()
+
+    # def end_recording(self):
+    #     # Stop recording and save the file
+    #     self.computer.end_recording()
+    #     self.computer.get_recording(os.path.join(self.run_dir, "recording.mp4"))
+
 
     def save(self, name: str, objects: Union[Any, List[Tuple[str, Any]]]) -> str:
         """Save objects (text, images, JSON) into a timestamped folder with specified names."""

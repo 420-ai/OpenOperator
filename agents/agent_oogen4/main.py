@@ -1,3 +1,4 @@
+import sys
 from state import State
 from tracker import Tracker
 from config import OOConfig
@@ -5,10 +6,10 @@ from logging_setup import configure_logging
 from workflow.agent_planner import init_agent_planner
 from workflow.agent_me import init_agent_me
 from workflow.agent_replanner import init_agent_replanner
+from workflow.node_summarize import OONodeSummarize
 from environment.computer.env import ComputerEnv
 import asyncio
 import logging
-import sys
 from datetime import datetime
 
 t = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -27,6 +28,23 @@ state = State(t)
 config = OOConfig()
 config.load("teams", "scenario-2")
 # tracker.save_config(config)
+state.save_config(config)
+
+# print(type(config))
+# print(config)
+# print(type(config.value))
+# print(config.value)
+
+# state.save_config(config)
+
+# loaded_config = state.get_config()
+
+# print(type(loaded_config))
+# print(loaded_config)
+# print(type(loaded_config.value))
+# print(loaded_config.value)
+
+# sys.exit(0)
 
 # Main function
 async def main() -> None:
@@ -35,16 +53,15 @@ async def main() -> None:
         # tracker.start_recording()
 
          # Initialize Windows VM environment
-        env = ComputerEnv(config, state, tracker)
+        env = ComputerEnv(state, tracker)
         _, _ = env.reset()  
 
         # -----------------------
         # Agent Planner
         # -----------------------
-        agent_planner = init_agent_planner(config, state, tracker)
+        agent_planner = init_agent_planner(state, tracker)
         _ = await agent_planner.run(task=config.instruction)
         
-
         # ----------------------
         # ----------------------
         # PLAN LOOP
@@ -59,43 +76,58 @@ async def main() -> None:
             # -----------------------
             # Agent ME
             # -----------------------
-            agent_me = init_agent_me(config, state, tracker, env)
+            agent_me = init_agent_me(state, tracker, env)
             _ = await agent_me.run()
-
-            sys.exit(0)
 
             # -----------------------
             # Agent Replanner
             # -----------------------
-            agent_replanner = init_agent_replanner(config, state)
+            agent_replanner = init_agent_replanner(state, tracker)
             result = await agent_replanner.run()
-            print("Agent Replanner result:")
-            print(result)
             
             if result == "ALL DONE":
                 planResult = True
                 break
 
+            if "all done" in result.lower():
+                raise ValueError("Agent Replanner returned 'ALL DONE' in the text, but not only 'ALL DONE' ------> INVESTIGATE")
+
+        # -----------------------
+        # Node Summarization
+        # -----------------------
+        node_summarize = OONodeSummarize(state, tracker)
+        summarization = node_summarize.execute()
 
         # Save the plan step result to the state
+        task_result = ""
         if planResult == True:
-            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-            print("PLAN FINISHED SUCCESSFULLY")
-            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            task_result = f"""Task completed successfully.
+            
+            Here is the summarization of the steps taken:
+            =============================================
+            {summarization}
+            =============================================
+            """
         else:
-            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-            print("PLAN REACHED MAX VERSIONS")
-            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            task_result = f"""Task reached maximum plan versions of {config.workflow.params.max_plan_versions}.
+            
+            Here is the summarization of the steps taken:
+            =============================================
+            {summarization}
+            =============================================
+            """
 
-        logger.info("PLAN LOOP END")
+        # region Log + State + Tracker
+        logger.info("----------------------------")
+        logger.info(task_result)
+        logger.info("----------------------------")
+
+        state.save_task_result(task_result)
+
+        tracker.save("main", [
+            ("task_result", task_result),
+        ])
+        # endregion
 
     except Exception as e:
         logger.error(f"An error occurred: {e}")

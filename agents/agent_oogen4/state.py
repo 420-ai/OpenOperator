@@ -1,12 +1,8 @@
 import os
-import time
-import shutil
-from datetime import datetime
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 from PIL import Image
 import json
-
+from config import OOConfig
 
 class State:
     """
@@ -28,9 +24,21 @@ class State:
         self.current_iteration = None
     
     # ----------------------------------------------------
-    # Environment management
+    # General management
     # ----------------------------------------------------
 
+    # Config
+    def save_config(self, config: OOConfig) -> None:
+        with open(os.path.join(self.run_dir, "config.json"), "w", encoding="utf-8") as f:
+            json.dump(config.config._to_dict(), f, indent=4)  
+
+    def get_config(self) -> OOConfig:
+        with open(os.path.join(self.run_dir, "config.json"), "r", encoding="utf-8") as f:
+            config_dict = json.load(f)
+
+        return OOConfig(config_dict)
+
+    # Environment
     def save_initial_observation(self, observation: Dict[str, Any]) -> str:
         env_dir = os.path.join(self.run_dir, f"environment")
         os.makedirs(env_dir, exist_ok=True)
@@ -40,6 +48,12 @@ class State:
         # Save the ui elements
         with open(os.path.join(env_dir, "ui_elements.json"), "w") as f:
             json.dump(observation["ui_elements"], f, indent=4)
+
+    # Task
+    def save_task_result(self, task_result: str): 
+        with open(os.path.join(self.run_dir, "task_result.txt"), "w") as f:
+            f.write(task_result)
+        
 
     # ----------------------------------------------------
     # Plan version management

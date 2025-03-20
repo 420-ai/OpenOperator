@@ -22,14 +22,14 @@ class NodeGetStep:
     Get the first step from the plan.
     """
 
-    def __init__(self, config: OOConfig, state: State, tracker: Tracker):
+    def __init__(self, state: State, tracker: Tracker):
         logger.debug("Initializing...")
 
         self.name = "agent_me--node_get_step"
         self.description = "Get the first step from the plan."
 
         self.state = state
-        self.config = config
+        self.config = state.get_config()
         self.tracker = tracker
 
         self.llm = llm_phi4

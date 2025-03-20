@@ -97,5 +97,3 @@ class ComputerClient:
         else:
             logger.error("Failed to close all windows. Status code: %d", response.status_code)
 
-
-computer = ComputerClient()

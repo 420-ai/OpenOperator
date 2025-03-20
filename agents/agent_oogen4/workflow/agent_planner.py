@@ -1,7 +1,7 @@
 import logging
 from typing import Any, AsyncGenerator, Sequence
 from clients.llm import llm_gpt4o, calculate_cost
-from clients.computer import computer
+from clients.computer import ComputerClient
 from autogen_agentchat.agents import BaseChatAgent
 from autogen_agentchat.messages import AgentEvent, ChatMessage, TextMessage
 from autogen_core import CancellationToken
@@ -13,7 +13,7 @@ from config import OOConfig
 from tracker import Tracker
 from helpers import format_autogen_message, resize_and_compress_image
 
-logger = logging.getLogger("agent.planner")
+logger = logging.getLogger("agent_planner")
 
 SYSTEM_MESSAGE = """You are an AI assistant responsible for breaking down complex tasks into structured, step-by-step plans that an AI agent can execute. Your goal is to ensure that each step is **clear, actionable, and logical**, guiding the agent through a structured problem-solving process.
 
@@ -74,17 +74,19 @@ USER_MESSAGE = """Your objective is: {objective}. Please create a **structured s
 
 class OOPlannerAgent(BaseChatAgent):
 
-    def __init__(self, config: OOConfig, state: State, tracker: Tracker):
+    def __init__(self, state: State, tracker: Tracker):
         logger.debug("Initializing...")
 
         name = "agent_planner"
         description = "Agent responsible for planning"
 
-        self.config = config
+        self.config = state.get_config()
         self.state = state
         self.tracker = tracker
 
         self.llm = llm_gpt4o
+
+        self.computer = ComputerClient(server_url=f"{self.config.environment.params.server_ip}:{self.config.environment.params.computer_port}")
 
         super().__init__(
             name, 
@@ -103,26 +105,28 @@ class OOPlannerAgent(BaseChatAgent):
         logger.debug(f"Entity: {self.name}")
         logger.debug("=================================")
         logger.info("Predicting ...")
+        self.state.create_new_plan_version()
 
         # Get the user task
         user_task = messages[0].content
         
         # Take a screenshot
-        screenshot = computer.get_screenshot()
+        screenshot_t0 = self.computer.get_screenshot()
 
         # Resize and compress the screenshot
-        screenshot_resized = resize_and_compress_image(screenshot)
+        screenshot_t0_resized = resize_and_compress_image(screenshot_t0)
+        self.state.save_plan_image(screenshot_t0_resized, "t0.png")
 
         # Define new messages
         system_message = SystemMessage(content=SYSTEM_MESSAGE)
         user_message = UserMessage(content=[
             USER_MESSAGE.format(objective=user_task), 
-            AutogenImage.from_pil(screenshot_resized)
+            AutogenImage.from_pil(screenshot_t0_resized)
         ], source="user")
 
         # region Log + State + Tracker
         self.tracker.save(self.name, [
-            ("screenshot_resized", screenshot_resized),
+            ("screenshot_t0_resized", screenshot_t0_resized),
             ("system_message", system_message),
             ("user_message", user_message)
         ])
@@ -142,9 +146,7 @@ class OOPlannerAgent(BaseChatAgent):
         logger.debug(f"Model: {model_name}, Total cost: {total_cost}$")
         logger.debug(format_autogen_message(result))
 
-        self.state.create_new_plan_version()
         self.state.save_plan_text(result.content)
-        self.state.save_plan_image(screenshot_resized, "t0.png")
 
         self.tracker.save(self.name, [
             ("llm_response", result),
@@ -172,6 +174,6 @@ class OOPlannerAgent(BaseChatAgent):
         return await super().on_reset(cancellation_token)
     
 
-def init_agent_planner(config: OOConfig, state: State, tracker: Tracker) -> OOPlannerAgent:
+def init_agent_planner(state: State, tracker: Tracker) -> OOPlannerAgent:
     logger.debug("Initializing agent-planner...")
-    return OOPlannerAgent(config, state, tracker)
+    return OOPlannerAgent(state, tracker)

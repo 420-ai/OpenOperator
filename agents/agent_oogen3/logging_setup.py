@@ -1,9 +1,12 @@
 import logging.config
 import os
 
-def configure_logging(directory: str) -> None:
+def configure_logging(timestamp: str) -> None:
 
-    LOG_FILE = os.path.join(directory, "app.log")
+    CURRENT_FOLDER = os.path.dirname(os.path.abspath(__file__))
+    LOGS_DIR = os.path.join(CURRENT_FOLDER, "logs")
+    os.makedirs(LOGS_DIR, exist_ok=True)  
+    LOG_FILE = os.path.join(LOGS_DIR, f"app_{timestamp}.log")
 
     LOGGING_CONFIG = {
         "version": 1,

@@ -1,5 +1,4 @@
 from typing import Any
-from config import OOConfig
 from state import State
 from tracker import Tracker
 from clients.llm import llm_phi4, calculate_cost
@@ -25,14 +24,14 @@ class NodeSummarizePlanStep:
     Summarize actions in iterations
     """
 
-    def __init__(self, config: OOConfig, state: State, tracker: Tracker):
+    def __init__(self, state: State, tracker: Tracker):
         logger.debug("Initializing...")
 
         self.name = "agent_me--node_summarize_plan_step"
         self.description = "Summarize all history of plan step iterations."
 
         self.state = state
-        self.config = config
+        self.config = state.get_config()
         self.tracker = tracker
 
         self.llm = llm_phi4
