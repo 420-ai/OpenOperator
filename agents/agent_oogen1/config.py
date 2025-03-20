@@ -1,19 +1,49 @@
 import os
 import json
 
+class ConfigObject:
+    """Helper class to convert a dictionary into an object with attribute access."""
+    def __init__(self, dictionary):
+        for key, value in dictionary.items():
+            setattr(self, key, self._convert(value))
+
+    def get(self, key, default=None):
+        """Mimic dictionary get method, returning dictionary values as raw dicts."""
+        value = getattr(self, key, default if default is not None else self.__dict__)
+        return value._to_dict() if isinstance(value, ConfigObject) else value
+
+    def _convert(self, value):
+        """Recursively convert dictionaries into ConfigObject instances."""
+        if isinstance(value, dict):
+            return ConfigObject(value)
+        elif isinstance(value, list):
+            return [self._convert(item) if isinstance(item, dict) else item for item in value]
+        return value
+
+    def _to_dict(self):
+        """Ensure full conversion of nested ConfigObject instances to dictionaries."""
+        result = {}
+        for key, value in self.__dict__.items():
+            if isinstance(value, ConfigObject):  # Ensure recursion
+                result[key] = value._to_dict()
+            elif isinstance(value, list):  # Handle lists of objects
+                result[key] = [item._to_dict() if isinstance(item, ConfigObject) else item for item in value]
+            else:
+                result[key] = value
+        return result
+
 class OOConfig:
-    def __init__(self):
-        self.config = {}
+    def __init__(self, dictionary: dict = {}):
+        self.config = ConfigObject(dictionary)  
 
     def load(self, domain: str, scenario: str):
-        print(os.getcwd())
-        config_path = os.path.join(os.getcwd(), "configs", domain, f"{scenario}.json")
-        
+        config_path = os.path.join(os.path.dirname(__file__), "configs", domain, f"{scenario}.json")
+
         if not os.path.exists(config_path):
             raise FileNotFoundError(f"Configuration file not found: {config_path}")
-        
+
         with open(config_path, "r", encoding="utf-8") as file:
-            self.config = json.load(file)
+            self.config = ConfigObject(json.load(file))
 
     @property
     def value(self) -> dict:
@@ -21,34 +51,25 @@ class OOConfig:
 
     @property
     def instruction(self) -> str:
-        return self.config.get("instruction", "")
+        return self.config.instruction
+
+    @property
+    def workflow(self):
+        return self.config.workflow
     
-    @property
-    def SYSTEM_MESSAGE(self) -> str:
-        return self._get_nested_value_as_string("messages.SYSTEM_MESSAGE")
+    def model_config(self, name: str):
+        models = self.config.workflow.models
+        for model in models:
+            if name.startswith(model.get("name")):
+                return model
+        raise ValueError(f"Model '{name}' not found in configuration.")
 
     @property
-    def USER_MESSAGE(self) -> str:
-        return self._get_nested_value_as_string("messages.USER_MESSAGE")
+    def environment(self):
+        return self.config.environment
 
     @property
-    def PARSED_UI_ELEMENTS_MESSAGE(self) -> str:
-        return self._get_nested_value_as_string("messages.PARSED_UI_ELEMENTS_MESSAGE")
+    def evaluation(self):
+        return self.config.evaluation
 
-    def _get_nested_value_as_string(self, key_path: str, separator: str = "\n", default="") -> str:
-        """Helper function to retrieve nested dictionary values and join lists into a string."""
-        value = self._get_nested_value(key_path, default)
-        if isinstance(value, list):
-            return separator.join(value)
-        return value if isinstance(value, str) else default
-
-    def _get_nested_value(self, key_path: str, default=None):
-        """Helper function to retrieve nested dictionary values using dot notation."""
-        keys = key_path.split(".")
-        value = self.config
-        for key in keys:
-            if isinstance(value, dict) and key in value:
-                value = value[key]
-            else:
-                return default
-        return value
+config = OOConfig()

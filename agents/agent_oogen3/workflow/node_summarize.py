@@ -2,8 +2,8 @@ import logging
 from workflow.clients.llm import llm_gpt4o, calculate_cost
 from autogen_core.models import UserMessage, SystemMessage
 from state import State
-from config import OOConfig
 from tracker import Tracker
+from helpers import format_autogen_message
 
 logger = logging.getLogger("node_summarize")
 
@@ -75,10 +75,10 @@ class OONodeSummarize:
 
         # region Log + State + Tracker
         logger.debug(f"Model: {model_name}, Total cost: {total_cost}$")
-        logger.debug(result.to_json())
+        logger.debug(format_autogen_message(result))
 
         self.tracker.save(self.name, [
-            ("llm_response", result.to_json()),
+            ("llm_response", result),
             ("cost", f"{total_cost}$"),
         ])
         # endregion

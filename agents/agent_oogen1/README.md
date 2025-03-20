@@ -1,10 +1,12 @@
 # OO Agent
 
-Open Operator agent. + Human in the loop
+Open Operator agent.
 
-[Autogen](https://github.com/microsoft/autogen) framework.
-
-[ReAct](https://arxiv.org/abs/2210.03629) style agent.
+| Param        | Value                                           |
+| ------------ | ----------------------------------------------- |
+| AI Framework | [Autogen](https://github.com/microsoft/autogen) |
+| Agent Style  | [ReAct](https://arxiv.org/abs/2210.03629)       |
+| RL           | No                                              |
 
 ### Azure OpenAI
 
@@ -17,8 +19,7 @@ The agent needs `.env` file with data belo
 ```
 AZURE_API_KEY=<AZURE_OPENAI_API_KEY>
 AZURE_OPENAI_BASEURL=https://<AZURE_OPENAI_NAME>.openai.azure.com/
-AZURE_OPENAI_DEPLOYMENT=<GPT_MODEL_DEPLOYMENT>
-AZURE_OPENAI_API_VERSION=2024-05-01-preview
+AZURE_OPENAI_API_VERSION=2025-01-01-preview
 ```
 
 ## Run

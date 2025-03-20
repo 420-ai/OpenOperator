@@ -2045,7 +2045,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="FqKy40Dnmp_hI6z32tXf" name="Agent-OOGen2">
-    <mxGraphModel dx="1933" dy="1820" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="634" dy="924" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -2157,7 +2157,7 @@
         <mxCell id="fN5lRGCn1ckkr4WnW4im-3" value="Search engine" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://www.shutterstock.com/image-vector/magnifying-glass-search-button-microphone-260nw-2120105102.jpg;" parent="1" vertex="1">
           <mxGeometry x="2387" y="666.39" width="110" height="29.61" as="geometry" />
         </mxCell>
-        <mxCell id="DnjO6x8t-SD2fBKV3i4r-1" value="Plan-Execute" style="text;strokeColor=none;fillColor=none;html=1;fontSize=24;fontStyle=1;verticalAlign=middle;align=center;" vertex="1" parent="1">
+        <mxCell id="DnjO6x8t-SD2fBKV3i4r-1" value="Plan-Execute" style="text;strokeColor=none;fillColor=none;html=1;fontSize=24;fontStyle=1;verticalAlign=middle;align=center;" parent="1" vertex="1">
           <mxGeometry x="2140" y="210" width="170" height="40" as="geometry" />
         </mxCell>
       </root>
@@ -3360,7 +3360,7 @@
     </mxGraphModel>
   </diagram>
   <diagram name="Agent-OOGen4-Workflow" id="OjngrAYfpGqVEOkZ6sdf">
-    <mxGraphModel dx="7410" dy="8725" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="3458" dy="6227" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="oE_lqHIpweWtTrGydMjJ-0" />
         <mxCell id="oE_lqHIpweWtTrGydMjJ-1" parent="oE_lqHIpweWtTrGydMjJ-0" />

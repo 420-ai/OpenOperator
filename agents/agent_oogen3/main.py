@@ -8,7 +8,6 @@ from workflow.agent_replanner import init_agent_replanner
 from workflow.node_summarize import OONodeSummarize
 import asyncio
 import logging
-import re
 from datetime import datetime
 
 t = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -76,7 +75,7 @@ async def main() -> None:
         # Node Summarization
         # -----------------------
         node_summarize = OONodeSummarize(state, tracker)
-        summarization = node_summarize.execute()
+        summarization = await node_summarize.execute()
 
         # Save the plan step result to the state
         task_result = ""

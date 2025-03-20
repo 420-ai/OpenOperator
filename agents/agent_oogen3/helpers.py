@@ -90,8 +90,10 @@ def format_autogen_message(message: AgentEvent | ChatMessage | TaskResult) -> st
     elif type(message) in [ToolCallRequestEvent, ToolCallExecutionEvent, MemoryQueryEvent, 
                             UserInputRequestedEvent, ModelClientStreamingChunkEvent, ThoughtEvent]:
         msg_str = format_message(message)
-    elif type(message) in [SystemMessage, UserMessage, AssistantMessage, FunctionExecutionResultMessage, ChatAgentResponse]:
+    elif type(message) in [SystemMessage, UserMessage, AssistantMessage, FunctionExecutionResultMessage]:
         msg_str = format_message(message)
+    elif type(message) == ChatAgentResponse:
+        msg_str = format_response(message)
     else:
         raise ValueError(f"Unsupported message type: {type(message)}")
 
@@ -186,9 +188,24 @@ def format_message(msg: Any) -> str:
                 f"Function ({result.name}, ID: {result.call_id}): {'Error: ' if result.is_error else 'Result: '}{result.content}"
             )
 
-    elif isinstance(msg, ChatAgentResponse): 
-        formatted_message.append(f"ChatAgent Response: {msg.chat_message.content.strip()}")
-
     formatted_message.append(f"------------------------")
 
     return "\n".join(formatted_message)
+
+
+def format_response(response: ChatAgentResponse) -> str:
+    """Formats the response into a structured string."""
+    formatted_response = []
+    formatted_response.append(f"====== Response ======")
+
+    if response.chat_message:
+        formatted_response.append(f"Chat Message: {response.chat_message.content.strip()}")
+
+    if response.inner_messages:
+        formatted_response.append(f"Inner Messages:")
+        for msg in response.inner_messages:
+            formatted_response.append(format_autogen_message(msg))
+
+    formatted_response.append(f"========================")
+
+    return "\n".join(formatted_response)

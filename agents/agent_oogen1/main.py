@@ -1,48 +1,56 @@
-from tracker import Tracker
-from config import OOConfig
-from logging_setup import configure_logging
-from autogen_agentchat.ui import Console
-from agent.team import init_team
 import asyncio
 import logging
+from tracker import Tracker
+from config import config
+from state import State
+from logging_setup import configure_logging
+from workflow.agent_me import init_agent_me
+from helpers import format_autogen_message
+
+from datetime import datetime
+t = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+# Logging
+configure_logging(t)
 logger = logging.getLogger("main")
 
-# Tracker object to log images, messages, config and other data
-tracker = Tracker()
-configure_logging(tracker.result_dir)
+# Tracker object to keep track of images, messages, config and other data
+tracker = Tracker(t)
+
+# State object to store the current state of the agent
+state = State(t)
 
 # Configuration object for agent
-config = OOConfig()
+# config = OOConfig()
 config.load("teams", "scenario-2")
-tracker.save_config(config)
+# tracker.save_config(config)
+state.save_config(config)
 
 # Main function
 async def main() -> None:
     try:
-        team = init_team(config, tracker)
-
         logger.info("Starting task execution...")
-        tracker.start_recording()
+        # tracker.start_recording()
+        state.create_new_plan_version()
+
+        agent = init_agent_me(state, tracker)
 
         # Run the task with the team
-        stream = team.run_stream(task=config.instruction)
-        await Console(stream)
+        stream = agent.run_stream(task=config.instruction)
 
-        while True:
-            # Get user input from the console.
-            user_input = input("Enter a message (type 'exit' to leave): ")
-            if user_input.strip().lower() == "exit":
-                break
-            # Run the team and stream messages to the console.
-            stream = team.run_stream(task=user_input)
-            await Console(stream)
+        async for message in stream:
+            logger.debug(format_autogen_message(message))
+                
+    except Exception as e:
+        logger.error(f"An error occurred: {e}")
+        logger.exception(e)
 
     except asyncio.CancelledError:
         logger.warning("Task was cancelled.")
     
-    finally:
-        logger.info("Stopping recording and saving the file...")
-        tracker.end_recording()
+    # finally:
+    #     logger.info("Stopping recording and saving the file...")
+    #     tracker.end_recording()
 
 if __name__ == "__main__":
     try:

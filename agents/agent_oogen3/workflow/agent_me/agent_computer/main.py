@@ -149,6 +149,13 @@ class OOAgentComputer(AssistantAgent):
             # endregion
 
             async for response in super().on_messages_stream([user_message], cancellation_token):
+
+                # region Log + State + Tracker
+                self.tracker.save(self.name, [
+                    ("response", response),
+                ])
+                # endregion
+
                 yield response
 
         else:
@@ -167,6 +174,13 @@ class OOAgentComputer(AssistantAgent):
 
             # This is any other step in the agent's run
             async for response in super().on_messages_stream(messages, cancellation_token):
+
+                # region Log + State + Tracker
+                self.tracker.save(self.name, [
+                    ("response", response),
+                ])
+                # endregion
+                
                 yield response
 
 
