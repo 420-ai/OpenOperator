@@ -22,10 +22,10 @@ services:
       - ./iso/win.iso:/custom.iso
       - ./scripts:/oem
       - ./data:/data
-      - ../../../../servers/server_browser_control:/data/server_browser_control
-      - ../../../../servers/server_computer_control:/data/server_computer_control
-      - ../../../../servers/server_evaluator:/data/server_evaluator
-      - ../../../../servers/server_network_proxy:/data/server_network_proxy
+      - ../../../servers/server_browser_control:/data/server_browser_control
+      - ../../../servers/server_computer_control:/data/server_computer_control
+      - ../../../servers/server_evaluator:/data/server_evaluator
+      - ../../../servers/server_network_proxy:/data/server_network_proxy
       - ./storage:/storage
     restart: always
     stop_grace_period: 2m

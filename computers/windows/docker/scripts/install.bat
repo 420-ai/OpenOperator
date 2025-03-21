@@ -6,6 +6,7 @@ REM 0) Set Username
 REM ---------------------------
 set "USERNAME=Docker"
 echo Using username: %USERNAME%
+setx PATH %PATH%;%LOCALAPPDATA%\Microsoft\WinGet\Links
 
 REM ---------------------------
 REM 1) Set up logging

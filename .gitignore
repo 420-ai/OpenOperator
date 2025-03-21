@@ -30,6 +30,7 @@ computers/windows/parallels_vm/data/server_browser_control
 computers/windows/parallels_vm/data/server_computer_control
 computers/**/iso
 computers/**/storage
+computers/**/storage*
 
 # Servers
 servers/**/recordings
