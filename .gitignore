@@ -13,6 +13,8 @@ Zone.Identifier
 .env
 !servers/server_browser_control/.env
 !servers/server_computer_control/.env
+!servers/server_network_proxy/.env
+!servers/server_evaluator/.env
 !computers/windows/docker/data/init/.env
 !computers/windows/parallels_vm/data/init/.env
 

@@ -1,0 +1,5 @@
+fastapi
+mitmproxy
+pydantic
+uvicorn
+dotenv

@@ -4,6 +4,7 @@ services:
     image: lukaskellerstein/windows-computer:0.0.2
     environment:
       BOOT_MODE: "windows_plain"
+      DEBUG: "y"
     devices:
       - /dev/kvm
       - /dev/net/tun
