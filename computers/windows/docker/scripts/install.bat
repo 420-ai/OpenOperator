@@ -39,8 +39,6 @@ setx PYTHONW "%PYTHONW_PATH%" /M >nul
 echo Python set to %PYTHON_PATH% >> "%LOGFILE%"
 echo Pythonw set to %PYTHONW_PATH% >> "%LOGFILE%"
 
-
-
 REM ---------------------------
 REM 3) Install software
 REM ---------------------------
@@ -70,6 +68,15 @@ echo Python libraries for 'server computer control' were installed >> "%LOGFILE%
 echo Installing Python libraries for 'server browser control' ... >> "%LOGFILE%"
 "%PYTHON_PATH%" -m pip install -r "\\host.lan\Data\server_browser_control\requirements.txt" >> "%LOGFILE%" 2>&1
 echo Python libraries for 'server browser control' were installed >> "%LOGFILE%"
+
+echo Installing Python libraries for 'server network proxy' ... >> "%LOGFILE%"
+uv sync --directory "\\host.lan\Data\server_network_proxy" >> "%LOGFILE%" 2>&1
+echo Python libraries for 'server network proxy' were installed >> "%LOGFILE%"
+
+echo Installing Python libraries for 'server evaluator' ... >> "%LOGFILE%"
+uv sync --directory "\\host.lan\Data\server_evaluator" >> "%LOGFILE%" 2>&1
+echo Python libraries for 'server evaluator' were installed >> "%LOGFILE%"
+
 
 REM ---------------------------
 REM 5) Add Firewall Rules
@@ -118,7 +125,7 @@ REM Without /DELAY is needed in order to wait until network storage is available
 echo Creating 'scheduled tasks' for servers >> "%LOGFILE%"
 schtasks /Create /TN "StartServer-ComputerControl" /SC ONSTART /TR "\"%STARTUP_SERVER_COMPUTER_CONTROL_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /DELAY 0000:30 /F
 schtasks /Create /TN "StartServer-BrowserControl" /SC ONSTART /TR "\"%STARTUP_SERVER_BROWSER_CONTROL_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /DELAY 0000:30 /F
-schtasks /Create /TN "StartServer-NetworkProxy" /SC ONSTART /TR "\"%STARTUP_SERVER_NETWORK_PROXY_BAT%\"" /RU system /RL HIGHEST /IT /DELAY 0000:30 /F
+schtasks /Create /TN "StartServer-NetworkProxy" /SC ONSTART /TR "\"%STARTUP_SERVER_NETWORK_PROXY_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /DELAY 0000:30 /F
 schtasks /Create /TN "StartServer-Evaluator" /SC ONSTART /TR "\"%STARTUP_SERVER_EVALUATOR_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /DELAY 0000:30 /F
 echo 'Scheduled tasks' for servers created >> "%LOGFILE%"
 
