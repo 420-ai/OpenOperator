@@ -15,6 +15,8 @@ services:
       - 3389:3389/udp
       - 5050:5050
       - 5051:5051
+      - 5052:5052
+      - 5053:5053
       - 9222:9222
     volumes:
       - ./iso/win.iso:/custom.iso
@@ -22,6 +24,8 @@ services:
       - ./data:/data
       - ../../../servers/server_browser_control:/data/server_browser_control
       - ../../../servers/server_computer_control:/data/server_computer_control
+      - ../../../servers/server_evaluator:/data/server_evaluator
+      - ../../../servers/server_network_proxy:/data/server_network_proxy
       - ./storage:/storage
     restart: always
     stop_grace_period: 2m

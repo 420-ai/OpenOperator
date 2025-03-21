@@ -28,6 +28,14 @@ class OOAzureOpenAIClient:
         :param tool_choice: Tool selection mode (default: "auto").
         :return: Chat completion result.
         """
+
+        if tools is None:
+            return self.client.chat.completions.create(
+                model=self.model,  # Deployment name is set during initialization
+                messages=messages,
+                tools=tools,
+            )
+
         return self.client.chat.completions.create(
             model=self.model,  # Deployment name is set during initialization
             messages=messages,

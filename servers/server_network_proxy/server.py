@@ -9,6 +9,14 @@ import signal
 import platform
 
 from addons.teams_telemetry import TeamsTelemetryAddon
+from logging_setup import configure_logging
+import logging
+import traceback
+import os
+from logging_setup import configure_logging
+
+from dotenv import load_dotenv
+load_dotenv()
 
 app = FastAPI(title="Mitmproxy Controller")
 
@@ -19,6 +27,7 @@ stop_event = Event()
 running = False
 loop = None
 
+port = os.getenv("PORT", 5052)
 
 def run_proxy():
     global running, proxy_master, loop
@@ -30,7 +39,7 @@ def run_proxy():
 
     opts = options.Options(
         listen_host="0.0.0.0",
-        listen_port=8080,
+        listen_port=port,
         mode=["local:msedgewebview2"],
         ssl_insecure=True,
         showhost=True,
@@ -139,4 +148,21 @@ if __name__ == "__main__":
         except AttributeError:
             pass
 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    LOG_PATH=os.getenv("LOG_PATH", r"\\host.lan\Data\logs")
+    configure_logging(LOG_PATH)
+
+    logger = logging.getLogger("server_network_proxy")
+    logger.info("starting network proxy server...")
+
+    try:
+        uvicorn.run(
+            app,
+            host="0.0.0.0",
+            port=port,
+            log_config=None,
+            timeout_graceful_shutdown=0,
+        )
+    except Exception as e:
+        logger.error(f"Error starting server: {e}")
+        error_traceback = traceback.format_exc()
+        print(error_traceback)
