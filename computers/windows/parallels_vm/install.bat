@@ -23,6 +23,9 @@ echo ================================================= >> "%LOGFILE%"
 echo Installation started at %date% %time% >> "%LOGFILE%"
 echo ================================================= >> "%LOGFILE%"
 
+echo Setting up winget links for PATH >> "%LOGFILE%"
+setx PATH "%PATH%;%LOCALAPPDATA%\Microsoft\WinGet\Links" /M >nul
+
 REM ---------------------------
 REM 2) Download & Install Python system-wide (silent)
 REM ---------------------------
@@ -68,10 +71,23 @@ echo Python script INITIALIZE executed. >> "%LOGFILE%"
 REM ---------------------------
 REM 4) Install Required Python Packages for SERVERS
 REM ---------------------------
-echo Installing Python libraries for servers... >> "%LOGFILE%"
+echo Installing Python libraries for 'server computer control' ... >> "%LOGFILE%"
 "%PYTHON_PATH%" -m pip install -r "C:\INSTALL\data\server_computer_control\requirements.txt" >> "%LOGFILE%" 2>&1
+echo Python libraries for 'server computer control' were installed >> "%LOGFILE%"
+
+echo Installing Python libraries for 'server browser control' ... >> "%LOGFILE%"
 "%PYTHON_PATH%" -m pip install -r "C:\INSTALL\data\server_browser_control\requirements.txt" >> "%LOGFILE%" 2>&1
-echo Python libraries for servers were installed >> "%LOGFILE%"
+echo Python libraries for 'server browser control' were installed >> "%LOGFILE%"
+
+echo Installing Python libraries for 'server network proxy' ... >> "%LOGFILE%"
+"%PYTHON_PATH%" -m pip install -r "C:\INSTALL\data\server_network_proxy\requirements.txt" >> "%LOGFILE%" 2>&1
+echo Python libraries for 'server network proxy' were installed >> "%LOGFILE%"
+
+echo Installing Python libraries for 'server evaluator' ... >> "%LOGFILE%"
+"%PYTHON_PATH%" -m pip install -r "C:\INSTALL\data\server_evaluator\requirements.txt" >> "%LOGFILE%" 2>&1
+echo Python libraries for 'server evaluator' were installed >> "%LOGFILE%"
+
+
 
 REM ---------------------------
 REM 5) Add Firewall Rules
@@ -79,6 +95,8 @@ REM ---------------------------
 echo Adding firewall rules... >> "%LOGFILE%"
 netsh advfirewall firewall add rule name="SERVER_COMPUTER_CONTROL" dir=in action=allow protocol=TCP localport=5050
 netsh advfirewall firewall add rule name="SERVER_BROWSER_CONTROL" dir=in action=allow protocol=TCP localport=5051
+netsh advfirewall firewall add rule name="SERVER_NETWORK_PROXY" dir=in action=allow protocol=TCP localport=5052
+netsh advfirewall firewall add rule name="SERVER_EVALUATOR" dir=in action=allow protocol=TCP localport=5053
 REM Add firewall rule for Chrome DevTools (port 9222)
 netsh advfirewall firewall add rule name="Chrome Remote Debugging Port" dir=in action=allow protocol=TCP localport=9222
 echo Firewall rules added >> "%LOGFILE%"
@@ -100,6 +118,19 @@ set "STARTUP_SERVER_COMPUTER_CONTROL_BAT=%~dp0start_server_computer_control.bat"
 ) > "%STARTUP_SERVER_COMPUTER_CONTROL_BAT%"
 echo .bat files for servers created >> "%LOGFILE%"
 
+set "STARTUP_SERVER_NETWORK_PROXY_BAT=%~dp0start_server_network_proxy.bat"
+(
+    echo @echo off
+    echo start /b "" "%PYTHONW_PATH%" "C:\INSTALL\data\server_network_proxy\server.py"
+) > "%STARTUP_SERVER_NETWORK_PROXY_BAT%"
+
+set "STARTUP_SERVER_EVALUATOR_BAT=%~dp0start_server_evaluator.bat"
+(
+    echo @echo off
+    echo start /b "" "%PYTHONW_PATH%" "C:\INSTALL\data\server_evaluator\server.py"
+) > "%STARTUP_SERVER_EVALUATOR_BAT%"
+echo .bat files for servers created >> "%LOGFILE%"
+
 REM ---------------------------
 REM 7) Schedule Startup Task
 REM ---------------------------
@@ -108,11 +139,15 @@ REM Without /DELAY is needed in order to wait until network storage is available
 echo Creating 'scheduled tasks' for servers >> "%LOGFILE%"
 schtasks /Create /TN "StartServer-ComputerControl" /SC ONSTART /TR "\"%STARTUP_SERVER_COMPUTER_CONTROL_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /DELAY 0000:30 /F
 schtasks /Create /TN "StartServer-BrowserControl" /SC ONSTART /TR "\"%STARTUP_SERVER_BROWSER_CONTROL_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /DELAY 0000:30 /F
+schtasks /Create /TN "StartServer-NetworkProxy" /SC ONSTART /TR "\"%STARTUP_SERVER_NETWORK_PROXY_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /DELAY 0000:30 /F
+schtasks /Create /TN "StartServer-Evaluator" /SC ONSTART /TR "\"%STARTUP_SERVER_EVALUATOR_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /DELAY 0000:30 /F
 echo 'Scheduled tasks' for servers created >> "%LOGFILE%"
 
 echo Triggering 'scheduled tasks' for servers >> "%LOGFILE%"
 schtasks /Run /TN "StartServer-ComputerControl"
 schtasks /Run /TN "StartServer-BrowserControl"
+schtasks /Run /TN "StartServer-NetworkProxy"
+schtasks /Run /TN "StartServer-Evaluator"
 echo 'Scheduled tasks' for servers started >> "%LOGFILE%"
 
 echo Installation completed at %date% %time% >> "%LOGFILE%"

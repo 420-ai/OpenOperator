@@ -6,6 +6,7 @@ import subprocess
 import logging
 import pythoncom
 import glob
+import time
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -176,7 +177,11 @@ def download_and_install(name, mirrors, tools_config):
                 log(f"Installation failed for {name}: {e}")
                 logging.error(f"Installation failed for {name}: {e}")
 
+    # Time sleep for waiting until the installation process is released
+    time.sleep(3)
+    print(f"Removing {installer_path}")
     os.remove(installer_path)
+    print(f"Removed {installer_path}")
 
 
 def start_software_installation():

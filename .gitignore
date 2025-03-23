@@ -28,9 +28,13 @@ logs
 computers/windows/docker/data/logs/*.txt
 computers/windows/docker/data/server_browser_control
 computers/windows/docker/data/server_computer_control
+computers/windows/docker/data/server_evaluator
+computers/windows/docker/data/server_network_proxy
 !computers/windows/parallels_vm/data/logs
 computers/windows/parallels_vm/data/server_browser_control
 computers/windows/parallels_vm/data/server_computer_control
+computers/windows/parallels_vm/data/server_evaluator
+computers/windows/parallels_vm/data/server_network_proxy
 computers/**/iso
 computers/**/storage
 computers/**/storage*
@@ -38,12 +42,10 @@ computers/**/storage*
 # Servers
 servers/**/recordings
 servers/**/traces
+servers/**/parsed
 servers/**/screenshots
 servers/**/user_data
 servers/**/weights
-
-
-
 
 # Agents
 agents/**/recordings

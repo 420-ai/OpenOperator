@@ -13,6 +13,7 @@ dependencies = [
     { name = "azure-core" },
     { name = "azure-identity" },
     { name = "core" },
+    { name = "functions" },
     { name = "gymnasium" },
     { name = "ollama" },
     { name = "openai" },
@@ -28,6 +29,7 @@ requires-dist = [
     { name = "azure-core", specifier = ">=1.32.0" },
     { name = "azure-identity", specifier = ">=1.20.0" },
     { name = "core", virtual = "../core" },
+    { name = "functions", virtual = "../functions" },
     { name = "gymnasium", specifier = ">=1.1.1" },
     { name = "ollama", specifier = ">=0.4.7" },
     { name = "openai", specifier = ">=1.66.3" },
@@ -298,8 +300,10 @@ dependencies = [
     { name = "anthropic" },
     { name = "ollama" },
     { name = "openai" },
+    { name = "pillow" },
     { name = "pydantic" },
     { name = "python-dotenv" },
+    { name = "requests" },
 ]
 
 [package.metadata]
@@ -307,8 +311,10 @@ requires-dist = [
     { name = "anthropic", specifier = ">=0.49.0" },
     { name = "ollama", specifier = ">=0.4.7" },
     { name = "openai", specifier = ">=1.68.2" },
+    { name = "pillow", specifier = ">=11.1.0" },
     { name = "pydantic", specifier = ">=2.10.6" },
     { name = "python-dotenv", specifier = ">=1.0.1" },
+    { name = "requests", specifier = ">=2.32.3" },
 ]
 
 [[package]]
@@ -375,6 +381,11 @@ sdist = { url = "https://files.pythonhosted.org/packages/2e/2c/8384832b7a6b1fd6b
 wheels = [
     { url = "https://files.pythonhosted.org/packages/05/2c/ffc08c54c05cdce6fbed2aeebc46348dbe180c6d2c541c7af7ba0aa5f5f8/Farama_Notifications-0.0.4-py3-none-any.whl", hash = "sha256:14de931035a41961f7c056361dc7f980762a143d05791ef5794a751a2caf05ae", size = 2511 },
 ]
+
+[[package]]
+name = "functions"
+version = "0.1.0"
+source = { virtual = "../functions" }
 
 [[package]]
 name = "gymnasium"
