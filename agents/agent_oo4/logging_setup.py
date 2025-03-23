@@ -67,6 +67,10 @@ def configure_logging(timestamp: str) -> None:
                 "level": "ERROR",
                 "propagate": False,
             },
+            "anthropic": {
+                "level": "ERROR",
+                "propagate": False,
+            },
         },
     }
 

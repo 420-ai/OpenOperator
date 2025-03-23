@@ -1,14 +1,12 @@
-import time
-from typing import Annotated
-from clients.computer import ComputerClient
+from core.clients.computer import ComputerClient
 
-def mouse_left_click(server_url: Annotated[str, "The URL of the computer server."],):
+def mouse_left_click():
     print("---------------------------------")
     print("Tool: mouse_left_click")
 
     print("Clicking mouse...")
     
-    computer = ComputerClient(server_url=server_url)
+    computer = ComputerClient()
     computer.execute_python_command("pyautogui.click()")
     
     print("---------------------------------")

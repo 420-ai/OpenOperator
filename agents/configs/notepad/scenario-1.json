@@ -1,0 +1,31 @@
+{
+  "instruction": "Please open Notepad, create a new file named 'draft.txt', type 'This is a draft.', and save it to the Documents folder.",
+  "workflow": {
+    "params": {
+      "max_plan_versions": 10,
+      "max_plan_step_iterations": 5,
+      "max_plan_step_actions": 5
+    }
+  },
+  "environment": {
+    "start": [
+      {
+        "func": "close_all_windows",
+        "args": null
+      },
+      {
+        "func": "open_application",
+        "args": {
+          "app_name": "Microsoft Teams"
+        }
+      }
+    ],
+    "end": [
+      {
+        "func": "close_all_windows",
+        "args": null
+      }
+    ]
+  },
+  "evaluation": {}
+}

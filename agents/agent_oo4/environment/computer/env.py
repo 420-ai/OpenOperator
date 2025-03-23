@@ -1,27 +1,20 @@
+import logging
 from typing import Tuple
 import gymnasium as gym
 import numpy as np
 import json
-from state import State
-from tracker import Tracker
-from clients.computer import ComputerClient
-from clients.som import omniparser
-from functions import FUNCTIONS
-import logging
-import sys
-from environment.computer.tools.keyboard_type import keyboard_type
-from environment.computer.tools.keyboard_hotkeys import keyboard_hotkeys
-from environment.computer.tools.mouse_move import mouse_move
-from environment.computer.tools.mouse_scroll import mouse_scroll
-from environment.computer.tools.mouse_left_click import mouse_left_click
-from environment.computer.tools.mouse_double_click import mouse_double_click
-import asyncio
+from core.clients.computer import ComputerClient
+from core.clients.som import OmniparserClient
+from core.state import State
+from core.tracker import Tracker
+from agent_oo4.environment.computer.tools.keyboard_type import keyboard_type
+from agent_oo4.environment.computer.tools.keyboard_hotkeys import keyboard_hotkeys
+from agent_oo4.environment.computer.tools.mouse_move import mouse_move
+from agent_oo4.environment.computer.tools.mouse_scroll import mouse_scroll
+from agent_oo4.environment.computer.tools.mouse_left_click import mouse_left_click
+from agent_oo4.environment.computer.tools.mouse_double_click import mouse_double_click
 
 logger = logging.getLogger("environment.computer")
-
-async def async_tool_run(tool, params_json):
-    """Runs tool.run asynchronously"""
-    return await tool.run(args=params_json, cancellation_token=None)
 
 class ComputerEnv(gym.Env):
     """
@@ -51,8 +44,10 @@ class ComputerEnv(gym.Env):
         self.config = state.get_config()
         self.tracker = tracker
 
-        self.computer = ComputerClient(server_url=f"{self.config.environment.params.server_ip}:{self.config.environment.params.computer_port}")
-        self.som = omniparser
+        self.computer = ComputerClient()
+        self.som = OmniparserClient()
+
+        self.step_count = 0
 
         self.tools = [
             keyboard_type,
@@ -67,6 +62,8 @@ class ComputerEnv(gym.Env):
         """
         Executes an action: Click or Type into a UI element.
         """
+        self.step_count += 1
+        logger.debug(f"\n***************************\nEnvironment step No.{self.step_count}\n***************************")
 
         action_type, params = action
         logger.debug(f"Action: {action_type}")
@@ -83,7 +80,7 @@ class ComputerEnv(gym.Env):
         # Execute the action using the tool functions
         # ----------------------------
         params_json = json.loads(params)
-        tool_result = tool_selected(**params_json, server_url=f"{self.config.environment.params.server_ip}:{self.config.environment.params.computer_port}")
+        tool_result = tool_selected(**params_json)
         # ----------------------------
         # ----------------------------
 
@@ -115,22 +112,9 @@ class ComputerEnv(gym.Env):
         """
         Resets the environment (reloads VM snapshot).
         """
+        self.step_count = 0
 
-        # --------------------------------
-        # Call Envrionment reset method
-        start_functions = self.config.environment.start
-        for item in start_functions:
-            func_name = item.func  
-            args = item.get("args", {})  
-            if func_name in FUNCTIONS:
-                if args:  
-                    FUNCTIONS[func_name](**args)  
-                else:
-                    FUNCTIONS[func_name]()  
-            else:
-                print(f"Warning: Function '{func_name}' not found.")
-
-        # --------------------------------
+        
         # Get initial observation
 
         # 1. take a screenshot

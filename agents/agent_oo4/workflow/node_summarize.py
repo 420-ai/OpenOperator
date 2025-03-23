@@ -1,8 +1,10 @@
-import logging
-from clients.llm import my_llm_gpt4o, my_calculate_cost
-from state import State
-from tracker import Tracker
+from core.clients.llm import LLMClient
+from core.models import Message
+from core.state import State
+from core.tracker import Tracker
+from agent_oo4.helpers import fm
 
+import logging
 logger = logging.getLogger("node_summarize")
 
 SYSTEM_MESSAGE = """You are a summarizer agent. Your task is to create a concise and clear summary of the actions taken.
@@ -25,7 +27,9 @@ class OONodeSummarize:
         self.config = state.get_config()
         self.tracker = tracker
 
-        self.llm = my_llm_gpt4o
+        # self.llm = LLMClient("azure", model="gpt-4o", deployment="gpt-4o-deployment")
+        self.llm = LLMClient("ollama", model="mistral:latest")
+
 
     async def execute(self) -> str:
         
@@ -52,42 +56,34 @@ class OONodeSummarize:
         # ----------------------
         # Summarize
         # ----------------------
-        system_message = {"role": "system", "content": SYSTEM_MESSAGE}
-        user_message = {
-            "role": "user", 
-            "content":  USER_MESSAGE.format(history=history)
-        }
+        system_message = Message(role="system", content=SYSTEM_MESSAGE)
+        user_message = Message(
+            role="user", 
+            content=USER_MESSAGE.format(history=history)
+        )
 
         # region Log + State + Tracker
         self.tracker.save(self.name, [
-            ("system_message", system_message),
-            ("user_message", user_message)
+            ("system_message", system_message.model_dump()),
+            ("user_message", user_message.model_dump())
         ])
         # endregion
         
         # Call LLM
-        result = await self.llm.call(messages=[
+        result = self.llm.call(messages=[
             system_message,
             user_message,
         ])
 
-        # ---- COST CALCULATION ----
-        model_name, total_cost = my_calculate_cost(result.usage.prompt_tokens, result.usage.completion_tokens, self.llm.model, self.config)
-        # ---- END COST CALCULATION ----
-
         # region Log + State + Tracker
-        logger.debug(f"Model: {model_name}, Total cost: {total_cost}$")
-        logger.debug(result.to_json())
+        cost = f"Provider: {self.llm.provider}, Model: {self.llm.model}, Total cost: {result.usage.cost}$"
+        logger.debug(cost)
+        logger.debug(fm(result.message.content))
 
         self.tracker.save(self.name, [
-            ("llm_response", result.to_json()),
-            ("cost", f"{total_cost}$"),
+            ("llm_response", result.message.content),
+            ("cost", cost),
         ])
         # endregion
 
-        # ?????
-        if len(result.choices) > 1:
-            print(result.choices)
-            raise ValueError("Multiple choices returned, expected only one. -------> INVESTIGATE")
-
-        return result.choices[0].message.content
+        return result.message.content

@@ -1,11 +1,13 @@
 import json
-from typing import Any, List, Union
-from state import State
-from tracker import Tracker
-from clients.llm import my_llm_gpt4o, my_calculate_cost
-from clients.som import omniparser
-from helpers import encode_image, format_messages
-from environment.computer.env import ComputerEnv
+from typing import List
+from core.clients.llm import LLMClient
+from core.clients.som import OmniparserClient
+from core.models import Message, TextContent, ImageContent, ToolResult
+from core.message_store import MessageStore
+from core.state import State
+from core.tracker import Tracker
+from agent_oo4.helpers import encode_image, fm
+from agent_oo4.environment.computer.env import ComputerEnv
 
 import logging
 logger = logging.getLogger("agent_me--agent_computer")
@@ -157,12 +159,16 @@ class OOAgentComputer:
         self.config = state.get_config()
         self.tracker = tracker
 
-        self.llm = my_llm_gpt4o
-        self.som = omniparser
+        # self.llm = LLMClient("azure", model="gpt-4o", deployment="gpt-4o-deployment")
+        self.llm = LLMClient("azure", model="gpt-4o-mini", deployment="gpt-4o-mini-deployment")
+        # self.llm = LLMClient("openai", model="gpt-4o")
+        # self.llm = LLMClient("ollama", model="llama3.2-vision:latest")
+        # self.llm = LLMClient("anthropic", model="claude-3-7-sonnet-20250219")
 
+        self.som = OmniparserClient()
         self.computerEnv = env
 
-    async def run(self) -> List[dict]:
+    async def run(self) -> List[Message]:
         logger.debug("Running ...")
 
         # ----------------------
@@ -170,7 +176,7 @@ class OOAgentComputer:
         # ACTIONS LOOP
         # ----------------------
         # ----------------------
-        all_messages = []
+        messages_store = MessageStore()
 
         # Get the plan step from state
         plan_step = self.state.current_plan_data["plan_step"]["text"]
@@ -183,40 +189,35 @@ class OOAgentComputer:
         parsed = self.som.analyze_image(screenshot_t1)
 
         # region Log + State + Tracker
-        logger.debug(f"Plan step: {plan_step}")
-
         self.tracker.save(f"{self.name}-{0}", [
-            ("screenshot_t1_resized", screenshot_t1_resized),
-            ("plan_step", plan_step)
+            ("plan_step", plan_step),
+            ("screenshot_t1_resized", screenshot_t1_resized)
         ])
         # endregion
 
-        system_message = {"role": "system", "content": SYSTEM_MESSAGE}
-        user_message = {
-            "role": "user", 
-            "content":  [
-                {
-                    "type": "text",
-                    "text": USER_MESSAGE.format(
-                                plan_step=plan_step,
-                                ui_elements=parsed["parsed_content_list"]
-                            )
-                },
-                {
-                    "type": "image_url",
-                    "image_url": {
-                        "url": f"data:image/png;base64,{encode_image(parsed["parsed_image"])}",
-                    }
-                }
+        system_message = Message(role="system", content=SYSTEM_MESSAGE)
+        user_message = Message(
+            role="user", 
+            content=[
+                TextContent(type="text", text=USER_MESSAGE.format(
+                                                    plan_step=plan_step,
+                                                    ui_elements=parsed["parsed_content_list"]
+                                                )),
+                ImageContent(
+                    type="image",        
+                    data=encode_image(parsed["parsed_image"]),
+                    media_type="image/png"
+                )
             ]
-        }
-        all_messages.append(system_message)
-        all_messages.append(user_message)
+        )
+
+        messages_store.add_message(system_message)
+        messages_store.add_message(user_message)
 
         # region Log + State + Tracker
         self.tracker.save(f"{self.name}-{0}", [
-            ("system_message", system_message),
-            ("user_message", user_message),
+            ("system_message", system_message.model_dump()),
+            ("user_message", user_message.model_dump()),
             ("parsed_screenshot", parsed["parsed_image"])
         ])
         # endregion
@@ -232,41 +233,34 @@ class OOAgentComputer:
             
             # region Log + State + Tracker
             self.tracker.save(f"{self.name}-{loop_count}", [
-                ("loop_count", f"Loop: {loop_count}"),
-                ("messages", all_messages),
+                ("messages", messages_store.get_messages_dict(optimized=True))
             ])
             # endregion
 
             # Call LLM
             result = self.llm.call(
-                messages=all_messages,
+                messages=messages_store.get_messages(),
                 tools=TOOLS # CUSTOM TOOLS
             )
 
-            # ---- COST CALCULATION ----
-            model_name, total_cost = my_calculate_cost(result.usage.prompt_tokens, result.usage.completion_tokens, self.llm.model, self.config)
-            # ---- END COST CALCULATION ----
+            messages_store.add_message(result)
 
             # region Log + State + Tracker
-            logger.debug(f"Model: {model_name}, Total cost: {total_cost}$")
-            logger.debug(result.to_json())
+            cost = f"Provider: {self.llm.provider}, Model: {self.llm.model}, Total cost: {result.usage.cost}$"
+            logger.debug(cost)
+            logger.debug(fm(result.message.model_dump()))
 
             self.tracker.save(f"{self.name}-{loop_count}", [
-                ("llm_response", result.to_json()),
-                ("cost", f"{total_cost}$"),
+                ("llm_response", result.message.model_dump()),
+                ("cost", cost),
             ])
             # endregion
-
-            # ?????
-            if len(result.choices) > 1:
-                print(result.choices)
-                raise ValueError("Multiple choices returned, expected only one. -------> INVESTIGATE")
 
             # ------------------------------
             # Section where we got from LLM a text response
             # => custom implementation of TextMessageTermination
             # ------------------------------
-            if result.choices[0].finish_reason != "tool_calls":
+            if result.finish_reason != "tool_calls":
                 logger.debug("TextMessageTermination, end the loop")
                 break
 
@@ -275,33 +269,19 @@ class OOAgentComputer:
             # => everything is ok, continue
             # ------------------------------
             actions_json = []
-            for tool_call in result.choices[0].message.tool_calls:
-                tool_call_json = {
+            for tool_call in result.message.tool_calls:
+                action_json = {
                     "id": tool_call.id,
-                    "action": tool_call.function.name,
-                    "parameters": json.loads(tool_call.function.arguments),
+                    "action": tool_call.name,
+                    "parameters": tool_call.arguments,
                 }
-                actions_json.append(tool_call_json)
+                actions_json.append(action_json)
 
-            logger.debug(f"Actions: {actions_json}")
+            logger.debug(f"Actions: \n{actions_json}")
 
-            message_json_str = result.choices[0].message.model_dump_json()
-            message_json = json.loads(message_json_str)
-
-            # Add tool_call to the list of messages
-            all_messages.append(message_json)
-
-            # ----------------------
-            # ----------------------
-            # ----------------------
-            # ----------------------
             # ----------------------
             # ----------------------
             # Take actions in the environment
-            # ----------------------
-            # ----------------------
-            # ----------------------
-            # ----------------------
             # ----------------------
             # ----------------------
             # Loop through messages and actions
@@ -314,13 +294,16 @@ class OOAgentComputer:
                 obs, reward, terminated, truncated, info = self.computerEnv.step(data)
 
                 # Add the tool_call result to the list of messages
-                msg = {
-                    "role": "tool",
-                    "tool_call_id": action["id"],  
-                    "name": action["action"],
-                    "content": info["tool_result"],  
-                }
-                all_messages.append(msg)
+                tool_response = Message(
+                    role="tool",
+                    tool_result=ToolResult(
+                        call_id=action["id"],
+                        content=info["tool_result"]
+                    )
+                )
+                messages_store.add_message(tool_response)
+
+                
 
         print("-------------------------")
         print("-------------------------")
@@ -333,16 +316,20 @@ class OOAgentComputer:
         print("We break out of the plan step actions loop")
         print("AGENT TAKE ACTIONS - FINISHED")
 
+        
+        # Remove the BASE64 image from the messages
+        all_msgs = messages_store.get_messages_dict(optimized=True)
+
         # region Log + State + Tracker
         logger.debug("All messages:")
-        logger.debug(format_messages(all_messages))
+        logger.debug(all_msgs)
 
         self.tracker.save(self.name, [
-            ("all_messages", all_messages),
+            ("all_messages", all_msgs)
         ])
         # endregion
 
-        return all_messages
+        return messages_store.get_messages()
 
         
     
