@@ -1,18 +1,11 @@
-import logging
-from typing import Any, AsyncGenerator, Sequence
-from clients.llm import llm_gpt4o, calculate_cost
-from clients.computer import ComputerClient
-from autogen_agentchat.agents import BaseChatAgent
-from autogen_agentchat.messages import AgentEvent, ChatMessage, TextMessage
-from autogen_core import CancellationToken
-from autogen_agentchat.base import Response
-from autogen_core.models import UserMessage, SystemMessage
-from autogen_core import Image as AutogenImage
-from state import State
-from config import OOConfig
-from tracker import Tracker
-from helpers import format_autogen_message, resize_and_compress_image
+from core.clients.llm import LLMClient
+from core.models import Message, TextContent, ImageContent
+from core.clients.computer import ComputerClient
+from core.state import State
+from core.tracker import Tracker
+from agent_oo4.helpers import encode_image, resize_and_compress_image, fm
 
+import logging
 logger = logging.getLogger("agent_planner")
 
 SYSTEM_MESSAGE = """You are an AI assistant responsible for breaking down complex tasks into structured, step-by-step plans that an AI agent can execute. Your goal is to ensure that each step is **clear, actionable, and logical**, guiding the agent through a structured problem-solving process.
@@ -72,33 +65,27 @@ USER_MESSAGE = """Your objective is: {objective}. Please create a **structured s
 """
 
 
-class OOPlannerAgent(BaseChatAgent):
+class OOPlannerAgent:
 
     def __init__(self, state: State, tracker: Tracker):
         logger.debug("Initializing...")
 
-        name = "agent_planner"
-        description = "Agent responsible for planning"
+        self.name = "agent_planner"
+        self.description = "Agent responsible for planning"
 
         self.config = state.get_config()
         self.state = state
         self.tracker = tracker
 
-        self.llm = llm_gpt4o
+        # self.llm = LLMClient("azure", model="gpt-4o", deployment="gpt-4o-deployment")
+        # self.llm = LLMClient("openai", model="gpt-4o")
+        self.llm = LLMClient("ollama", model="llama3.2-vision:latest")
+        # self.llm = LLMClient("anthropic", model="claude-3-7-sonnet-20250219")
 
-        self.computer = ComputerClient(server_url=f"{self.config.environment.params.server_ip}:{self.config.environment.params.computer_port}")
-
-        super().__init__(
-            name, 
-            description,
-        )
+        self.computer = ComputerClient()
         
 
-    @property
-    def produced_message_types(self) -> Sequence[type[ChatMessage]]:
-        return (TextMessage,)
-
-    async def _inner_on_messages(self, messages: Sequence[ChatMessage], cancellation_token: CancellationToken) -> Any:
+    async def run(self) -> str:
         
         # Log the current step
         logger.debug("=================================")
@@ -108,7 +95,7 @@ class OOPlannerAgent(BaseChatAgent):
         self.state.create_new_plan_version()
 
         # Get the user task
-        user_task = messages[0].content
+        user_task = self.config.instruction
         
         # Take a screenshot
         screenshot_t0 = self.computer.get_screenshot()
@@ -117,62 +104,48 @@ class OOPlannerAgent(BaseChatAgent):
         screenshot_t0_resized = resize_and_compress_image(screenshot_t0)
         self.state.save_plan_image(screenshot_t0_resized, "t0.png")
 
-        # Define new messages
-        system_message = SystemMessage(content=SYSTEM_MESSAGE)
-        user_message = UserMessage(content=[
-            USER_MESSAGE.format(objective=user_task), 
-            AutogenImage.from_pil(screenshot_t0_resized)
-        ], source="user")
+        # Messages
+        system_message = Message(role="system", content=SYSTEM_MESSAGE)
+        user_message = Message(
+            role="user", 
+            content=[
+                TextContent(type="text", text=USER_MESSAGE.format(objective=user_task)),
+                ImageContent(
+                    type="image",        
+                    data=encode_image(screenshot_t0_resized),
+                    media_type="image/png"
+                )
+            ]
+        )
 
         # region Log + State + Tracker
         self.tracker.save(self.name, [
-            ("screenshot_t0_resized", screenshot_t0_resized),
-            ("system_message", system_message),
-            ("user_message", user_message)
+            ("system_message", system_message.model_dump()),
+            ("user_message", user_message.model_dump()),
+            ("screenshot_t0_resized", screenshot_t0_resized)
         ])
         # endregion
         
         # Call LLM
-        result = await self.llm.create(messages=[
-            system_message,
-            user_message,
-        ])
-
-        # ---- COST CALCULATION ----
-        model_name, total_cost = calculate_cost(result.usage, self.llm._resolved_model, self.config)
-        # ---- END COST CALCULATION ----
-
-        # region Log + State + Tracker
-        logger.debug(f"Model: {model_name}, Total cost: {total_cost}$")
-        logger.debug(format_autogen_message(result))
-
-        self.state.save_plan_text(result.content)
-
-        self.tracker.save(self.name, [
-            ("llm_response", result),
-            ("cost", f"{total_cost}$"),
-        ])
-        # endregion
-
-        # [Not needed] Construct response message - 
-        return TextMessage(content=result.content, source=self.name)
-
-    async def on_messages(self, messages: Sequence[ChatMessage], cancellation_token: CancellationToken) -> Response:
-        result = await self._inner_on_messages(messages, cancellation_token)
-        return Response(chat_message=result)
-    
-    async def on_messages_stream(
-        self, messages: Sequence[ChatMessage], cancellation_token: CancellationToken
-    ) -> AsyncGenerator[AgentEvent | ChatMessage | Response, None]:
-        result = await self._inner_on_messages(messages, cancellation_token)
-        yield Response(
-            chat_message=result,
-            inner_messages=[],
+        result = self.llm.call(
+            messages=[
+                system_message,
+                user_message,
+            ]
         )
 
-    async def on_reset(self, cancellation_token):
-        return await super().on_reset(cancellation_token)
-    
+        # region Log + State + Tracker
+        cost = f"Provider: {self.llm.provider}, Model: {self.llm.model}, Total cost: {result.usage.cost}$"
+        logger.debug(cost)
+        logger.debug(fm(result.message.content))
+
+        self.state.save_plan_text(result.message.content)
+
+        self.tracker.save(self.name, [
+            ("llm_response", result.message.content),
+            ("cost", cost),
+        ])
+        # endregion
 
 def init_agent_planner(state: State, tracker: Tracker) -> OOPlannerAgent:
     logger.debug("Initializing agent-planner...")

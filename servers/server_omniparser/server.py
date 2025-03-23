@@ -11,11 +11,6 @@ from torch import cuda
 
 from util.omniparser import Omniparser
 
-# root_dir = path.join(path.dirname(path.dirname(path.dirname(path.abspath(__file__)))))
-
-# print(__file__)
-# print(path.dirname(__file__))
-
 root_dir = path.dirname(__file__)
 weights_dir = path.join(root_dir, 'weights')
 

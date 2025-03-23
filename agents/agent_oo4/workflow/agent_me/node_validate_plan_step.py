@@ -1,10 +1,8 @@
-from state import State
-from tracker import Tracker
-from clients.llm import llm_gpt4o, calculate_cost
-from autogen_core import Image as AutogenImage
-from autogen_core.models import UserMessage, SystemMessage
-from PIL import Image
-from helpers import format_autogen_message
+from core.clients.llm import LLMClient
+from core.models import Message, TextContent, ImageContent
+from core.state import State
+from core.tracker import Tracker
+from agent_oo4.helpers import encode_image, fm
 
 import logging
 logger = logging.getLogger("agent_me--node_validate_plan_step")
@@ -81,7 +79,8 @@ class NodeValidatePlanStep:
         self.config = state.get_config()
         self.tracker = tracker
 
-        self.llm = llm_gpt4o
+        self.llm = LLMClient("azure", model="gpt-4o", deployment="gpt-4o-deployment")
+        # self.llm = LLMClient("ollama", model="gemma3:27b")
 
     async def execute(self, actions_history: str) -> bool:
         logger.debug("Executing...")
@@ -90,42 +89,50 @@ class NodeValidatePlanStep:
         screenshot_t1 = self.state.get_current_plan_image("t1_resized")
         screenshot_t2 = self.state.get_current_plan_image("t2_resized")
 
-        system_message = SystemMessage(content=SYSTEM_MESSAGE)
-        user_message = UserMessage(content=[
-            USER_MESSAGE.format(
-                objective=plan_step, 
-                actions_history=actions_history
-            ),
-            AutogenImage.from_pil(screenshot_t1),
-            AutogenImage.from_pil(screenshot_t2) 
-        ], source="user")
+        # Messages
+        system_message = Message(role="system", content=SYSTEM_MESSAGE)
+        user_message = Message(
+            role="user", 
+            content=[
+                TextContent(type="text", text=USER_MESSAGE.format(objective=plan_step, actions_history=actions_history)),
+                ImageContent(
+                    type="image",        
+                    data=encode_image(screenshot_t1),
+                    media_type="image/png"
+                ),
+                ImageContent(
+                    type="image",        
+                    data=encode_image(screenshot_t2),
+                    media_type="image/png"
+                )
+            ]
+        )
 
         # region Log + State + Tracker
         self.tracker.save(self.name, [
-            ("system_message", system_message),
-            ("user_message", user_message)
+            ("system_message", system_message.model_dump()),
+            ("user_message", user_message.model_dump()),
+            ("screenshot_t1", screenshot_t1),
+            ("screenshot_t2", screenshot_t2)
         ])
         # endregion
 
-        result = await self.llm.create(
+        result = self.llm.call(
             messages=[
                 system_message,
                 user_message
             ]
         )
 
-        # ---- COST CALCULATION ----
-        total_cost = calculate_cost(result.usage, self.llm._resolved_model, self.config)
-        # ---- END COST CALCULATION ----
-
         # region Log + State + Tracker
-        logger.debug(f"Total cost: {total_cost}$")
-        logger.debug(format_autogen_message(result))
+        cost = f"Provider: {self.llm.provider}, Model: {self.llm.model}, Total cost: {result.usage.cost}$"
+        logger.debug(cost)
+        logger.debug(fm(result.message.content))
 
         self.tracker.save(self.name, [
-            ("llm_response", result),
-            ("cost", f"{total_cost}$"),
+            ("llm_response", result.message.content),
+            ("cost", cost),
         ])
         # endregion
         
-        return result.content
+        return result.message.content

@@ -36,62 +36,11 @@ $ uv run server.py
 
 Start the agent.
 
+```bash
+$ cd ./agents/agent_oo4
+$ uv venv
+$ source .venv/bin/activate
+$ uv sync
+$ cd ..
+$ uv run -m agent_oo4.main
 ```
-$ cd agents/agent_oogen3
-$ uv run main.py
-```
-
----
-
-## Setup
-
-### Prerequisites
-
-- Python 3.12 or higher
-
-### Installation
-
-#### On Windows:
-
-```
-setup.bat
-```
-
-#### On macOS/Linux:
-
-```
-python setup.py
-```
-
-The setup script will:
-
-1. Install `uv` if it's not already installed
-2. Create a virtual environment
-3. Use `uv sync` to install all packages dependencies
-
-## Development
-
-After activating the virtual environment:
-
-- On Windows: `.venv\Scripts\activate.bat`
-- On macOS/Linux: `source .venv/bin/activate`
-
-You can update all dependencies using:
-
-# TODO
-
-- Agent_OOGen4 --> Agent_oo4 = remove the Autogen parts
-
-  - oo + oo2 = custom AI agent + Gymansium env
-  - oogen1 + oogen2 + oogen3 = Autogen AI agents
-
-- Remove the oogen4 ??
-
-- Rename agents to nodes (ex. Agent planner -> Node planner)
-
-- Have a global config and reference not from state, but
-  `from config import config`
-
-- Finish implementation of Environment "start" and "end" functions
-
-- Add MCP

@@ -1,16 +1,19 @@
 import sys
-from state import State
-from tracker import Tracker
-from config import OOConfig
-from logging_setup import configure_logging
-from workflow.agent_planner import init_agent_planner
-from workflow.agent_me import init_agent_me
-from workflow.agent_replanner import init_agent_replanner
-from workflow.node_summarize import OONodeSummarize
-from environment.computer.env import ComputerEnv
 import asyncio
 import logging
+from core.state import State
+from core.tracker import Tracker
+from core.config import OOConfig
+from functions.executor import FunctionExecutor
+from agent_oo4.logging_setup import configure_logging
+from agent_oo4.workflow.agent_planner import init_agent_planner
+from agent_oo4.workflow.agent_me import init_agent_me
+from agent_oo4.workflow.agent_replanner import init_agent_replanner
+from agent_oo4.workflow.node_summarize import OONodeSummarize
+from agent_oo4.environment.computer.env import ComputerEnv
 from datetime import datetime
+from dotenv import load_dotenv
+load_dotenv()
 
 t = datetime.now().strftime("%Y%m%d_%H%M%S")
 
@@ -30,27 +33,15 @@ config.load("teams", "scenario-2")
 # tracker.save_config(config)
 state.save_config(config)
 
-# print(type(config))
-# print(config)
-# print(type(config.value))
-# print(config.value)
-
-# state.save_config(config)
-
-# loaded_config = state.get_config()
-
-# print(type(loaded_config))
-# print(loaded_config)
-# print(type(loaded_config.value))
-# print(loaded_config.value)
-
-# sys.exit(0)
-
 # Main function
 async def main() -> None:
     try:
         logger.info("Starting task execution...")
         # tracker.start_recording()
+
+        # Trigger the start functions
+        executor = FunctionExecutor()
+        executor.execute_from_list(config.environment.start)
 
          # Initialize Windows VM environment
         env = ComputerEnv(state, tracker)
@@ -60,8 +51,8 @@ async def main() -> None:
         # Agent Planner
         # -----------------------
         agent_planner = init_agent_planner(state, tracker)
-        _ = await agent_planner.run(task=config.instruction)
-        
+        _ = await agent_planner.run()
+
         # ----------------------
         # ----------------------
         # PLAN LOOP
@@ -128,6 +119,9 @@ async def main() -> None:
             ("task_result", task_result),
         ])
         # endregion
+
+        # Trigger the end functions
+        executor.execute_from_list(config.environment.end)
 
     except Exception as e:
         logger.error(f"An error occurred: {e}")

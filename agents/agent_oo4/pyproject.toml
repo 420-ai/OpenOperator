@@ -4,13 +4,24 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
+authors = [
+    { name = "Lukas Kellerstein", email = "lukas.kellerstein@microsoft.com" }
+]
 dependencies = [
+    "core",
+    "functions",
     "asyncio>=3.4.3",
     "autogen-agentchat>=0.4.8",
     "autogen-ext[azure,ollama,openai]>=0.4.8",
     "azure-core>=1.32.0",
     "azure-identity>=1.20.0",
     "gymnasium>=1.1.1",
+    "ollama>=0.4.7",
     "openai>=1.66.3",
     "python-dotenv>=1.0.1",
+    "pillow>=11.1.0",
 ]
+
+[tool.uv.sources]
+core = { path = "../core" }
+functions = { path = "../functions" }

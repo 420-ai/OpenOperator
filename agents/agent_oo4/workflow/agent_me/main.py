@@ -1,17 +1,15 @@
-import sys
-import json
-from state import State
-from tracker import Tracker
-from helpers import resize_and_compress_image
-from workflow.agent_me.node_get_step import NodeGetStep
-from workflow.agent_me.node_is_step_done import NodeIsStepDone
-from workflow.agent_me.node_summarize_actions import NodeSummarizeActions
-from workflow.agent_me.node_validate_plan_step import NodeValidatePlanStep
-from workflow.agent_me.node_is_step_done_by_validation import NodeIsStepDoneByValidation
-from workflow.agent_me.node_summarize_plan_step import NodeSummarizePlanStep
-from workflow.agent_me.agent_computer import OOAgentComputer
-from clients.computer import ComputerClient
-from environment.computer.env import ComputerEnv
+from core.clients.computer import ComputerClient
+from core.state import State
+from core.tracker import Tracker
+from agent_oo4.workflow.agent_me.node_get_step import NodeGetStep
+from agent_oo4.workflow.agent_me.node_is_step_done import NodeIsStepDone
+from agent_oo4.workflow.agent_me.node_summarize_actions import NodeSummarizeActions
+from agent_oo4.workflow.agent_me.node_validate_plan_step import NodeValidatePlanStep
+from agent_oo4.workflow.agent_me.node_is_step_done_by_validation import NodeIsStepDoneByValidation
+from agent_oo4.workflow.agent_me.node_summarize_plan_step import NodeSummarizePlanStep
+from agent_oo4.workflow.agent_me.agent_computer import OOAgentComputer
+from agent_oo4.environment.computer.env import ComputerEnv
+from agent_oo4.helpers import resize_and_compress_image
 
 import logging
 logger = logging.getLogger("agent_me")
@@ -33,7 +31,7 @@ class OOAgentMe:
         self.config = state.get_config()
         self.tracker = tracker  
 
-        self.computer = ComputerClient(server_url=f"{self.config.environment.params.server_ip}:{self.config.environment.params.computer_port}")
+        self.computer = ComputerClient()
         self.computerEnv = env
 
         self.nodeGetStep = NodeGetStep(state, tracker)
@@ -60,9 +58,22 @@ class OOAgentMe:
         # ----------------------
         # Is the step done?
         # ----------------------
-        isDone = await self.nodeIsStepDone.execute()
+        isDone, description = await self.nodeIsStepDone.execute()
         if isDone == True:
-            return "AgenMe is done with the step, because it is already done"
+            reason = f"""Plan step seems to be already done. Here is the reasoning: {description.split("REASON:")[-1].strip()}"""
+
+            # region Log + State + Tracker
+            logger.debug(reason)
+
+            self.state.save_plan_step_result(reason)
+
+            self.tracker.save(self.name, [
+                ("plan_step_result", reason)
+            ])
+            # endregion
+
+            # we just need to end the agent, doesn't need to return anything
+            return None
 
         # ----------------------
         # ----------------------

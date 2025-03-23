@@ -1,9 +1,9 @@
-from state import State
-from tracker import Tracker
-from workflow.agent_replanner.node_format_plan_versions import NodeFormatAllPlanVersions
-from workflow.agent_replanner.node_replan import NodeReplan
-from clients.computer import ComputerClient
-from helpers import resize_and_compress_image
+from core.clients.computer import ComputerClient
+from core.state import State
+from core.tracker import Tracker
+from agent_oo4.workflow.agent_replanner.node_format_plan_versions import NodeFormatAllPlanVersions
+from agent_oo4.workflow.agent_replanner.node_replan import NodeReplan
+from agent_oo4.helpers import resize_and_compress_image
 
 import logging
 logger = logging.getLogger("agent_replanner")
@@ -24,7 +24,7 @@ class OOAgentReplanner:
         self.config = state.get_config()
         self.tracker = tracker
 
-        self.computer = ComputerClient(server_url=f"{self.config.environment.params.server_ip}:{self.config.environment.params.computer_port}")
+        self.computer = ComputerClient()
 
         self.nodeFormatAllPlanVersions = NodeFormatAllPlanVersions(state, tracker)
         self.nodeReplan = NodeReplan(state, tracker)
@@ -64,11 +64,9 @@ class OOAgentReplanner:
             self.state.save_plan_image(screenshot_resized, "t0.png")
 
         # region Log + State + Tracker
-        logger.debug(f"New plan: {result}")
-
         self.tracker.save(self.name, [
-            ("screenshot_t3_resized", screenshot_resized),
             ("new_plan", result),
+            ("screenshot_t3_resized", screenshot_resized),
         ])
         # endregion
 

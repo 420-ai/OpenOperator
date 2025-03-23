@@ -2,6 +2,7 @@
 .gradio
 .venv
 __pycache__
+*.egg-info
 
 dist
 **/node_modules
@@ -41,6 +42,9 @@ servers/**/screenshots
 servers/**/user_data
 servers/**/weights
 
+
+
+
 # Agents
 agents/**/recordings
 agents/**/traces
@@ -53,6 +57,23 @@ agents/**/tmp
 agents/**/state
 agents/**/logs
 agents/**/cache
+
+old_agents/**/recordings
+old_agents/**/traces
+old_agents/**/screenshots
+old_agents/**/tracker
+old_agents/**/parsed
+old_agents/**/results
+old_agents/**/test
+old_agents/**/tmp
+old_agents/**/state
+old_agents/**/logs
+old_agents/**/cache
+
+# Core
+!agents/test
+!agents/core/test
+agents/core/test/**/out
 
 # Models
 models/magma/video/*.png
