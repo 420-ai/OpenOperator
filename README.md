@@ -48,5 +48,5 @@ $ uv run -m agent_oo4.main
 # Docker
 
 ```bash
-docker compose build --no-cache --progress=plain
+docker compose up
 ```
