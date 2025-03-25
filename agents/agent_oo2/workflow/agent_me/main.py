@@ -6,41 +6,29 @@ from core.clients.som import OmniparserClient
 from core.clients.computer import ComputerClient
 from core.models import Message, TextContent, ImageContent, ToolResult
 from core.message_store import MessageStore
-from agent_oo1.helpers import encode_image, fm
-from agent_oo1.helpers import resize_and_compress_image
-from agent_oo1.workflow.tools.keyboard_type import keyboard_type
-from agent_oo1.workflow.tools.keyboard_hotkeys import keyboard_hotkeys
-from agent_oo1.workflow.tools.mouse_move import mouse_move
-from agent_oo1.workflow.tools.mouse_scroll import mouse_scroll
-from agent_oo1.workflow.tools.mouse_left_click import mouse_left_click
-from agent_oo1.workflow.tools.mouse_double_click import mouse_double_click
-
+from agent_oo2.helpers import encode_image, fm
+from agent_oo2.helpers import resize_and_compress_image
+from agent_oo2.workflow.tools.keyboard_type import keyboard_type
+from agent_oo2.workflow.tools.keyboard_hotkeys import keyboard_hotkeys
+from agent_oo2.workflow.tools.mouse_move import mouse_move
+from agent_oo2.workflow.tools.mouse_scroll import mouse_scroll
+from agent_oo2.workflow.tools.mouse_left_click import mouse_left_click
+from agent_oo2.workflow.tools.mouse_double_click import mouse_double_click
+from agent_oo2.workflow.agent_me.node_get_step import NodeGetStep
 
 import logging
 logger = logging.getLogger("agent_me")
 
-
 SYSTEM_MESSAGE = """
-You are a helpful and intelligent AI agent working on a computer. Your job is to complete the user's task by reasoning step-by-step and using available tools (functions) only when necessary.
-
-You receive a screenshot of the user's screen with each message. All visible UI elements are listed with IDs and coordinates.
-
-Use the screenshot and UI element data to understand what is currently visible to the user.
-
-Your workflow:
-1. Think carefully about the user's instruction and your current progress.
-2. If you already have enough information to complete the task, respond with "ALL DONE" and summarize the actions taken.
-3. Otherwise, reason about what is missing, and call the most appropriate tool to continue.
-
-Never call tools blindly or repeatedly. Always explain your reasoning before taking action.
-
-Always act with the end goal in mind.
+You are an execution agent. You are given a single step from a high-level plan. Your job is to complete this step as effectively as possible using the available tools. Do not attempt to complete the entire task or make long-term plans. Focus only on executing the current step accurately.
+If the current step is completed return "ALL DONE" and stop the execution.
+Do not ask questions, act confidently and do not hesitate.
 """
 
 USER_MESSAGE_INSTRUCTION = """
-Here is the user task.
+Here is the plan step.
 =========================
-{instruction}
+{plan_step}
 =========================
 """
 
@@ -205,22 +193,41 @@ class OOAgentMe:
             mouse_double_click,
         ]
 
-    async def run(self) -> str:
-        logger.debug("Running ...")
+        self.nodeGetStep = NodeGetStep(state, tracker)
 
-        # Log the current step
+    async def run(self) -> str:
         logger.debug("=================================")
         logger.debug(f"Entity: {self.name}")
         logger.debug("=================================")
         logger.debug("Running...")
-        self.state.create_new_plan_version()
+        
+        
+        # ----------------------
+        # Get the first step of the plan
+        # ----------------------
+        await self.nodeGetStep.execute()
+
+        plan_step = self.state.get_plan_step_text()
+
+        # region Log + State + Tracker
+        logger.debug(f"Plan step: {plan_step}")
+
+        self.tracker.save(self.name, [
+            ("plan_step", plan_step),
+        ])
+        # endregion
+
+
+        # ----------------------
+        # Initialize
+        # ----------------------
 
         # Prepare messages for the LLM
         system_message = Message(role="system", content=SYSTEM_MESSAGE)
         user_message = Message(
                 role="user", 
                 content=USER_MESSAGE_INSTRUCTION.format(
-                    instruction=self.config.instruction
+                    plan_step=plan_step
                 )
             )
 
@@ -228,34 +235,35 @@ class OOAgentMe:
         self.message_store.add_message(user_message)
 
         # region Log + State + Tracker
-        logger.debug(system_message.model_dump())
-        logger.debug(user_message.model_dump())
-
-        self.state.save_plan_text(self.config.instruction)
-
         self.tracker.save(self.name, [
-            ("instruction", self.config.instruction),
             ("system_message", system_message.model_dump()),
             ("user_message", user_message.model_dump()),
         ])
         # endregion
 
 
-        planIteration = -1
-        planValidation = False
-        while planIteration < self.config.workflow.params.max_plan_versions:
-            planIteration += 1
+        # ----------------------
+        # ----------------------
+        # PLAN STEP LOOP
+        # ----------------------
+        # ----------------------
+
+        planStepIteration = 0
+        textMessageTermination = False
+        textMessage = ""
+        while planStepIteration <= self.config.workflow.params.max_plan_step_iterations:
+            planStepIteration += 1
 
             logger.debug("--------------------------")
-            logger.debug(f"Agent - Plan version: {planIteration}")
+            logger.debug(f"Agent - Plan Step iteration: {planStepIteration}")
             logger.debug("--------------------------")
-            if planIteration > 0:
+            if planStepIteration > 0:
                 # Create a new plan version
                 logger.debug("Creating new plan version")
                 self.state.create_new_plan_version()
 
             # region Log + State + Tracker
-            self.tracker.save(f"{self.name}-{planIteration}", [
+            self.tracker.save(f"{self.name}-{planStepIteration}", [
                 ("messages", self.message_store.get_messages_dict(optimized=True))
             ])
             # endregion
@@ -291,7 +299,7 @@ class OOAgentMe:
             self.state.save_plan_image(screenshot_t0_resized, "t0_resized.png")
             self.state.save_plan_image(parsed_t0["parsed_image"], "t0_parsed.png")
 
-            self.tracker.save(f"{self.name}-{planIteration}", [
+            self.tracker.save(f"{self.name}-{planStepIteration}", [
                 ("user_message", user_message.model_dump()),
                 ("screenshot_t0_resized", screenshot_t0_resized),
                 ("screenshot_t0_parsed", parsed_t0["parsed_image"]),
@@ -303,10 +311,9 @@ class OOAgentMe:
             # ----------------------
             # ----------------------
             # Call LLM
+            # Initial reasoning + planning + generate action
             # ----------------------
             # ----------------------
-
-            # Call the LLM
             llm_result = self.llm.call(
                 messages=self.message_store.get_messages(),
                 tools=TOOLS,
@@ -320,7 +327,7 @@ class OOAgentMe:
             logger.debug(cost)
             logger.debug(fm(llm_result.message.model_dump()))
 
-            self.tracker.save(f"{self.name}-{planIteration}", [
+            self.tracker.save(f"{self.name}-{planStepIteration}", [
                 ("llm_response", llm_result.message.model_dump()),
                 ("cost", cost),
             ])
@@ -328,20 +335,20 @@ class OOAgentMe:
 
 
             # ----------------------
-            # ----------------------
             # Should we continue?
-            # ----------------------
             # ----------------------
 
             # "ALL DONE"
-            if "ALL DONE" in llm_result.message.content:
-                planValidation = True
-                logger.debug("Plan is done")
-                break
+            # if "ALL DONE" in llm_result.message.content:
+            #     planStepValidation = True
+            #     logger.debug("Plan is done")
+            #     break
 
 
             # Text response
             if llm_result.finish_reason != "tool_calls":
+                textMessageTermination = True
+                textMessage = llm_result.message.content
                 logger.debug("TextMessageTermination, end the loop")
                 break
 
@@ -375,24 +382,18 @@ class OOAgentMe:
 
 
         # Save the plan step result to the state
-        if planValidation == True:
-            plan_result = f"Plan is successfuly done after {str(planIteration)} iterations."
-        elif planValidation == False and planIteration < self.config.workflow.params.max_plan_versions:
-            plan_result = f"Plan is not done after {str(planIteration)} iterations. We got a text response from the LLM, but not 'ALL DONE'."
+        if textMessageTermination == True:
+            plan_step_result = f"After {str(planStepIteration)} iterations. Received a text response from the LLM: {textMessage}"
         else:
             # Add a summarization of the all actions taken for this plan step
-            plan_result = f"Plan reached max iterations of {str(self.config.workflow.params.max_plan_versions)}."
+            plan_step_result = f"Plan reached max iterations of {str(self.config.workflow.params.max_plan_step_iterations)}."
 
         # region Log + State + Tracker
-        logger.debug(plan_result)
+        logger.debug(plan_step_result)
 
-        self.state.save_plan_result(plan_result)
+        self.state.save_plan_step_result(plan_step_result)
 
         self.tracker.save(self.name, [
-            ("plan_result", plan_result),
+            ("plan_step_result", plan_step_result),
         ])
         # endregion
-
-        # ----------------------------------------
-        # Perhaps not needed to return any string
-        return plan_result

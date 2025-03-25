@@ -1,3 +1,4 @@
+import os
 import sys
 import asyncio
 import logging
@@ -5,16 +6,13 @@ from core.state import State
 from core.tracker import Tracker
 from core.config import OOConfig
 from functions.executor import FunctionExecutor
-from agent_oo4.logging_setup import configure_logging
-from agent_oo4.workflow.agent_planner import OOPlannerAgent
-from agent_oo4.workflow.agent_me import OOAgentMe
-from agent_oo4.workflow.agent_replanner import OOAgentReplanner
-from agent_oo4.workflow.node_summarize import OONodeSummarize
-from agent_oo4.environment.computer.env import ComputerEnv
+from agent_oo2.logging_setup import configure_logging
+from agent_oo2.workflow.agent_me.main import OOAgentMe
+from agent_oo2.workflow.node_planner import OOPlannerNode
+from agent_oo2.workflow.node_replanner import OOReplannerNode
 from datetime import datetime
 from dotenv import load_dotenv
 load_dotenv()
-import os
 
 d = os.path.dirname(__file__)
 t = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -45,27 +43,23 @@ async def start() -> None:
         executor = FunctionExecutor()
         executor.execute_from_list(config.environment.start)
 
-         # Initialize Windows VM environment
-        env = ComputerEnv(state, tracker)
-        _, _ = env.reset()  
-
         # -----------------------
-        # Agent Planner
+        # Planner Node
         # -----------------------
-        agent_planner = OOPlannerAgent(state, tracker)
-        _ = await agent_planner.run()
+        node_planner = OOPlannerNode(state, tracker)
+        _ = await node_planner.execute()
 
         # ----------------------
         # ----------------------
         # PLAN LOOP
         # ----------------------
         # ----------------------
-        planVersion = 0
+        planVersion = -1
         planResult = False
 
         while planResult == False and planVersion < config.workflow.params.max_plan_versions:
             planVersion += 1
-
+            
             logger.debug("--------------------------")
             logger.debug(f"Workflow - Plan version: {planVersion}")
             logger.debug("--------------------------")
@@ -73,15 +67,15 @@ async def start() -> None:
             # -----------------------
             # Agent ME
             # -----------------------
-            agent_me = OOAgentMe(state, tracker, env)
+            agent_me = OOAgentMe(state, tracker)
             _ = await agent_me.run()
 
             # -----------------------
-            # Agent Replanner
+            # RePlanner Node
             # -----------------------
-            agent_replanner = OOAgentReplanner(state, tracker)
-            result = await agent_replanner.run()
-            
+            node_replanner = OOReplannerNode(state, tracker)
+            result = await node_replanner.execute()
+
             if result == "ALL DONE":
                 planResult = True
                 break
@@ -89,30 +83,13 @@ async def start() -> None:
             if "all done" in result.lower():
                 raise ValueError("Agent Replanner returned 'ALL DONE' in the text, but not only 'ALL DONE' ------> INVESTIGATE")
 
-        # -----------------------
-        # Node Summarization
-        # -----------------------
-        node_summarize = OONodeSummarize(state, tracker)
-        summarization = await node_summarize.execute()
 
         # Save the plan step result to the state
         task_result = ""
         if planResult == True:
-            task_result = f"""Task completed successfully.
-            
-            Here is the summarization of the steps taken:
-            =============================================
-            {summarization}
-            =============================================
-            """
+            task_result = f"""Task completed successfully."""
         else:
-            task_result = f"""Task reached maximum plan versions of {config.workflow.params.max_plan_versions}.
-            
-            Here is the summarization of the steps taken:
-            =============================================
-            {summarization}
-            =============================================
-            """
+            task_result = f"""Task reached maximum plan versions of {config.workflow.params.max_plan_versions}."""
 
         # region Log + State + Tracker
         logger.info("----------------------------")
