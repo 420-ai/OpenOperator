@@ -9,11 +9,11 @@ uv run server.py
 Build
 
 ```bash
-docker build -t omniparser-server .
+docker build --no-cache --progress=plain -t omniparser-server .
 ```
 
 Run
 
 ```bash
-docker run --name omniparser-server omniparser-server:latest
+docker run --name omniparser-server -p 8000:8000 --gpus all omniparser-server:latest
 ```
