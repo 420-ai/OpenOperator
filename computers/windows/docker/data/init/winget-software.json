@@ -8,6 +8,9 @@
 			[
 				{
 					"PackageIdentifier" : "astral-sh.uv"
+				},
+				{
+					"PackageIdentifier" : "mitmproxy.mitmproxy"
 				}
 			],
 			"SourceDetails" : 

@@ -1,6 +1,5 @@
 import click
 import time
-import sys
 from fastapi import FastAPI
 from pydantic import BaseModel
 from os import path
@@ -72,7 +71,7 @@ async def probe():
 def main(host: str, port: int):
     """Run the FastAPI server."""
     import uvicorn
-    uvicorn.run("server:app", host=host, port=port, reload=True)
+    uvicorn.run("server:app", host=host, port=port, reload=True, log_config=None)
 
 if __name__ == '__main__':
     main()

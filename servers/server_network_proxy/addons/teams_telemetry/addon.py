@@ -25,10 +25,22 @@ class TeamsTelemetryAddon:
         )
 
         if should_intercept:
+            
             ## this is for the JS portion
             if flow.request.headers.get("content-type") == "application/x-json-stream":
-                flow.request.decode()
-                body = flow.request.content.decode("utf-8")
+                logging.info("Intercepting Teams event data from maglev. application/x-json-stream")
+
+                query_encoding = flow.request.query.get("content-encoding")
+
+                if (
+                    flow.request.headers.get("content-encoding") == "gzip"
+                    or query_encoding == "gzip"
+                ):
+                    body = decode_gzip(flow.request.content).decode("utf-8")
+                else:
+                    flow.request.decode()
+                    body = flow.request.content.decode("utf-8")
+
                 if body:
                     records = body.splitlines()
                     for record in records:
