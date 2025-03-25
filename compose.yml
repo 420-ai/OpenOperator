@@ -52,11 +52,11 @@ services:
       BROWSER_CONTROL_URL: http://windowscomputer:5051
       OMNIPARSER_URL: http://omniparser-server:8000
       OLLAMA_URL: http://0.0.0.0:11434
-      ANTHROPIC_API_KEY: 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
-      OPENAI_API_KEY: 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
+      ANTHROPIC_API_KEY: <API_KEY>
+      OPENAI_API_KEY: <API_KEY>
       AZURE_OPENAI_API_VERSION: 2025-01-01-preview
       AZURE_OPENAI_BASEURL: https://oo-openai-1.openai.azure.com/
-      AZURE_API_KEY: 9ODjnpbo2wYr8yQkNNGi3dHQcSMf3mu2N2rac6Lc1z0uCIzLERbjJQQJ99BCACHYHv6XJ3w3AAABACOGKwm5
+      AZURE_API_KEY: <API_KEY>
     networks:
       - default
 
