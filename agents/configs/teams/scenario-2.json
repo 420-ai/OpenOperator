@@ -14,6 +14,10 @@
         "args": null
       },
       {
+        "func": "start_network_proxy",
+        "args": null
+      },
+      {
         "func": "open_application",
         "args": {
           "app_name": "Microsoft Teams"
@@ -21,6 +25,10 @@
       }
     ],
     "end": [
+      {
+        "func": "stop_network_proxy",
+        "args": null
+      },
       {
         "func": "close_all_windows",
         "args": null

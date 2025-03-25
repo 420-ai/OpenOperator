@@ -15,9 +15,6 @@ import traceback
 import os
 from logging_setup import configure_logging
 
-from dotenv import load_dotenv
-load_dotenv()
-
 app = FastAPI(title="Mitmproxy Controller")
 
 # Global variables to track proxy state
@@ -27,14 +24,15 @@ stop_event = Event()
 running = False
 loop = None
 
-port = os.getenv("PORT", 5052)
+port = 5052
+
 
 def run_proxy():
     global running, proxy_master, loop
 
     if loop is None:
         loop = asyncio.new_event_loop()
-    
+
     asyncio.set_event_loop(loop)
 
     opts = options.Options(
@@ -46,21 +44,23 @@ def run_proxy():
     )
 
     if proxy_master is None:
-        proxy_master = DumpMaster(opts, loop=loop, with_termlog=True)
+        proxy_master = DumpMaster(
+            opts, loop=loop, with_termlog=False, with_dumper=False
+        )
         proxy_master.addons.add(TeamsTelemetryAddon())
 
     running = True
 
     try:
         # Create a task for the proxy and add a check for the stop event
-        print("Starting proxy...")
+        logging.info("Starting proxy...")
         proxy_task = loop.create_task(proxy_master.run())
         while not stop_event.is_set() and not proxy_task.done():
             loop.run_until_complete(asyncio.sleep(0.25))
 
         # If stop was requested and task is still running
         if stop_event.is_set() and not proxy_task.done():
-            print("Stopping proxy...")
+            logging.info("Stopping proxy...")
             proxy_master.shutdown()
             proxy_task.cancel()
             try:
@@ -68,7 +68,7 @@ def run_proxy():
             except asyncio.CancelledError:
                 pass
     except Exception as e:
-        print(f"Proxy error: {e}")
+        logging.error(f"Proxy error: {e}")
     finally:
         running = False
         stop_event.clear()
@@ -148,7 +148,7 @@ if __name__ == "__main__":
         except AttributeError:
             pass
 
-    LOG_PATH=os.getenv("LOG_PATH", r"\\host.lan\Data\logs")
+    LOG_PATH = os.getenv("LOG_PATH", r"\\host.lan\Data\logs")
     configure_logging(LOG_PATH)
 
     logger = logging.getLogger("server_network_proxy")

@@ -19,24 +19,25 @@ def configure_logging(directory: str) -> None:
                 "class": "logging.FileHandler",
                 "filename": LOG_FILE,
                 "formatter": "detailed",
-                "level": "DEBUG",
+                "level": "FATAL",
             },
             "console": {
                 "class": "logging.StreamHandler",
                 "formatter": "detailed",
-                "level": "DEBUG",
+                "level": "FATAL",
             },
             "default": {
                 "class": "logging.FileHandler",
                 "filename": LOG_FILE,
                 "formatter": "detailed",
-                "level": "DEBUG",
+                "level": "FATAL",
             },
         },
         "root": {
             "handlers": ["console", "file"],
-            "level": "DEBUG",
+            "level": "FATAL",
         },
     }
 
     logging.config.dictConfig(LOGGING_CONFIG)
+    logging.basicConfig(level=logging.FATAL)
