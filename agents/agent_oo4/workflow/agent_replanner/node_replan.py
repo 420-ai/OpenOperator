@@ -94,8 +94,8 @@ class NodeReplan:
         self.config = state.get_config()
         self.tracker = tracker
 
-        # self.llm = LLMClient("azure", model="gpt-4o", deployment="gpt-4o-deployment")
-        self.llm = LLMClient("ollama", model="llama3.2-vision:latest")
+        self.llm = LLMClient("azure", model="gpt-4o", deployment="gpt-4o-deployment")
+        # self.llm = LLMClient("ollama", model="llama3.2-vision:latest")
 
     async def execute(self, history: str) -> str:
         logger.debug("Executing...")

@@ -31,7 +31,7 @@ class NodeGetStep:
         self.config = state.get_config()
         self.tracker = tracker
 
-        self.llm = LLMClient("ollama", model="phi4:latest")
+        self.llm = LLMClient("ollama", model="mistral:latest")
 
 
     async def execute(self) -> None:

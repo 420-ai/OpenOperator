@@ -28,4 +28,10 @@ ANTHROPIC_API_KEY=<API_KEY>
 
 ## Run
 
-`uv run main.py`
+```bash
+uv venv
+source .venv/bin/activate
+uv sync
+cd ..
+uv run -m agent_oo4.main
+```

@@ -4,4 +4,14 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "core",
+    "functions",
+    "asyncio>=3.4.3",
+    "pillow>=11.1.0",
+    "python-dotenv>=1.0.1",
+]
+
+[tool.uv.sources]
+core = { path = "../core" }
+functions = { path = "../functions" }

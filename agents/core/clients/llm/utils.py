@@ -46,7 +46,8 @@ def calculate_cost_in_usd(provider: str, model_name: str, input_tokens: int, out
     input_cost = (input_tokens / 1_000_000) * input_price_per_million
     output_cost = (output_tokens / 1_000_000) * output_price_per_million
 
-    return input_cost + output_cost
+    total_cost = input_cost + output_cost
+    return round(total_cost, 8)
 
 
 def detect_tool_use(messages: List[Message]) -> bool:
