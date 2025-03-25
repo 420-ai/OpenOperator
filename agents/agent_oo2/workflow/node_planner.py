@@ -3,10 +3,10 @@ from core.models import Message, TextContent, ImageContent
 from core.clients.computer import ComputerClient
 from core.state import State
 from core.tracker import Tracker
-from agent_oo4.helpers import encode_image, resize_and_compress_image, fm
+from agent_oo2.helpers import encode_image, resize_and_compress_image, fm
 
 import logging
-logger = logging.getLogger("agent_planner")
+logger = logging.getLogger("node_planner")
 
 SYSTEM_MESSAGE = """You are an AI assistant responsible for breaking down complex tasks into structured, step-by-step plans that an AI agent can execute. Your goal is to ensure that each step is **clear, actionable, and logical**, guiding the agent through a structured problem-solving process.
 
@@ -65,13 +65,13 @@ USER_MESSAGE = """Your objective is: {objective}. Please create a **structured s
 """
 
 
-class OOPlannerAgent:
+class OOPlannerNode:
 
     def __init__(self, state: State, tracker: Tracker):
         logger.debug("Initializing...")
 
-        self.name = "agent_planner"
-        self.description = "Agent responsible for planning"
+        self.name = "node_planner"
+        self.description = "Node responsible for planning"
 
         self.config = state.get_config()
         self.state = state
@@ -85,9 +85,7 @@ class OOPlannerAgent:
         self.computer = ComputerClient()
         
 
-    async def run(self) -> str:
-        
-        # Log the current step
+    async def execute(self) -> str:
         logger.debug("=================================")
         logger.debug(f"Entity: {self.name}")
         logger.debug("=================================")

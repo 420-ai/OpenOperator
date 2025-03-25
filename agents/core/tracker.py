@@ -7,9 +7,8 @@ import os
 from core.clients.computer import ComputerClient
 
 class Tracker:
-    def __init__(self, timestamp: str):
-        CURRENT_FOLDER = Path(__file__).resolve().parent
-        RUN_DIR = CURRENT_FOLDER / "tracker" / timestamp
+    def __init__(self, dir: str, timestamp: str):
+        RUN_DIR = Path(dir) / "tracker" / timestamp
         RUN_DIR.mkdir(parents=True, exist_ok=True)
         
         self.run_dir = RUN_DIR

@@ -10,11 +10,12 @@ class State:
     Each run of the application uses a different subfolder with timestamp.
     """
     
-    def __init__(self, timestamp: str):
+    def __init__(self, dir: str, timestamp: str):
         """
         Initialize the State object.
         """
-        self.base_dir = os.path.join(os.path.dirname(__file__), "state")
+
+        self.base_dir = os.path.join(dir, "state")
         # Create a timestamp-based run directory
         self.run_dir = os.path.join(self.base_dir, timestamp)
         os.makedirs(self.run_dir, exist_ok=True)
@@ -139,6 +140,23 @@ class State:
         image.save(dest_path)
         return dest_path
     
+    def save_plan_result(self, content: str, version: Optional[int] = None) -> str:
+        """
+        Save plan result content to plan_result.txt.
+        
+        Args:
+            content: Result content to save
+            version: Plan version number, uses current if None
+        Returns:
+            Path to the saved file
+        """
+        plan_dir = self._get_plan_version_dir(version)
+        file_path = os.path.join(plan_dir, "plan_result.txt")
+        
+        with open(file_path, "w") as f:
+            f.write(content)
+        
+        return file_path
     
     def list_plan_versions(self) -> List[str]:
         """
@@ -429,6 +447,25 @@ class State:
             data["plan_step"]["iterations"] = self.get_current_plan_step_iterations_data()
 
         return data
+    
+    def get_plan_step_text(self) -> Optional[str]:
+        """
+        Retrieve the plan step text content.
+        
+        Returns:
+            The content of plan_step.txt or None if not found
+        """
+        if self.current_plan_version is None:
+            raise ValueError("No plan version selected")
+
+        plan_step_dir = self._get_plan_step_dir(self.current_plan_version)
+        plan_step_text_path = os.path.join(plan_step_dir, "plan_step.txt")
+        
+        if os.path.exists(plan_step_text_path):
+            with open(plan_step_text_path, "r") as f:
+                return f.read()
+        
+        return None
 
     def get_current_plan_step_iterations_data(self) -> List[Dict[str, Optional[str]]]:
         """

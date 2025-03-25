@@ -3,7 +3,7 @@
   "workflow": {
     "params": {
       "max_plan_versions": 10,
-      "max_plan_step_iterations": 5,
+      "max_plan_step_iterations": 3,
       "max_plan_step_actions": 5
     }
   },

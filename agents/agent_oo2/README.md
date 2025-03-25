@@ -2,11 +2,11 @@
 
 Open Operator agent.
 
-| Param        | Value                                                                            |
-| ------------ | -------------------------------------------------------------------------------- |
-| AI Framework | No AI Agent framework.                                                           |
-| Agent Style  | Custom workflow - Inspired by [Plan and solve](https://arxiv.org/abs/2305.04091) |
-| RL           | No, but possible via using Gymnasium env                                         |
+| Param        | Value                                              |
+| ------------ | -------------------------------------------------- |
+| AI Framework | No AI Agent framework.                             |
+| Agent Style  | [Plan and solve](https://arxiv.org/abs/2305.04091) |
+| RL           | No                                                 |
 
 ### LLMs
 
@@ -33,5 +33,5 @@ uv venv
 source .venv/bin/activate
 uv sync
 cd ..
-uv run -m agent_oo4.main
+uv run -m agent_oo1.main
 ```
