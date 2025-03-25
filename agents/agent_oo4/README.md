@@ -20,10 +20,12 @@ The agent needs `.env` file with data below (the exact EnvVars depends on the ve
 AZURE_API_KEY=<API_KEY>
 AZURE_OPENAI_BASEURL=https://<AZURE_OPENAI_NAME>.openai.azure.com/
 AZURE_OPENAI_API_VERSION=2025-01-01-preview
-OLLAMA_URL=http://127.0.0.1:11434
-OMNIPARSER_URL=http://127.0.0.1:8000
 OPENAI_API_KEY=<API_KEY>
 ANTHROPIC_API_KEY=<API_KEY>
+OLLAMA_URL=http://127.0.0.1:11434
+OMNIPARSER_URL=http://127.0.0.1:8000
+COMPUTER_CONTROL_URL=http://127.0.0.1:5050
+BROWSER_CONTROL_URL=http://127.0.0.1:5051
 ```
 
 ## Run
