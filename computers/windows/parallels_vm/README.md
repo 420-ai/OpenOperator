@@ -30,7 +30,13 @@ Share folder `computers/windows/parallels_vm` into VM. Then you will see new net
 1. Create a folder `C:\INSTALL`
 2. Create a folder `C:\TEMP`
 
-3. Copy a folders `../../servers/server_browser_control` and `../../servers/server_computer_control` into this folder
+3. Copy a folders below into the `data` folder in this directory
+
+- `../../servers/server_browser_control`
+- `../../servers/server_computer_control`
+- `../../servers/evaluator`
+- `../../servers/network_proxy`
+
 4. Adjust the `.env` files in each server => Uncomment the section for `# Parallels - Windows` and comment out the other variants
 5. Copy the content of this folder into path `C:\INSTALL`
 
@@ -47,6 +53,8 @@ On the `VM` are running a open-operator servers:
 
 - server computer control on port `5050`
 - server browser control on port `5051`
+- server network proxy on port `5052`
+- server evaluator on port `5053`
 
 You can test them if they are running correctly by opening browser with urls:
 

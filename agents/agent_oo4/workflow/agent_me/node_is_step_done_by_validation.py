@@ -36,8 +36,8 @@ class NodeIsStepDoneByValidation:
         self.config = state.get_config()
         self.tracker = tracker
 
-        # self.llm = LLMClient("azure", model="gpt-4o-mini", deployment="gpt-4o-mini-deployment")
-        self.llm = LLMClient("ollama", model="llama3.2-vision:latest")
+        self.llm = LLMClient("azure", model="gpt-4o-mini", deployment="gpt-4o-mini-deployment")
+        # self.llm = LLMClient("ollama", model="llama3.2-vision:latest")
 
     async def execute(self, validation: str) -> bool:
         logger.debug("Executing...")

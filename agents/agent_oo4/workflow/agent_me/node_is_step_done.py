@@ -46,7 +46,8 @@ class NodeIsStepDone:
         self.config = state.get_config()
         self.tracker = tracker
 
-        self.llm = LLMClient("ollama", model="llama3.2-vision:latest")
+        # self.llm = LLMClient("ollama", model="llama3.2-vision:latest")
+        self.llm = LLMClient("azure", model="gpt-4o-mini", deployment="gpt-4o-mini-deployment")
 
     async def execute(self) -> Tuple[bool, str]:
         logger.debug("Executing...")

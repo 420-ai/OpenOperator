@@ -77,9 +77,9 @@ class OOPlannerAgent:
         self.state = state
         self.tracker = tracker
 
-        # self.llm = LLMClient("azure", model="gpt-4o", deployment="gpt-4o-deployment")
+        self.llm = LLMClient("azure", model="gpt-4o", deployment="gpt-4o-deployment")
         # self.llm = LLMClient("openai", model="gpt-4o")
-        self.llm = LLMClient("ollama", model="llama3.2-vision:latest")
+        # self.llm = LLMClient("ollama", model="llama3.2-vision:latest")
         # self.llm = LLMClient("anthropic", model="claude-3-7-sonnet-20250219")
 
         self.computer = ComputerClient()
@@ -146,7 +146,3 @@ class OOPlannerAgent:
             ("cost", cost),
         ])
         # endregion
-
-def init_agent_planner(state: State, tracker: Tracker) -> OOPlannerAgent:
-    logger.debug("Initializing agent-planner...")
-    return OOPlannerAgent(state, tracker)

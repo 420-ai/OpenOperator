@@ -182,8 +182,3 @@ class OOAgentMe:
         # ----------------------------------------
         # Perhaps not needed to return any string
         return "Agent ME > AgentReplanner"
-
-
-def init_agent_me(state: State, tracker: Tracker, env: ComputerEnv) -> OOAgentMe:
-    logger.debug("Initializing agent-me...")
-    return OOAgentMe(state, tracker, env)

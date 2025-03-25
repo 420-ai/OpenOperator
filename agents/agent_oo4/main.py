@@ -6,15 +6,17 @@ from core.tracker import Tracker
 from core.config import OOConfig
 from functions.executor import FunctionExecutor
 from agent_oo4.logging_setup import configure_logging
-from agent_oo4.workflow.agent_planner import init_agent_planner
-from agent_oo4.workflow.agent_me import init_agent_me
-from agent_oo4.workflow.agent_replanner import init_agent_replanner
+from agent_oo4.workflow.agent_planner import OOPlannerAgent
+from agent_oo4.workflow.agent_me import OOAgentMe
+from agent_oo4.workflow.agent_replanner import OOAgentReplanner
 from agent_oo4.workflow.node_summarize import OONodeSummarize
 from agent_oo4.environment.computer.env import ComputerEnv
 from datetime import datetime
 from dotenv import load_dotenv
 load_dotenv()
+import os
 
+d = os.path.dirname(__file__)
 t = datetime.now().strftime("%Y%m%d_%H%M%S")
 
 # Logging
@@ -22,10 +24,10 @@ configure_logging(t)
 logger = logging.getLogger("main")
 
 # Tracker object to keep track of images, messages, config and other data
-tracker = Tracker(t)
+tracker = Tracker(d, t)
 
 # State object to store the current state of the agent
-state = State(t)
+state = State(d, t)
 
 # Configuration object for agent
 config = OOConfig()
@@ -34,7 +36,7 @@ config.load("teams", "scenario-2")
 state.save_config(config)
 
 # Main function
-async def main() -> None:
+async def start() -> None:
     try:
         logger.info("Starting task execution...")
         # tracker.start_recording()
@@ -50,7 +52,7 @@ async def main() -> None:
         # -----------------------
         # Agent Planner
         # -----------------------
-        agent_planner = init_agent_planner(state, tracker)
+        agent_planner = OOPlannerAgent(state, tracker)
         _ = await agent_planner.run()
 
         # ----------------------
@@ -67,13 +69,13 @@ async def main() -> None:
             # -----------------------
             # Agent ME
             # -----------------------
-            agent_me = init_agent_me(state, tracker, env)
+            agent_me = OOAgentMe(state, tracker, env)
             _ = await agent_me.run()
 
             # -----------------------
             # Agent Replanner
             # -----------------------
-            agent_replanner = init_agent_replanner(state, tracker)
+            agent_replanner = OOAgentReplanner(state, tracker)
             result = await agent_replanner.run()
             
             if result == "ALL DONE":
@@ -129,13 +131,13 @@ async def main() -> None:
 
     except asyncio.CancelledError:
         logger.warning("Task was cancelled.")
-    
+
     # finally:
     #     logger.info("Stopping recording and saving the file...")
     #     tracker.end_recording()
 
 if __name__ == "__main__":
     try:
-        asyncio.run(main())
+        asyncio.run(start())
     except KeyboardInterrupt:
         logger.info("KeyboardInterrupt received. Cleaning up before exit...")

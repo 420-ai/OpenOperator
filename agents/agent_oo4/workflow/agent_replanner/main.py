@@ -71,8 +71,3 @@ class OOAgentReplanner:
         # endregion
 
         return result
-
-
-def init_agent_replanner(state: State, tracker: Tracker) -> OOAgentReplanner:
-    logger.debug("Initializing agent-replanner...")
-    return OOAgentReplanner(state, tracker)

@@ -195,8 +195,8 @@ def capture_screen_with_cursor():
         screenshot = pyautogui.screenshot()
         cursor_x, cursor_y = pyautogui.position()
         cursor = Image.open(cursor_path)
-        # make the cursor smaller
-        cursor = cursor.resize((int(cursor.width / 1.5), int(cursor.height / 1.5)))
+        # make the cursor bigger
+        cursor = cursor.resize((int(cursor.width * 2), int(cursor.height * 2)))
         screenshot.paste(cursor, (cursor_x, cursor_y), cursor)
         screenshot.save(file_path)
     elif user_platform == "Linux":
