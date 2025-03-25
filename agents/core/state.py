@@ -447,6 +447,25 @@ class State:
             data["plan_step"]["iterations"] = self.get_current_plan_step_iterations_data()
 
         return data
+    
+    def get_plan_step_text(self) -> Optional[str]:
+        """
+        Retrieve the plan step text content.
+        
+        Returns:
+            The content of plan_step.txt or None if not found
+        """
+        if self.current_plan_version is None:
+            raise ValueError("No plan version selected")
+
+        plan_step_dir = self._get_plan_step_dir(self.current_plan_version)
+        plan_step_text_path = os.path.join(plan_step_dir, "plan_step.txt")
+        
+        if os.path.exists(plan_step_text_path):
+            with open(plan_step_text_path, "r") as f:
+                return f.read()
+        
+        return None
 
     def get_current_plan_step_iterations_data(self) -> List[Dict[str, Optional[str]]]:
         """
