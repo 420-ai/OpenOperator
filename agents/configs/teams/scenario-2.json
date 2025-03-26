@@ -1,5 +1,5 @@
 {
-  "instruction": "Find a list of chats inside Microsoft Teams. Switch between the chats 2 times. Summarize the latest chat thread in 3 paragraphs with bullet points. Reply with that information to the results.",
+  "instruction": "Find a list of chats inside Microsoft Teams. Switch between the chats 5 times. Summarize the latest chat thread in 3 paragraphs with bullet points. Reply with that information to the results.",
   "workflow": {
     "params": {
       "max_plan_versions": 20,
