@@ -43,7 +43,7 @@ async def start() -> None:
 
         # Trigger the start functions
         executor = FunctionExecutor()
-        executor.execute_from_list(config.environment.start)
+        executor.execute_from_list(config.environment.start, state)
 
          # Initialize Windows VM environment
         env = ComputerEnv(state, tracker)
