@@ -10,6 +10,7 @@ from agent_oo1.logging_setup import configure_logging
 from agent_oo1.workflow.agent_me import OOAgentMe
 from datetime import datetime
 from dotenv import load_dotenv
+
 load_dotenv()
 
 d = os.path.dirname(__file__)
@@ -31,6 +32,7 @@ config.load("teams", "scenario-2")
 # tracker.save_config(config)
 state.save_config(config)
 
+
 # Main function
 async def start() -> None:
     try:
@@ -39,7 +41,7 @@ async def start() -> None:
 
         # Trigger the start functions
         executor = FunctionExecutor()
-        executor.execute_from_list(config.environment.start)
+        executor.execute_from_list(config.environment.start, state=state)
 
         # -----------------------
         # Agent ME
@@ -48,7 +50,7 @@ async def start() -> None:
         _ = await agent_me.run()
 
         # Trigger the end functions
-        executor.execute_from_list(config.environment.end)
+        executor.execute_from_list(config.environment.end, state=state)
 
     except Exception as e:
         logger.error(f"An error occurred: {e}")
@@ -60,6 +62,7 @@ async def start() -> None:
     # finally:
     #     logger.info("Stopping recording and saving the file...")
     #     tracker.end_recording()
+
 
 if __name__ == "__main__":
     try:

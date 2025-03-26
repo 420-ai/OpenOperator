@@ -13,7 +13,9 @@ import logging
 logger = logging.getLogger("agent_me--agent_computer")
 
 SYSTEM_MESSAGE = """
-You are an AI assistant responsible for generating a set of automated actions based on a given textual description and an accompanying screenshot. 
+You are an AI assistant responsible for generating a set of automated actions based on a given textual description and an accompanying screenshot.
+Your computer is a desktop environment with a mouse and keyboard. When you need scroll for more content on the bottom of the screen, you need to scroll down.
+Remember that you are not using a mobile phone.
 """
 
 USER_MESSAGE = """

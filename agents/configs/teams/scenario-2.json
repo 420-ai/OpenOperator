@@ -1,8 +1,8 @@
 {
-  "instruction": "Summarize the **whole** conversation with 'Casey Bennett' in MS Teams. Scroll through the chat history to ensure all messages are included in the summary. The summary should be concise and cover all key points discussed in the conversation.",
+  "instruction": "Find a list of chats inside Microsoft Teams. Switch between the chats 2 times. Summarize the latest chat thread in 3 paragraphs with bullet points. Reply with that information to the results.",
   "workflow": {
     "params": {
-      "max_plan_versions": 10,
+      "max_plan_versions": 20,
       "max_plan_step_iterations": 3,
       "max_plan_step_actions": 5
     }
@@ -32,8 +32,19 @@
       {
         "func": "close_all_windows",
         "args": null
+      },
+      {
+        "func": "get_evaluation_results",
+        "args": {
+          "evaluation": [
+            {
+              "evaluator": "teams_scenarios",
+              "scenarios": ["chat_switch"],
+              "telemetry_file": "/data/logs/teams-telemetry/teams-telemetry-0.log"
+            }
+          ]
+        }
       }
     ]
-  },
-  "evaluation": {}
+  }
 }

@@ -55,6 +55,9 @@ class State:
         with open(os.path.join(self.run_dir, "task_result.txt"), "w") as f:
             f.write(task_result)
         
+    def save_evaluation_result(self, evaluation_result: str):
+        with open(os.path.join(self.run_dir, "evaluation_result.txt"), "w") as f:
+            f.write(evaluation_result)
 
     # ----------------------------------------------------
     # Plan version management
