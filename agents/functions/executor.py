@@ -14,7 +14,7 @@ class FunctionExecutor:
 
     def execute(self, item: dict, **kwargs):
         func_name = item.get("func")
-        args = item.get("args", {})
+        args = item.get("args") or {}
 
         if not func_name:
             print("Warning: Missing 'func' name in item.")
@@ -46,6 +46,7 @@ if __name__ == "__main__":
     # Example usage
     function_list = [
         {"func": "example_function", "args": {"arg1": "value1"}},
-        {"func": "another_function"}
+        {"func": "another_function", "args": None}
     ]
     executor.execute_from_list(function_list, extra_arg="extra_value")
+    

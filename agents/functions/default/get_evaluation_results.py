@@ -15,7 +15,7 @@ def get_evaluation_results(evaluation: Any, state: State):
 
     evaulator_url = os.getenv("EVALUATOR_URL", "http://localhost:5053")
 
-    response = requests.post(f"{evaulator_url}/evaluate", json=evaluation)
+    response = requests.post(f"{evaulator_url}/evaluate", json={"evaluation": evaluation})
 
     if response.status_code == 200:
         try:
@@ -42,15 +42,14 @@ if __name__ == "__main__":
     ## setup logging
     logging.basicConfig(level=logging.INFO)
 
-    evaluation = {
-        "evaluation": [
-            {
-                "evaluator": "teams_scenarios",
-                "scenarios": ["chat_switch"],
-                "telemetry_file": r"/data/logs/teams-telemetry/teams-telemetry-0.log"
-            }
-        ]
-    }
+    evaluation = [
+        {
+            "evaluator": "teams_scenarios",
+            "scenarios": ["chat_switch"],
+            "telemetry_file": r"/data/logs/teams-telemetry/teams-telemetry-0.log"
+        }
+    ]
+    
 
     class MockState:
         def save_evaluation_result(self, y): 
