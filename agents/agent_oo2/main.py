@@ -41,7 +41,7 @@ async def start() -> None:
 
         # Trigger the start functions
         executor = FunctionExecutor()
-        executor.execute_from_list(config.environment.start)
+        executor.execute_from_list(config.environment.start, state=state)
 
         # -----------------------
         # Planner Node
@@ -104,7 +104,7 @@ async def start() -> None:
         # endregion
 
         # Trigger the end functions
-        executor.execute_from_list(config.environment.end)
+        executor.execute_from_list(config.environment.end, state=state)
 
     except Exception as e:
         logger.error(f"An error occurred: {e}")

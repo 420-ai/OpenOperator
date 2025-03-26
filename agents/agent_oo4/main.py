@@ -43,7 +43,7 @@ async def start() -> None:
 
         # Trigger the start functions
         executor = FunctionExecutor()
-        executor.execute_from_list(config.environment.start, state)
+        executor.execute_from_list(config.environment.start, state=state)
 
          # Initialize Windows VM environment
         env = ComputerEnv(state, tracker)
@@ -127,7 +127,7 @@ async def start() -> None:
         # endregion
 
         # Trigger the end functions
-        executor.execute_from_list(config.environment.end)
+        executor.execute_from_list(config.environment.end, state=state)
 
     except Exception as e:
         logger.error(f"An error occurred: {e}")
