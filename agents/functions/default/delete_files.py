@@ -1,8 +1,8 @@
 import os
 from typing import List
+from core.state import State
 
-
-def delete_files(paths: List[str]):
+def delete_files(paths: List[str], state: State):
     """
     Delete files from the filesystem.
 

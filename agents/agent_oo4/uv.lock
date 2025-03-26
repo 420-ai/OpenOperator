@@ -184,6 +184,12 @@ wheels = [
 name = "functions"
 version = "0.1.0"
 source = { virtual = "../functions" }
+dependencies = [
+    { name = "core" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "core", virtual = "../core" }]
 
 [[package]]
 name = "gymnasium"
