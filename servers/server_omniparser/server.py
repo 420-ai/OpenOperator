@@ -1,4 +1,3 @@
-import click
 import time
 from fastapi import FastAPI
 from pydantic import BaseModel
@@ -6,18 +5,37 @@ from os import path
 from typing import TypedDict
 from download import download_omniparser
 import os
+from datetime import datetime
 from torch import cuda
-
 from util.omniparser import Omniparser
+import uvicorn
+import traceback
+import logging
+from logging_setup import configure_logging
+
+from dotenv import load_dotenv
+load_dotenv()
+
+# Port
+port = os.getenv("PORT")
+print(port)
+
+# Setup logging
+logs_path = os.getenv("LOG_PATH")
+print(logs_path)
+os.makedirs(logs_path, exist_ok=True)
+
+configure_logging(logs_path)
+logger = logging.getLogger("server_omniparser")
 
 root_dir = path.dirname(__file__)
 weights_dir = path.join(root_dir, 'weights')
 
 if path.exists(weights_dir) == False:
     os.makedirs(weights_dir, exist_ok=True)
-    print('weights folder not found, downloading models...')
+    logger.info('weights folder not found, downloading models...')
     download_omniparser(weights_dir)
-    print('models downloaded successfully!')
+    logger.info('models downloaded successfully!')
 
 class Config(TypedDict):
     som_model_path: str
@@ -49,11 +67,11 @@ app = FastAPI()
 
 @app.post('/parse')
 async def parse(parse_request: ParseRequest):
-    print('start parsing...')
+    logger.debug('start parsing...')
     start = time.time()
     dino_labled_img, parsed_content_list = omniparser.parse(parse_request.base64_image)
     latency = time.time() - start
-    print('time:', latency)
+    logger.debug('time:', latency)
     return {
         'som_image_base64': dino_labled_img,
         'parsed_content_list': parsed_content_list,
@@ -61,17 +79,27 @@ async def parse(parse_request: ParseRequest):
     }
 
 
-@app.get('/probe')
-async def probe():
-    return {'message': 'Omniparser API ready'}
+@app.get('/healthcheck')
+async def healthcheck():
+    return {
+        "status": "Successful", 
+        "message": "Service is operational!"
+    }
 
-@click.command()
-@click.option('--host', default='localhost', help='Host to run the server on.')
-@click.option('--port', default=8000, help='Port to run the server on.')
-def main(host: str, port: int):
-    """Run the FastAPI server."""
-    import uvicorn
-    uvicorn.run("server:app", host=host, port=port, reload=True, log_config=None)
+def main():
+    logger.info(f"Server started on port {port} at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    try:
+        uvicorn.run(
+            "server:app", 
+            host="0.0.0.0",  
+            port=port, 
+            reload=False,
+            log_config=None,  # Disable Uvicorn's default logging setup
+        )
+    except Exception as e:
+        logger.error(f"Error starting server: {e}")
+        error_traceback = traceback.format_exc()
+        logger.error(error_traceback)
 
 if __name__ == '__main__':
     main()

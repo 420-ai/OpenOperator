@@ -7,6 +7,7 @@ from typing import Any, Dict, List
 import requests
 from io import BytesIO
 from PIL import Image
+import time
 
 logger = logging.getLogger("core.clients.som.omniparser")
 
@@ -56,7 +57,15 @@ class OmniparserClient:
         w, h = screenshot.size
 
         base64_image = self._encode_image(screenshot)
+
+        start = time.time()
+        # ----------------------------------------------------
+        # Send the image to the server and get the response
         response = self._send_image_to_server(base64_image)
+        # ----------------------------------------------------
+        end = time.time()
+        duration = end - start
+        logger.info(f"Analysing image took {duration:.4f} seconds to complete.")
         
         formatted_output = []
         for i, item in enumerate(response["parsed_content_list"]):
