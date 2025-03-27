@@ -24,12 +24,10 @@ try:
 
     # Port
     port = os.getenv("PORT")
-
     print(port)
 
     # Setup logging
     logs_path = os.getenv("LOG_PATH")
-
     print(logs_path)
 
     configure_logging(logs_path)
@@ -222,18 +220,18 @@ try:
         logger.info(f"Server started on port {port} at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         try:
             uvicorn.run(
-                    "server:app", 
-                    host="0.0.0.0", 
-                    port=port, 
-                    reload=False,
-                    log_config=None,  # Disable Uvicorn's default logging setup
-                )
+                "server:app", 
+                host="0.0.0.0", 
+                port=port, 
+                reload=False,
+                log_config=None,  # Disable Uvicorn's default logging setup
+            )
         except Exception as e:
             logger.error(f"Error starting server: {e}")
             error_traceback = traceback.format_exc()
-            print(error_traceback)
+            logger.error(error_traceback)
 
 except Exception as ee:
-    print("An unexpected error occurred:", ee)
+    logger.error("An unexpected error occurred:", ee)
     error_traceback = traceback.format_exc()
-    print(error_traceback)
+    logger.error(error_traceback)
