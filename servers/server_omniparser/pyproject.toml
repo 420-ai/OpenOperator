@@ -18,10 +18,11 @@ dependencies = [
     "opencv-python>=4.8.1.78",
     "paddleocr>=2.9.1",
     "paddlepaddle>=3.0.0rc1",
+    "python-dotenv>=1.1.0",
     "supervision>=0.24.0",
     "timm>=1.0.15",
     "torch>=2.2.0",
-    "torchvision>=0.21.0",
+    "torchvision==0.20.1",
     "transformers>=4.46.1",
     "ultralytics>=8.3.80",
     "uvicorn>=0.34.0",
@@ -36,11 +37,13 @@ packages = ["server"]
 
 [tool.uv.sources]
 torch = [
-  { index = "pytorch-cpu", marker = "sys_platform != 'win32'" },
+  { index = "pytorch-cu121", marker = "sys_platform == 'linux'" },
+  { index = "pytorch-cpu", marker = "sys_platform == 'darwin'" },
   { index = "pytorch-cu124", marker = "sys_platform == 'win32'" },
 ]
 torchvision = [
-  { index = "pytorch-cpu", marker = "sys_platform != 'win32'" },
+  { index = "pytorch-cu121", marker = "sys_platform == 'linux'" },
+  { index = "pytorch-cpu", marker = "sys_platform == 'darwin'" },
   { index = "pytorch-cu124", marker = "sys_platform == 'win32'" },
 ]
 
@@ -52,4 +55,9 @@ explicit = true
 [[tool.uv.index]]
 name = "pytorch-cu124"
 url = "https://download.pytorch.org/whl/cu124"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cu121"
+url = "https://download.pytorch.org/whl/cu121"
 explicit = true

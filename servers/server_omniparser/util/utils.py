@@ -63,7 +63,6 @@ def get_yolo_model(model_path):
     from ultralytics import YOLO
 
     # Load the model.
-    print(model_path)
     model = YOLO(model_path)
     return model
 

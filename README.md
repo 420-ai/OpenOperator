@@ -44,3 +44,9 @@ $ uv sync
 $ cd ..
 $ uv run -m agent_oo4.main
 ```
+
+# Docker
+
+```bash
+docker compose up
+```

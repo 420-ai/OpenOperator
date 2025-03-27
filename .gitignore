@@ -16,6 +16,7 @@ Zone.Identifier
 !servers/server_computer_control/.env
 !servers/server_network_proxy/.env
 !servers/server_evaluator/.env
+!servers/server_omniparser/.env
 !computers/windows/docker/data/init/.env
 !computers/windows/parallels_vm/data/init/.env
 
