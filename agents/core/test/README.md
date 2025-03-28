@@ -31,7 +31,7 @@ Whoallaa, now you can run the tests.
 
 ## Run
 
-You can run any test via comman `python -m core.tests.<module>.<test>`
+You can run any test via comman `python -m core.test.<module>.<test>`
 
 # LLM Clients tests
 
