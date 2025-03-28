@@ -1,10 +1,9 @@
-print("Starting server...2")
-
 import os
 import logging
 import json
 import uvicorn
 import setproctitle
+from pydantic import AnyUrl
 
 # MCP
 from mcp.server.lowlevel import Server
@@ -12,11 +11,13 @@ import mcp.types as types
 from mcp.server.sse import SseServerTransport
 from starlette.applications import Starlette
 from starlette.routing import Mount, Route
-
+from mcp.server.lowlevel.helper_types import ReadResourceContents
+ 
 # Tools
-from tools.get_stock_price import get_stock_price
-from tools.get_dividend_date import get_dividend_date
+from tools.execute import execute_python_command
 
+# Resources
+from resources.get_screenshot import get_screenshot_with_cursor
 
 # Port
 port = os.getenv("PORT")
@@ -40,6 +41,12 @@ def serve():
 
     app = Server("mcp-computer-control")
 
+    # ----------------------------------
+    # ----------------------------------
+    # Tools
+    # ----------------------------------
+    # ----------------------------------
+
     @app.call_tool()
     async def fetch_tool(
         name: str, arguments: dict
@@ -50,10 +57,8 @@ def serve():
         print(arguments)
 
         result = None
-        if name == "get_stock_price":
-            result = get_stock_price(arguments["ticker"])
-        elif name == "get_dividend_date":
-            result = get_dividend_date(arguments["ticker"])
+        if name == "execute_python_command":
+            result = execute_python_command(arguments["command"])
 
         print("Result:")
         print(result)
@@ -78,13 +83,58 @@ def serve():
                         }
                     },
                 },
-            ),
-            types.Tool(
-                name="get_screenshot",
-                description="Get a screenshot of the computer screen.",
-                inputSchema=None
             )
         ]
+
+
+    # ----------------------------------
+    # ----------------------------------
+    # Resources
+    # ----------------------------------
+    # ----------------------------------
+
+    
+    @app.list_resources()
+    async def list_resources() -> list[types.Resource]:
+        return [
+            types.Resource(
+                uri="string:///hello",
+                name="Sample Text",
+                mimeType="text/plain"
+            ),
+            types.Resource(
+                uri="binary:///screenshot",
+                name="Screenshot",
+                mimeType="image/png"
+            ),
+        ]
+    
+    @app.read_resource()
+    async def handle_read_resource(uri: AnyUrl) -> list[ReadResourceContents]:
+
+        # Need to convert to string
+        uri = str(uri)
+
+        if uri == "string:///hello":
+            return [
+                ReadResourceContents(
+                    content="Hello",
+                    mime_type="text/plain"
+                )
+            ]
+        elif uri == "binary:///screenshot":
+            image_bytes = get_screenshot_with_cursor()
+            return [
+                ReadResourceContents(
+                    content=image_bytes,
+                    mime_type="image/png"
+                )
+            ]
+
+        raise ValueError(f"Unknown resource: {uri}")
+
+
+
 
     # ---------------------------------
     # SSE Server Transport
