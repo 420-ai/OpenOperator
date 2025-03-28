@@ -34,12 +34,12 @@ try:
     logs_path = os.getenv("LOG_PATH")
     print("LOG_PATH", logs_path)
     configure_logging(logs_path)
-    logger = logging.getLogger("server_computer_control_mcp")
+    logger = logging.getLogger("mcp_server_computer_control")
     print("Logging configured")
 
 
     # Named the process for easier identification
-    setproctitle.setproctitle("server_computer_control_MCP") 
+    setproctitle.setproctitle("MCP_server_computer_control") 
 
 
     # ----------------------------------
@@ -57,13 +57,13 @@ try:
     async def fetch_tool(
         name: str, arguments: dict
     ) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
-        logger.debug(f"CALL TOOL: {name}, {arguments}")
+        logger.info(f"CALL TOOL: {name}, {arguments}")
 
         result = None
         if name == "execute_python_command":
             result = execute_python_command(arguments["command"])
 
-        logger.debug(f"RESULT: {result}")
+        logger.info(f"RESULT: {result}")
 
         result_json = json.dumps(result)
 
@@ -71,6 +71,7 @@ try:
 
     @app.list_tools()
     async def list_tools() -> list[types.Tool]:
+        logger.info("LIST TOOLS")
         return [
             types.Tool(
                 name="execute_python_command",
@@ -98,6 +99,7 @@ try:
 
     @app.list_resources()
     async def list_resources() -> list[types.Resource]:
+        logger.info("LIST RESOURCES")
         return [
             types.Resource(
                 uri="string:///hello",
