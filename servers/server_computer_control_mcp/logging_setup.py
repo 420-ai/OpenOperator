@@ -4,7 +4,7 @@ import os
 def configure_logging(directory: str) -> None:
 
     os.makedirs(directory, exist_ok=True)
-    LOG_FILE = os.path.join(directory, "server_browser_control.log")
+    LOG_FILE = os.path.join(directory, "server_computer_control_mcp.log")
 
     LOGGING_CONFIG = {
         "version": 1,

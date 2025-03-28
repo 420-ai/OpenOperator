@@ -24,15 +24,13 @@ try:
 
     # Port
     port = os.getenv("PORT")
-    print(port)
+    print("PORT", port)
 
     # Setup logging
     logs_path = os.getenv("LOG_PATH")
-    print(logs_path)
-
+    print("LOG_PATH", logs_path)
     configure_logging(logs_path)
     logger = logging.getLogger("server_browser_control")
-
     print("Logging configured")
 
     # Named the process for easier identification

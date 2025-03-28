@@ -3,6 +3,8 @@ import os
 
 
 def configure_logging(directory: str) -> None:
+
+    os.makedirs(directory, exist_ok=True)
     LOG_FILE = os.path.join(directory, "server_network_proxy.log")
 
     LOGGING_CONFIG = {

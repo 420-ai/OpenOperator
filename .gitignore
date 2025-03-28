@@ -14,6 +14,7 @@ Zone.Identifier
 .env
 !servers/server_browser_control/.env
 !servers/server_computer_control/.env
+!servers/server_computer_control_mcp/.env
 !servers/server_network_proxy/.env
 !servers/server_evaluator/.env
 !servers/server_omniparser/.env

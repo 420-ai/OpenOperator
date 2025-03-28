@@ -3,6 +3,7 @@ import os
 
 def configure_logging(directory: str) -> None:
 
+    os.makedirs(directory, exist_ok=True)
     LOG_FILE = os.path.join(directory, "server_omniparser.log")
 
     LOGGING_CONFIG = {

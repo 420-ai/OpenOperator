@@ -5,6 +5,7 @@ import logging
 from core.state import State
 from core.tracker import Tracker
 from core.config import OOConfig
+from core.clients.mcp.computer.client import start as start_mcp_client
 from functions.executor import FunctionExecutor
 from agent_oo1.logging_setup import configure_logging
 from agent_oo1.workflow.agent_me import OOAgentMe
@@ -38,6 +39,10 @@ async def start() -> None:
     try:
         logger.info("Starting task execution...")
         # tracker.start_recording()
+
+        await start_mcp_client()
+
+        sys.exit(0)
 
         # Trigger the start functions
         executor = FunctionExecutor()
