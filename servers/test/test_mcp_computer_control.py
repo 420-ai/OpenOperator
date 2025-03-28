@@ -22,6 +22,7 @@ async def test_list_tools_async():
         async with ClientSession(*streams) as session:
             print("Listing tools...")
             try:
+                await session.initialize()
                 tools_list = await wait_for(session.list_tools(), timeout=5.0)
                 for tool in tools_list.tools:
                     print(f"Tool name: {tool.name}, Description: {tool.description}")
@@ -33,7 +34,8 @@ async def test_list_resources_async():
         async with ClientSession(*streams) as session:
             print("Listing resources...")
             try:
-                resources = await session.list_resources()
+                await session.initialize()
+                resources = await wait_for(session.list_resources(), timeout=5.0)
                 for resource in resources.resources:
                     print(f"Resource URI: {resource.uri}, Name: {resource.name}, MIMEType: {resource.mimeType}")
             except TimeoutError:
