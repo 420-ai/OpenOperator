@@ -66,7 +66,7 @@ async def main():
                 print(f"\n🔧 Calling tool: {case['name']} with arguments {case['arguments']}")
                 result = await client.call_tool(case["name"], case["arguments"])
                 assert result is not None, f"No result from {case['name']}"
-                for content in result.contents:
+                for content in result:
                     if hasattr(content, "text"):
                         print(f"✅ Output: {content.text}")
                     else:

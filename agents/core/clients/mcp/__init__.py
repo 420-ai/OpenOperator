@@ -1,1 +1,1 @@
-from mcp_client import McpServerClient
+from .mcp_client import McpServerClient

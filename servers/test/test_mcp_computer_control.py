@@ -49,7 +49,7 @@ async def test_call_tools_async():
             test_cases = [
                 {
                     "name": "mouse_move",
-                    "arguments": {"x": 100, "y": 200},
+                    "arguments": {"x": 300, "y": 200},
                 },
                 {
                     "name": "mouse_scroll",
@@ -82,7 +82,7 @@ async def test_call_tools_async():
                 try:
                     print(f"\n🔧 Calling tool: {test_case['name']}")
                     result = await wait_for(session.call_tool(test_case["name"], test_case["arguments"]), timeout=5.0)
-                    for content in result.contents:
+                    for content in result.content:
                         print(f"✅ Result from {test_case['name']}: {content.text if hasattr(content, 'text') else content}")
                 except TimeoutError:
                     print(f"❌ Timed out calling tool: {test_case['name']}")
