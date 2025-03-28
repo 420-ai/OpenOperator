@@ -11,4 +11,5 @@ dependencies = [
     "python-dotenv>=1.0.1",
     "requests>=2.32.3",
     "pillow>=10.3.0",
+    "mcp>=1.6.0",
 ]
