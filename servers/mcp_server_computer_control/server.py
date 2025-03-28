@@ -19,7 +19,13 @@ from starlette.routing import Mount, Route
 from mcp.server.lowlevel.helper_types import ReadResourceContents
  
 # Tools
-from tools.execute import execute_python_command
+from tools.all_tools import ALL_TOOLS
+from tools.mouse_move import mouse_move
+from tools.mouse_left_click import mouse_left_click
+from tools.mouse_double_click import mouse_double_click
+from tools.mouse_scroll import mouse_scroll
+from tools.keyboard_type import keyboard_type
+from tools.keyboard_hotkeys import keyboard_hotkeys
 
 # Resources
 from resources.get_screenshot import get_screenshot_with_cursor
@@ -60,8 +66,34 @@ try:
         logger.info(f"CALL TOOL: {name}, {arguments}")
 
         result = None
-        if name == "execute_python_command":
-            result = execute_python_command(arguments["command"])
+        if name == "mouse_move":
+            x = arguments["x"]
+            y = arguments["y"]
+            result = mouse_move(x=x, y=y)
+
+        elif name == "mouse_scroll":
+            direction = arguments["direction"]
+            amount = arguments["amount"]
+            delay = arguments["delay"]
+            steps = arguments["steps"]
+            result = mouse_scroll(direction=direction, amount=amount, delay=delay, steps=steps)
+
+        elif name == "mouse_left_click":
+            result = mouse_left_click()
+
+        elif name == "mouse_double_click":
+            result = mouse_double_click()
+
+        elif name == "keyboard_type":
+            text = arguments["text"]
+            result = keyboard_type(text=text)
+
+        elif name == "keyboard_hotkeys":
+            hotkeys = arguments["hotkeys"]
+            result = keyboard_hotkeys(hotkeys=hotkeys)
+
+        else:
+            result = f"Tool '{name}' not recognized."
 
         logger.info(f"RESULT: {result}")
 
@@ -72,22 +104,7 @@ try:
     @app.list_tools()
     async def list_tools() -> list[types.Tool]:
         logger.info("LIST TOOLS")
-        return [
-            types.Tool(
-                name="execute_python_command",
-                description="Executes a Python command on the computer.",
-                inputSchema={
-                    "type": "object",
-                    "required": ["command"],
-                    "properties": {
-                        "command": {
-                            "type": "string",
-                            "description": "The Python command to execute.",
-                        }
-                    },
-                },
-            )
-        ]
+        return ALL_TOOLS
 
 
     # ----------------------------------
@@ -95,7 +112,6 @@ try:
     # Resources
     # ----------------------------------
     # ----------------------------------
-
 
     @app.list_resources()
     async def list_resources() -> list[types.Resource]:

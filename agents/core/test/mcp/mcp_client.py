@@ -1,5 +1,5 @@
 import asyncio
-from core.clients.mcp.mcp_client import McpServerClient 
+from core.clients.mcp import McpServerClient 
 
 async def main():
     client = McpServerClient("http://127.0.0.1:5055")
