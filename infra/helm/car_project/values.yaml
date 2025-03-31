@@ -1,0 +1,24 @@
+namespace: car
+
+carApi:
+  name: car-api
+  image: lukaskellerstein/car-api:0.0.1
+  port: 8000
+  replicas: 1
+
+carApp:
+  name: car-app
+  image: lukaskellerstein/car-app:0.0.1
+  replicas: 1
+
+carDb:
+  name: car-db
+  image: mongo
+  port: 27017
+  replicas: 1
+
+carUi:
+  name: car-ui
+  image: lukaskellerstein/car-ui:0.0.2
+  port: 5000
+  replicas: 1

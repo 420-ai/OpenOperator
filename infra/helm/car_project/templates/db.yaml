@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.carDb.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.carDb.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.carDb.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.carDb.name }}
+    spec:
+      containers:
+        - name: mongo
+          image: {{ .Values.carDb.image }}
+          ports:
+            - containerPort: {{ .Values.carDb.port | int }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.carDb.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    app: {{ .Values.carDb.name }}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.carDb.port | int }}
+      targetPort: {{ .Values.carDb.port | int }}

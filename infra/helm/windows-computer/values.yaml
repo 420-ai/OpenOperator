@@ -1,0 +1,72 @@
+namespace: computers
+
+url_path: "computer1"
+web:
+  port: 8006
+
+image:
+  repository: lukaskellerstein/windows-computer
+  tag: "0.0.2"
+  pullPolicy: IfNotPresent
+
+env:
+  BOOT_MODE: "windows_plain"
+  DEBUG: "y"
+
+resources: {}
+
+ports:
+  - name: http
+    containerPort: 8006
+    protocol: TCP
+  - name: rdp-tcp
+    containerPort: 3389
+    protocol: TCP
+  - name: rdp-udp
+    containerPort: 3389
+    protocol: UDP
+  - name: debug
+    containerPort: 5050
+  - name: service1
+    containerPort: 5051
+  - name: service2
+    containerPort: 5052
+  - name: service3
+    containerPort: 5053
+  - name: service4
+    containerPort: 5055
+  - name: devtools
+    containerPort: 9222
+
+azureFileSecret:
+  enabled: true
+  name: azure-files-secret
+  storageAccountName: "oostorage4444"
+  storageAccountKey: "<STORAGE_KEY>"
+
+azureFileShares:
+  - name: server-browser-control
+    shareName: server_browser_control
+    mountPath: /data/server_browser_control
+    size: 5Gi
+  - name: server-computer-control
+    shareName: server_computer_control
+    mountPath: /data/server_computer_control
+    size: 5Gi
+  - name: mcp-server-computer-control
+    shareName: mcp_server_computer_control
+    mountPath: /data/mcp_server_computer_control
+    size: 5Gi
+  - name: server-evaluator
+    shareName: server_evaluator
+    mountPath: /data/server_evaluator
+    size: 5Gi
+  - name: server-network-proxy
+    shareName: server_network_proxy
+    mountPath: /data/server_network_proxy
+    size: 5Gi
+  - name: storage
+    shareName: storage
+    mountPath: /storage
+    size: 10Gi
+

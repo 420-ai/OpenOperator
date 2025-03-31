@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.carUi.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.carUi.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.carUi.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.carUi.name }}
+    spec:
+      containers:
+        - name: {{ .Values.carUi.name }}
+          image: {{ .Values.carUi.image }}
+          env:
+            - name: PORT
+              value: "{{ .Values.carUi.port }}"
+            - name: API_URL
+              value: {{ .Values.carApi.name }}
+            - name: API_PORT
+              value: "{{ .Values.carApi.port }}"
+          ports:
+            - containerPort: {{ .Values.carUi.port | int }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.carUi.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    app: {{ .Values.carUi.name }}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.carUi.port | int }}
+      targetPort: {{ .Values.carUi.port | int }}

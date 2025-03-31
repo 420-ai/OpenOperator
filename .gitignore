@@ -85,3 +85,20 @@ models/magma/video/*.png
 
 # UI
 **/ui/**/recordings/
+
+# Terraform specific files --
+
+# Local .terraform directory
+**/.terraform/
+
+# Terraform plan and state
+**/*.tfstate
+**/*.tfstate.backup
+**/*.tfplan
+**/*.tfapply
+**/.terraform.tfstate.lock.info
+
+# Crash logs
+**/crash.log
+
+

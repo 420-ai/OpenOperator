@@ -1,0 +1,5 @@
+apiVersion: v2
+name: traefik
+description: Helm subchart for deploying Traefik
+version: 0.1.0
+appVersion: "3.3"

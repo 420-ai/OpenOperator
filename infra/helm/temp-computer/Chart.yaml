@@ -1,0 +1,6 @@
+apiVersion: v2
+name: tempcomputer
+description: Helm chart for tempcomputer container
+type: application
+version: 0.1.0
+appVersion: "0.0.2"

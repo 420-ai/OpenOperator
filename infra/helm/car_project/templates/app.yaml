@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.carApp.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.carApp.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.carApp.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.carApp.name }}
+    spec:
+      containers:
+        - name: {{ .Values.carApp.name }}
+          image: {{ .Values.carApp.image }}
+          env:
+            - name: API_URL
+              value: {{ .Values.carApi.name }}
+            - name: API_PORT
+              value: "{{ .Values.carApi.port }}"

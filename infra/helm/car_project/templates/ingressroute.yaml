@@ -1,0 +1,27 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-cars-prefix
+  namespace: {{ .Values.namespace }}
+spec:
+  stripPrefix:
+    prefixes:
+      - /cars
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: car-ui-ingressroute
+  namespace: {{ .Values.namespace }}
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: PathPrefix(`/cars`)
+      kind: Rule
+      services:
+        - name: {{ .Values.carUi.name }}
+          port: {{ .Values.carUi.port }}
+      middlewares:
+        - name: strip-cars-prefix
+          namespace: {{ .Values.namespace }}
