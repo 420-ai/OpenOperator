@@ -5,8 +5,7 @@ import json
 from io import BytesIO
 from PIL import Image
 
-# BASE_URL = "http://127.0.0.1:8000"
-BASE_URL = "http://omniparser-server-app.wittyocean-011afa73.westus3.azurecontainerapps.io/"
+BASE_URL = "http://127.0.0.1:8000"
 
 testimg_dir = "test-img"
 parsed_dir = "parsed"
