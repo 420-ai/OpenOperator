@@ -1,3 +1,0 @@
-namespace: traefik
-image: traefik:v3.3
-replicas: 1
