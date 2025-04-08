@@ -8,9 +8,25 @@ set "USERNAME=Docker"
 echo Using username: %USERNAME%
 
 REM ---------------------------
+REM 0.5) Copy all required files to C:\Data
+REM ---------------------------
+set "SOURCE=\\host.lan\Data"
+set "DEST=C:\Data"
+
+echo Copying data from %SOURCE% to %DEST%... >> "%LOGFILE%"
+robocopy "%SOURCE%" "%DEST%" /MIR /Z /NP /NFL /NDL /NJH /NJS /R:3 /W:5 >> "%LOGFILE%" 2>&1
+
+if %ERRORLEVEL% GEQ 8 (
+    echo File copy failed with error code %ERRORLEVEL%. >> "%LOGFILE%"
+    exit /b %ERRORLEVEL%
+)
+
+echo Files successfully copied to %DEST% >> "%LOGFILE%"
+
+REM ---------------------------
 REM 1) Set up logging
 REM ---------------------------
-set "LOGFILE=\\host.lan\Data\logs\install_bat.txt"
+set "LOGFILE=C:\Data\logs\install_bat.txt"
 echo ================================================= >> "%LOGFILE%"
 echo Installation started at %date% %time% >> "%LOGFILE%"
 echo ================================================= >> "%LOGFILE%"
@@ -60,12 +76,12 @@ REM Update pip
 
 REM Install Python libraries for INITIALIZE
 echo Installing Python libraries for INITIALIZE... >> %LOGFILE%
-"%PYTHON_PATH%" -m pip install -r "\\host.lan\Data\init\requirements.txt" >> "%LOGFILE%" 2>&1
+"%PYTHON_PATH%" -m pip install -r "C:\Data\init\requirements.txt" >> "%LOGFILE%" 2>&1
 echo Python libraries for INITIALIZE installed successfully! >> %LOGFILE%
 
 REM Run INITIALIZE Python script from network path
 echo Running Python script INITIALIZE from network... >> %LOGFILE%
-"%PYTHON_PATH%" "\\host.lan\Data\init\main.py" >> "%LOGFILE%" 2>&1
+"%PYTHON_PATH%" "C:\Data\init\main.py" >> "%LOGFILE%" 2>&1
 echo Python script INITIALIZE executed. >> %LOGFILE%
 
 
@@ -74,23 +90,23 @@ REM ---------------------------
 REM 4) Install Required Python Packages for SERVERS
 REM ---------------------------
 echo Installing Python libraries for 'server computer control' ... >> "%LOGFILE%"
-"%PYTHON_PATH%" -m pip install -r "\\host.lan\Data\server_computer_control\requirements.txt" >> "%LOGFILE%" 2>&1
+"%PYTHON_PATH%" -m pip install -r "C:\Data\server_computer_control\requirements.txt" >> "%LOGFILE%" 2>&1
 echo Python libraries for 'server computer control' were installed >> "%LOGFILE%"
 
 echo Installing Python libraries for 'MCP server computer control' ... >> "%LOGFILE%"
-"%PYTHON_PATH%" -m pip install -r "\\host.lan\Data\mcp_server_computer_control\requirements.txt" >> "%LOGFILE%" 2>&1
+"%PYTHON_PATH%" -m pip install -r "C:\Data\mcp_server_computer_control\requirements.txt" >> "%LOGFILE%" 2>&1
 echo Python libraries for 'MCP server computer control' were installed >> "%LOGFILE%"
 
 echo Installing Python libraries for 'server browser control' ... >> "%LOGFILE%"
-"%PYTHON_PATH%" -m pip install -r "\\host.lan\Data\server_browser_control\requirements.txt" >> "%LOGFILE%" 2>&1
+"%PYTHON_PATH%" -m pip install -r "C:\Data\server_browser_control\requirements.txt" >> "%LOGFILE%" 2>&1
 echo Python libraries for 'server browser control' were installed >> "%LOGFILE%"
 
 echo Installing Python libraries for 'server network proxy' ... >> "%LOGFILE%"
-"%PYTHON_PATH%" -m pip install -r "\\host.lan\Data\server_network_proxy\requirements.txt" >> "%LOGFILE%" 2>&1
+"%PYTHON_PATH%" -m pip install -r "C:\Data\server_network_proxy\requirements.txt" >> "%LOGFILE%" 2>&1
 echo Python libraries for 'server network proxy' were installed >> "%LOGFILE%"
 
 echo Installing Python libraries for 'server evaluator' ... >> "%LOGFILE%"
-"%PYTHON_PATH%" -m pip install -r "\\host.lan\Data\server_evaluator\requirements.txt" >> "%LOGFILE%" 2>&1
+"%PYTHON_PATH%" -m pip install -r "C:\Data\server_evaluator\requirements.txt" >> "%LOGFILE%" 2>&1
 echo Python libraries for 'server evaluator' were installed >> "%LOGFILE%"
 
 
@@ -114,31 +130,31 @@ echo Creating .bat files for servers >> "%LOGFILE%"
 set "STARTUP_SERVER_COMPUTER_CONTROL_BAT=%~dp0start_server_computer_control.bat"
 (
     echo @echo off
-    echo start /b "" "%PYTHONW_PATH%" "\\host.lan\Data\server_computer_control\server.py"
+    echo start /b "" "%PYTHONW_PATH%" "C:\Data\server_computer_control\server.py"
 ) > "%STARTUP_SERVER_COMPUTER_CONTROL_BAT%"
 
 set "STARTUP_MCP_SERVER_COMPUTER_CONTROL_BAT=%~dp0start_mcp_server_computer_control.bat"
 (
     echo @echo off
-    echo start /b "" "%PYTHONW_PATH%" "\\host.lan\Data\mcp_server_computer_control\server.py"
+    echo start /b "" "%PYTHONW_PATH%" "C:\Data\mcp_server_computer_control\server.py"
 ) > "%STARTUP_MCP_SERVER_COMPUTER_CONTROL_BAT%"
 
 set "STARTUP_SERVER_BROWSER_CONTROL_BAT=%~dp0start_server_browser_control.bat"
 (
     echo @echo off
-    echo start /b "" "%PYTHONW_PATH%" "\\host.lan\Data\server_browser_control\server.py"
+    echo start /b "" "%PYTHONW_PATH%" "C:\Data\server_browser_control\server.py"
 ) > "%STARTUP_SERVER_BROWSER_CONTROL_BAT%"
 
 set "STARTUP_SERVER_NETWORK_PROXY_BAT=%~dp0start_server_network_proxy.bat"
 (
     echo @echo off
-    echo start /b "" "%PYTHONW_PATH%" "\\host.lan\Data\server_network_proxy\server.py"
+    echo start /b "" "%PYTHONW_PATH%" "C:\Data\server_network_proxy\server.py"
 ) > "%STARTUP_SERVER_NETWORK_PROXY_BAT%"
 
 set "STARTUP_SERVER_EVALUATOR_BAT=%~dp0start_server_evaluator.bat"
 (
     echo @echo off
-    echo start /b "" "%PYTHONW_PATH%" "\\host.lan\Data\server_evaluator\server.py"
+    echo start /b "" "%PYTHONW_PATH%" "C:\Data\server_evaluator\server.py"
 ) > "%STARTUP_SERVER_EVALUATOR_BAT%"
 echo .bat files for servers created >> "%LOGFILE%"
 
