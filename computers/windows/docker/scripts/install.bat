@@ -8,10 +8,40 @@ set "USERNAME=Docker"
 echo Using username: %USERNAME%
 
 REM ---------------------------
+REM ---------------------------
+REM ---------------------------
+REM ---------------------------
+REM 0.1) Setup log directory (outside C:\Data to prevent robocopy overwrite)
+REM ---------------------------
+set "LOGDIR=C:\InstallLogs"
+set "LOGFILE=%LOGDIR%\install_bat.txt"
+
+if not exist "%LOGDIR%" (
+    mkdir "%LOGDIR%"
+    if %ERRORLEVEL% neq 0 (
+        echo Failed to create log folder at %LOGDIR%. Exiting.
+        exit /b %ERRORLEVEL%
+    )
+)
+
+echo ================================================= >> "%LOGFILE%"
+echo Installation started at %date% %time% >> "%LOGFILE%"
+echo ================================================= >> "%LOGFILE%"
+
+REM ---------------------------
 REM 0.5) Copy all required files to C:\Data
 REM ---------------------------
 set "SOURCE=\\host.lan\Data"
 set "DEST=C:\Data"
+
+echo Ensuring %DEST% exists... >> "%LOGFILE%"
+if not exist "%DEST%" (
+    mkdir "%DEST%"
+    if %ERRORLEVEL% neq 0 (
+        echo Failed to create %DEST% folder. >> "%LOGFILE%"
+        exit /b %ERRORLEVEL%
+    )
+)
 
 echo Copying data from %SOURCE% to %DEST%... >> "%LOGFILE%"
 robocopy "%SOURCE%" "%DEST%" /MIR /Z /NP /NFL /NDL /NJH /NJS /R:3 /W:5 >> "%LOGFILE%" 2>&1
@@ -24,12 +54,8 @@ if %ERRORLEVEL% GEQ 8 (
 echo Files successfully copied to %DEST% >> "%LOGFILE%"
 
 REM ---------------------------
-REM 1) Set up logging
 REM ---------------------------
-set "LOGFILE=C:\Data\logs\install_bat.txt"
-echo ================================================= >> "%LOGFILE%"
-echo Installation started at %date% %time% >> "%LOGFILE%"
-echo ================================================= >> "%LOGFILE%"
+REM ---------------------------
 
 echo Setting up winget links for PATH >> "%LOGFILE%"
 setx PATH "%PATH%;%LOCALAPPDATA%\Microsoft\WinGet\Links" /M >nul
@@ -79,8 +105,8 @@ echo Installing Python libraries for INITIALIZE... >> %LOGFILE%
 "%PYTHON_PATH%" -m pip install -r "C:\Data\init\requirements.txt" >> "%LOGFILE%" 2>&1
 echo Python libraries for INITIALIZE installed successfully! >> %LOGFILE%
 
-REM Run INITIALIZE Python script from network path
-echo Running Python script INITIALIZE from network... >> %LOGFILE%
+REM Run INITIALIZE Python script
+echo Running Python script INITIALIZE ... >> %LOGFILE%
 "%PYTHON_PATH%" "C:\Data\init\main.py" >> "%LOGFILE%" 2>&1
 echo Python script INITIALIZE executed. >> %LOGFILE%
 

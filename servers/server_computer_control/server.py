@@ -347,7 +347,6 @@ def update_computer():
 
     screenshot_str = data.get('screenshot')  
     screenshot = base64_str_to_image(screenshot_str)  
-    # screenshot.save("//host.lan/Data/models/test.png")
 
     scale = data.get('scale')  
     clipboard_content = data.get('clipboard_content')  

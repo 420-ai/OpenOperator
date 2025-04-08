@@ -23,7 +23,7 @@ async def evaluate(request: EvaluationRequest):
 
 
 if __name__ == "__main__":
-    LOG_PATH=os.getenv("LOG_PATH", r"\\host.lan\Data\logs")
+    LOG_PATH=os.getenv("LOG_PATH", r"C:\InstallLogs")
     configure_logging(LOG_PATH)
     logger = logging.getLogger("server_evaluator")
     logger.info("starting eval server...")

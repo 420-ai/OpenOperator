@@ -148,7 +148,7 @@ if __name__ == "__main__":
         except AttributeError:
             pass
 
-    LOG_PATH = os.getenv("LOG_PATH", r"\\host.lan\Data\logs")
+    LOG_PATH = os.getenv("LOG_PATH", r"C:\InstallLogs")
     configure_logging(LOG_PATH)
 
     logger = logging.getLogger("server_network_proxy")

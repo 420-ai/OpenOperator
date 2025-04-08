@@ -217,7 +217,7 @@ def install_with_winget():
                 "winget",
                 "import",
                 "--import-file",
-                r"\\host.lan\data\init\winget-software.json",
+                r"C:\InstallLogs\data\init\winget-software.json",
                 "--accept-source-agreements",
                 "--accept-package-agreements",
                 "--disable-interactivity",
