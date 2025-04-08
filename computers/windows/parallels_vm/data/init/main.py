@@ -7,6 +7,7 @@ import logging
 import pythoncom
 import glob
 import time
+import shutil
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -228,6 +229,25 @@ def install_with_winget():
         logging.error(f"winget installation failed: {e}")
 
 
+def turn_on_teams_flags():
+    try:
+        # copy the "configuration.json" to the installation location: 
+        # \users\docker\appdata\local\Packages\MicrosoftTeams_8wekyb3d8bbwe\LocalCache\Microsoft\MSTeams
+
+        teams_path = r"\users\docker\appdata\local\Packages\MicrosoftTeams_8wekyb3d8bbwe\LocalCache\Microsoft\MSTeams"
+        teams_config_path = os.path.join(
+            teams_path, "configuration.json"
+        )
+
+        shutil.copyfile(
+            os.path.join(os.path.dirname(__file__), "configuration.json"),
+            teams_config_path,
+        )
+
+    except Exception as e:
+        logging.error(f"Failed to copy Teams configuration: {e}")
+        raise
+        
 if __name__ == "__main__":
     try:
         logging.info("Starting Installer...")
@@ -235,6 +255,9 @@ if __name__ == "__main__":
         install_with_winget()
         install_playwright_chromium()
         logging.info("Installation completed successfully.")
+
+        turn_on_teams_flags()
+        logging.info("Teams flags turned on successfully.")
     except Exception as e:
         logging.error(f"Installation failed with error: {e}", exc_info=True)
     finally:
