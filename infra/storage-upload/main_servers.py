@@ -35,12 +35,17 @@ def upload_dir(current_local_path, current_dir_client: ShareDirectoryClient):
     for item in os.listdir(current_local_path):
         full_local_path = os.path.join(current_local_path, item)
         if os.path.isdir(full_local_path):
-            subdir_client = current_dir_client.create_subdirectory(item)
+            try:
+                subdir_client = current_dir_client.create_subdirectory(item)
+            except Exception:
+                subdir_client = current_dir_client.get_subdirectory_client(item)
+                print(f"  Directory {item} already exists, using existing one.")
             upload_dir(full_local_path, subdir_client)
         else:
             with open(full_local_path, "rb") as source_file:
                 current_dir_client.upload_file(item, source_file)
                 print(f"  Uploaded: {full_local_path}")
+
 
 def upload_selected_folders_to_directory(share_client, root_folder, selected_folders):
     root_dir_client = share_client.get_directory_client("")
