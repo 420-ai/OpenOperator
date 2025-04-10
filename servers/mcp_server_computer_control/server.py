@@ -16,6 +16,7 @@ import mcp.types as types
 from mcp.server.sse import SseServerTransport
 from starlette.applications import Starlette
 from starlette.routing import Mount, Route
+from starlette.middleware.base import BaseHTTPMiddleware
 from mcp.server.lowlevel.helper_types import ReadResourceContents
  
 # Tools
@@ -159,7 +160,7 @@ try:
     # SSE Server Transport
     # ---------------------------------
 
-    sse = SseServerTransport("/messages/")
+    sse = SseServerTransport("/mcp-cc/messages/")
 
     async def handle_sse(request):
         async with sse.connect_sse(
@@ -169,13 +170,20 @@ try:
                 streams[0], streams[1], app.create_initialization_options()
             )
 
+    class PrintPathMiddleware(BaseHTTPMiddleware):
+        async def dispatch(self, request, call_next):
+            logger.debug(f"Incoming path: {request.url.path}")
+            return await call_next(request)
+
     starlette_app = Starlette(
         debug=True,
         routes=[
-            Route("/sse", endpoint=handle_sse),
-            Mount("/messages/", app=sse.handle_post_message),
+            Route("/mcp-cc/sse", endpoint=handle_sse),
+            Mount("/mcp-cc/messages", app=sse.handle_post_message), 
+            Mount("/mcp-cc/messages/", app=sse.handle_post_message),
         ],
     )
+    starlette_app.add_middleware(PrintPathMiddleware)
 
     # ---------------------------
     # Run Server

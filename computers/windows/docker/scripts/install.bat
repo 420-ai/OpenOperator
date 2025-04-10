@@ -13,7 +13,7 @@ REM ---------------------------
 REM ---------------------------
 REM 0.1) Setup log directory (outside C:\Data to prevent robocopy overwrite)
 REM ---------------------------
-set "LOGDIR=C:\InstallLogs"
+set "LOGDIR=C:\Logs"
 set "LOGFILE=%LOGDIR%\install_bat.txt"
 
 if not exist "%LOGDIR%" (
@@ -156,31 +156,31 @@ echo Creating .bat files for servers >> "%LOGFILE%"
 set "STARTUP_SERVER_COMPUTER_CONTROL_BAT=%~dp0start_server_computer_control.bat"
 (
     echo @echo off
-    echo start /b "" "%PYTHONW_PATH%" "C:\Data\server_computer_control\server.py"
+    echo start /b "ComputerControlServer" "%PYTHONW_PATH%" "C:\Data\server_computer_control\server.py"
 ) > "%STARTUP_SERVER_COMPUTER_CONTROL_BAT%"
 
 set "STARTUP_MCP_SERVER_COMPUTER_CONTROL_BAT=%~dp0start_mcp_server_computer_control.bat"
 (
     echo @echo off
-    echo start /b "" "%PYTHONW_PATH%" "C:\Data\mcp_server_computer_control\server.py"
+    echo start /b "MCPComputerControlServer" "%PYTHONW_PATH%" "C:\Data\mcp_server_computer_control\server.py"
 ) > "%STARTUP_MCP_SERVER_COMPUTER_CONTROL_BAT%"
 
 set "STARTUP_SERVER_BROWSER_CONTROL_BAT=%~dp0start_server_browser_control.bat"
 (
     echo @echo off
-    echo start /b "" "%PYTHONW_PATH%" "C:\Data\server_browser_control\server.py"
+    echo start /b "BrowserControlServer" "%PYTHONW_PATH%" "C:\Data\server_browser_control\server.py"
 ) > "%STARTUP_SERVER_BROWSER_CONTROL_BAT%"
 
 set "STARTUP_SERVER_NETWORK_PROXY_BAT=%~dp0start_server_network_proxy.bat"
 (
     echo @echo off
-    echo start /b "" "%PYTHONW_PATH%" "C:\Data\server_network_proxy\server.py"
+    echo start /b "NetworkProxyServer" "%PYTHONW_PATH%" "C:\Data\server_network_proxy\server.py"
 ) > "%STARTUP_SERVER_NETWORK_PROXY_BAT%"
 
 set "STARTUP_SERVER_EVALUATOR_BAT=%~dp0start_server_evaluator.bat"
 (
     echo @echo off
-    echo start /b "" "%PYTHONW_PATH%" "C:\Data\server_evaluator\server.py"
+    echo start /b "ServerEvaluatorServer" "%PYTHONW_PATH%" "C:\Data\server_evaluator\server.py"
 ) > "%STARTUP_SERVER_EVALUATOR_BAT%"
 echo .bat files for servers created >> "%LOGFILE%"
 

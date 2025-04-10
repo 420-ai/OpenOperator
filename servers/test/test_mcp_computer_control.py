@@ -4,10 +4,12 @@ from asyncio import TimeoutError, wait_for
 from mcp.client.sse import sse_client
 from mcp import ClientSession
 
-BASE_URL = "http://127.0.0.1:5055"
+# BASE_URL = "http://127.0.0.1:5055"
+BASE_URL = "http://test-11.4.155.164.237.nip.io/mcp-cc"
+
 
 async def test_ping_async():
-    async with sse_client(BASE_URL + "/sse") as streams:
+    async with sse_client(BASE_URL+ "/sse") as streams:
         async with ClientSession(*streams) as session:
             print("Initializing session...")
             init_result = await session.initialize()
