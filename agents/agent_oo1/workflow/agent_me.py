@@ -1,4 +1,5 @@
 import sys
+import os
 from core.state import State
 from core.tracker import Tracker
 from core.clients.llm import LLMClient
@@ -174,6 +175,8 @@ TOOLS = [
 ]
 
 
+model = os.getenv("AZURE_MODEL", "gpt-4o")
+model_deployment = os.getenv("AZURE_MODEL_DEPLOYMENT_NAME", "gpt-4o-deployment")
 
 class OOAgentMe:
     """
@@ -192,7 +195,7 @@ class OOAgentMe:
         self.config = state.get_config()
         self.tracker = tracker  
 
-        self.llm = LLMClient("azure", model="gpt-4o", deployment="gpt-4o-deployment")
+        self.llm = LLMClient("azure", model=model, deployment=model_deployment)
         self.message_store = MessageStore()
 
         self.computer = ComputerClient()
@@ -217,12 +220,21 @@ class OOAgentMe:
         logger.debug("Running...")
         self.state.create_new_plan_version()
 
+        instruction = os.getenv("INSTRUCTION", self.config.instruction)
+
+        print(f"Instruction envVar: {instruction}")
+
+        if instruction == "":
+            instruction = self.config.instruction
+
+        print("final instruction: ", instruction)
+
         # Prepare messages for the LLM
         system_message = Message(role="system", content=SYSTEM_MESSAGE)
         user_message = Message(
                 role="user", 
                 content=USER_MESSAGE_INSTRUCTION.format(
-                    instruction=self.config.instruction
+                    instruction=instruction
                 )
             )
 

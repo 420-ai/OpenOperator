@@ -144,6 +144,7 @@ version = "0.1.0"
 source = { virtual = "../core" }
 dependencies = [
     { name = "anthropic" },
+    { name = "asyncio" },
     { name = "mcp" },
     { name = "ollama" },
     { name = "openai" },
@@ -156,6 +157,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "anthropic", specifier = ">=0.49.0" },
+    { name = "asyncio", specifier = ">=3.4.3" },
     { name = "mcp", specifier = ">=1.6.0" },
     { name = "ollama", specifier = ">=0.4.7" },
     { name = "openai", specifier = ">=1.68.2" },

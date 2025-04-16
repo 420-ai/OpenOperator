@@ -179,7 +179,6 @@ try:
         debug=True,
         routes=[
             Route("/mcp-cc/sse", endpoint=handle_sse),
-            Mount("/mcp-cc/messages", app=sse.handle_post_message), 
             Mount("/mcp-cc/messages/", app=sse.handle_post_message),
         ],
     )

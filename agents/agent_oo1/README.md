@@ -37,3 +37,43 @@ uv sync
 cd ..
 uv run -m agent_oo1.main
 ```
+
+# Docker
+
+Run docker commands from the forlder `agents`.
+
+Build
+
+```bash
+docker build -f ./agent_oo1/Dockerfile -t agent-oo1 .
+```
+
+Build without cache
+
+```bash
+docker build --no-cache --progress=plain -f ./agent_oo1/Dockerfile -t agent-oo1 .
+```
+
+**Build for k8s** = architecture Linux-Amd64
+
+```bash
+docker buildx build --platform=linux/amd64 -f ./agent_oo1/Dockerfile -t agent-oo1:0.0.1 .
+```
+
+Run
+
+```bash
+docker run --name agent_oo1 agent-oo1:0.0.1
+```
+
+Tag
+
+```bash
+docker tag agent-oo1:0.0.1 lukaskellerstein/agent-oo1:0.0.1
+```
+
+Push
+
+```bash
+docker push lukaskellerstein/agent-oo1:0.0.1
+```
