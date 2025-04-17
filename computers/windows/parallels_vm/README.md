@@ -32,13 +32,16 @@ Share folder `computers/windows/parallels_vm` into VM. Then you will see new net
 
 3. Copy a folders below into the `data` folder in this directory
 
+- `../../servers/mcp_server_computer_control`
 - `../../servers/server_browser_control`
 - `../../servers/server_computer_control`
 - `../../servers/evaluator`
 - `../../servers/network_proxy`
+- `../../servers/teams_control`
 
 4. Adjust the `.env` files in each server => Uncomment the section for `# Parallels - Windows` and comment out the other variants
-5. Copy the content of this folder into path `C:\INSTALL`
+
+5. **Copy the content of this folder into path `C:\INSTALL`**
 
 6. Open Command Prompt as Administrator
 7. Run the `install.bat` file with your username in the command prompt. Ex. `C:\INSTALL>install.bat lukaskellerstein`
@@ -55,6 +58,7 @@ On the `VM` are running a open-operator servers:
 - server browser control on port `5051`
 - server network proxy on port `5052`
 - server evaluator on port `5053`
+- server teams control on port `5056`
 
 You can test them if they are running correctly by opening browser with urls:
 

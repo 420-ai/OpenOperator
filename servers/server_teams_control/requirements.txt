@@ -1,0 +1,7 @@
+playwright
+appium-python-client
+uvicorn
+fastapi
+pydantic
+python-dotenv
+selenium

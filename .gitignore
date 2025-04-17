@@ -39,6 +39,8 @@ computers/windows/parallels_vm/data/server_computer_control
 computers/windows/parallels_vm/data/mcp_server_computer_control
 computers/windows/parallels_vm/data/server_evaluator
 computers/windows/parallels_vm/data/server_network_proxy
+computers/windows/parallels_vm/data/server_teams_control
+computers/windows/parallels_vm/data/server_appium
 computers/**/iso
 computers/**/storage
 computers/**/storage*
