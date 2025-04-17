@@ -12,6 +12,8 @@
 
 ## Getting Started
 
+The easiest way to run OpenOperator [OO] is via command `docker compose up` in the root of the project. If you want to run just a pieces of OO, you can either comment out parts of the compose.yml
+
 ### Computer
 
 To run computer that agent controls follows documentation [here](./computers/README.md).
@@ -43,10 +45,4 @@ $ source .venv/bin/activate
 $ uv sync
 $ cd ..
 $ uv run -m agent_oo4.main
-```
-
-# Docker
-
-```bash
-docker compose up
 ```

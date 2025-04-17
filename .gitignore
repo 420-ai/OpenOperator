@@ -18,6 +18,8 @@ Zone.Identifier
 !servers/server_evaluator/.env
 !servers/server_omniparser/.env
 !servers/mcp_server_computer_control/.env
+!servers/server_appium/.env
+!servers/server_teams_control/.env
 !computers/windows/docker/data/init/.env
 !computers/windows/parallels_vm/data/init/.env
 
@@ -33,6 +35,8 @@ computers/windows/docker/data/server_computer_control
 computers/windows/docker/data/mcp_server_computer_control
 computers/windows/docker/data/server_evaluator
 computers/windows/docker/data/server_network_proxy
+computers/windows/docker/data/server_appium
+computers/windows/docker/data/server_teams_control
 !computers/windows/parallels_vm/data/logs
 computers/windows/parallels_vm/data/server_browser_control
 computers/windows/parallels_vm/data/server_computer_control
@@ -65,6 +69,7 @@ agents/**/tmp
 agents/**/state
 agents/**/logs
 agents/**/cache
+!agents/**/.env
 
 old_agents/**/recordings
 old_agents/**/traces

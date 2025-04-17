@@ -543,7 +543,7 @@ def get_som_labeled_img(
     print('len(filtered_boxes):', len(filtered_boxes), starting_idx)
 
     # get parsed icon local semantics
-    time1 = time.time()
+    # time1 = time.time()
     if use_local_semantics:
         caption_model = caption_model_processor['model']
         if 'phi3_v' in caption_model.config.model_type:
@@ -572,7 +572,7 @@ def get_som_labeled_img(
     else:
         ocr_text = [f'Text Box ID {i}: {txt}' for i, txt in enumerate(ocr_text)]
         parsed_content_merged = ocr_text
-    print('time to get parsed content:', time.time() - time1)
+    # print('time to get parsed content:', time.time() - time1)
 
     filtered_boxes = box_convert(boxes=filtered_boxes, in_fmt='xyxy', out_fmt='cxcywh')
 

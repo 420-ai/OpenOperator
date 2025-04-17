@@ -31,6 +31,14 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
 )
 
+# Username
+if len(sys.argv) > 1:
+    username = sys.argv[1]
+else:
+    username = "docker"
+
+logging.info(f"Using USERNAME: {username}")
+
 
 TEMP_DIR = r"C:\TEMP"
 os.makedirs(TEMP_DIR, exist_ok=True)
@@ -228,12 +236,76 @@ def install_with_winget():
     except subprocess.CalledProcessError as e:
         logging.error(f"winget installation failed: {e}")
 
+
+
+def install_appium_cli():
+    npm_path = shutil.which("npm") or r"C:\Program Files\nodejs\npm.cmd"
+    if not os.path.exists(npm_path):
+        logging.error("npm not found. Make sure Node.js is installed and npm is in PATH.")
+        return
+
+    try:
+        command = [npm_path, "install", "-g", "appium"]
+        logging.info(f"Installing Appium CLI with command: {command}")
+
+        subprocess.run(command, check=True)
+        logging.info("Appium CLI installed successfully.")
+    except subprocess.CalledProcessError as e:
+        logging.error(f"Appium CLI installation failed: {e}")
+
+def install_winappdriver_silent():
+    wad_url = "https://github.com/microsoft/WinAppDriver/releases/download/v1.2.1/WindowsApplicationDriver_1.2.1.msi"
+    wad_installer_path = os.path.join(TEMP_DIR, "WindowsApplicationDriver.msi")
+
+    try:
+        logging.info("Downloading WinAppDriver...")
+        response = requests.get(wad_url, stream=True)
+        with open(wad_installer_path, "wb") as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                f.write(chunk)
+        logging.info("WinAppDriver downloaded successfully.")
+
+        logging.info("Installing WinAppDriver silently...")
+        subprocess.run(["msiexec", "/i", wad_installer_path, "/quiet", "/norestart"], check=True)
+        logging.info("WinAppDriver installed silently.")
+        os.remove(wad_installer_path)
+    except Exception as e:
+        logging.error(f"Failed to install WinAppDriver: {e}")
+
+def install_appium_drivers():
+    appium_cmd = fr"C:\Users\{username}\AppData\Roaming\npm\appium.cmd"
+    drivers = ["windows"]
+    for drv in drivers:
+        try:
+            subprocess.run([appium_cmd, "driver", "install", drv], check=True)
+            logging.info(f"Appium driver '{drv}' installed.")
+        except subprocess.CalledProcessError as e:
+            logging.error(f"Failed to install Appium driver '{drv}': {e}")
+    
+    # Install WinAppDriver silently
+    install_winappdriver_silent()
+
+def enable_windows_developer_mode():
+    try:
+        subprocess.run([
+            "reg",
+            "add",
+            r"HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock",
+            "/t", "REG_DWORD",
+            "/f",
+            "/v", "AllowDevelopmentWithoutDevLicense",
+            "/d", "1"
+        ], check=True)
+        logging.info("Windows Developer Mode enabled.")
+    except subprocess.CalledProcessError as e:
+        logging.error(f"Failed to enable Developer Mode: {e}")
+
+
+
 def turn_on_teams_flags():
     try:
         # copy the "configuration.json" to the installation location: 
-        # \users\docker\appdata\local\Packages\MicrosoftTeams_8wekyb3d8bbwe\LocalCache\Microsoft\MSTeams
-
-        teams_path = r"\users\docker\appdata\local\Packages\MicrosoftTeams_8wekyb3d8bbwe\LocalCache\Microsoft\MSTeams"
+        teams_path = fr"\users\{username}\appdata\local\Packages\MSTeams_8wekyb3d8bbwe\LocalCache\Microsoft\MSTeams"
         teams_config_path = os.path.join(
             teams_path, "configuration.json"
         )
@@ -251,7 +323,16 @@ if __name__ == "__main__":
     try:
         logging.info("Starting Installer...")
         start_software_installation()
+        logging.info("Software installation finished.")
         install_with_winget()
+        logging.info("Winget installation finished.")
+        
+        install_appium_cli()
+        install_appium_drivers()
+        logging.info("Appium CLI installed successfully.")
+        enable_windows_developer_mode()
+        logging.info("Windows Developer Mode enabled.")
+
         install_playwright_chromium()
         logging.info("Installation completed successfully.")
 

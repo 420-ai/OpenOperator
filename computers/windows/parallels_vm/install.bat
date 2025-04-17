@@ -41,18 +41,27 @@ REM ---------------------------
 set "PYTHON_INSTALLER=%TEMP%\python_installer.exe"
 set "PYTHON_URL=https://www.python.org/ftp/python/3.10.0/python-3.10.0-amd64.exe"
 
-echo Downloading Python installer... >> "%LOGFILE%"
-curl -L -o "%PYTHON_INSTALLER%" "%PYTHON_URL%" >> "%LOGFILE%" 2>&1
-
-echo Installing Python system-wide... >> "%LOGFILE%"
-"%PYTHON_INSTALLER%" /quiet InstallAllUsers=1 PrependPath=1 InstallLauncherAllUsers=1 >> "%LOGFILE%" 2>&1
-if %ERRORLEVEL% neq 0 (
-    echo Python installation failed with error code %ERRORLEVEL%. >> "%LOGFILE%"
-    exit /b %ERRORLEVEL%
-)
-
+REM Define Python paths
 set "PYTHON_PATH=C:\Program Files\Python310\python.exe"
 set "PYTHONW_PATH=C:\Program Files\Python310\pythonw.exe"
+
+REM Check if Python is already installed
+if exist %PYTHON_PATH% (
+    echo Python is already installed at %PYTHON_PATH%. Skipping installation. >> "%LOGFILE%"
+) else (
+    echo Python not found. Proceeding with installation. >> "%LOGFILE%"
+    
+    echo Downloading Python installer... >> "%LOGFILE%"
+    curl -L -o "%PYTHON_INSTALLER%" "%PYTHON_URL%" >> "%LOGFILE%" 2>&1
+
+    echo Installing Python system-wide... >> "%LOGFILE%"
+    "%PYTHON_INSTALLER%" /quiet InstallAllUsers=1 PrependPath=1 InstallLauncherAllUsers=1 >> "%LOGFILE%" 2>&1
+    if %ERRORLEVEL% neq 0 (
+        echo Python installation failed with error code %ERRORLEVEL%. >> "%LOGFILE%"
+        exit /b %ERRORLEVEL%
+    )
+)
+
 setx PYTHON "%PYTHON_PATH%" /M >nul
 setx PYTHONW "%PYTHONW_PATH%" /M >nul
 

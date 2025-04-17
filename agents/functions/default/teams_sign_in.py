@@ -15,7 +15,7 @@ def teams_sign_in(state: State):
     test_account = accounts[0]
 
     logging.info(f"Signing in to Teams with username: {test_account["Username"]}")
-    teams_control_url = os.environ.get("TEAMS_CONTROL_URL", "http://localhost:5056")
+    teams_control_url = os.getenv("TEAMS_CONTROL_URL", "http://localhost:5056")
 
     response = requests.post(
         f"{teams_control_url}/sign_in",

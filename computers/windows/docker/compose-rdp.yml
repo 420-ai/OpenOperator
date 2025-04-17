@@ -5,9 +5,13 @@ services:
     environment:
       BOOT_MODE: "windows_plain"
       DEBUG: "y"
+      DHCP: "Y"
     devices:
       - /dev/kvm
       - /dev/net/tun
+      - /dev/vhost-net
+    device_cgroup_rules:
+      - 'c *:* rwm'
     cap_add:
       - NET_ADMIN
     ports:
@@ -36,3 +40,9 @@ services:
       - ../../../servers/server_teams_control:/data/server_teams_control
     restart: always
     stop_grace_period: 2m
+    networks:
+      macvlan-dhcp:
+
+networks:
+  macvlan-dhcp:
+    external: true

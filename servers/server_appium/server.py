@@ -8,6 +8,9 @@ load_dotenv()
 LOG_PATH = os.getenv("LOG_PATH")
 print(f"Logs path: {LOG_PATH}")
 
+PORT = os.getenv("PORT")
+print(f"Port: {PORT}")
+
 def main():
     if len(sys.argv) > 1:
         username = sys.argv[1]
@@ -20,7 +23,7 @@ def main():
     args = [
         node_path,
         appium_js,
-        '-p', '4723',
+        '-p', f'{PORT}',
         # '--log', rf'{LOG_PATH}\AppiumServer.log'
     ]
 

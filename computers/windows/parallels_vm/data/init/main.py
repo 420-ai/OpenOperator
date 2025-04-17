@@ -301,9 +301,6 @@ def turn_on_teams_flags():
     try:
         # copy the "configuration.json" to the installation location: 
         teams_path = fr"\users\{username}\appdata\local\Packages\MSTeams_8wekyb3d8bbwe\LocalCache\Microsoft\MSTeams"
-
-        print(f"Teams path: {teams_path}")
-
         teams_config_path = os.path.join(
             teams_path, "configuration.json"
         )

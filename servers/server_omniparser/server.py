@@ -67,11 +67,11 @@ app = FastAPI()
 
 @app.post('/parse')
 async def parse(parse_request: ParseRequest):
-    logger.debug('start parsing...')
+    logger.info('start parsing...')
     start = time.time()
     dino_labled_img, parsed_content_list = omniparser.parse(parse_request.base64_image)
     latency = time.time() - start
-    logger.debug('time:', latency)
+    logger.info('time:', latency)
     return {
         'som_image_base64': dino_labled_img,
         'parsed_content_list': parsed_content_list,

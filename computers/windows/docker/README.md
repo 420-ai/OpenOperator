@@ -40,9 +40,27 @@ Navigate yourself into folder `windows/docker` and open terminal. Run command `d
 
 We can run version with pre-builded docker container `lukaskellerstein/windows-computer:<VERSION>` or we can build locally new docker container. Navigate to `windows/docker` and run command `docker compose -f compose-local.yml up`
 
-### 1.5 RDP
+### 1.5 VNC
 
-You can open the VM via `http://localhost:8006`
+You can open the VM via VNC => `http://localhost:8006`
+
+### 1.6 RDP
+
+1. Change a default `Docker` user password from "" to "1234" via VNC
+
+```bash
+net user Docker 1234
+```
+
+2. Set an `admin` connection in Microsoft Remote Desktop software
+
+**On Windows**
+
+Run mstsc via command
+
+```bash
+mstsc /admin
+```
 
 ### 1.6 Test in Docker
 
@@ -90,4 +108,56 @@ You can test the openoperator servers from host by running command `curl -v http
   "message": "Service is operational!"
 }
 * Closing connection
+```
+
+# RDP for docker
+
+1. Find name of the network interface
+
+```bash
+ip link
+```
+
+Example output
+
+```
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 63536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1550 qdisc mq state UP mode DEFAULT group default qlen 1000
+    link/ether 00:15:5w:d6:60:3b brd ff:ff:ef:fe:ff:ff
+```
+
+=> `eth0`
+
+2. Create a macvlan network
+
+`macvlan` network will help us connect to the docker container via RDP.
+
+subnet - find on the unifi ui, based on the network you are connected to
+gateway - find on the unifi ui, based on the network you are connected to
+
+```bash
+docker network create -d macvlan --subnet=192.168.2.0/24 --gateway=192.168.2.1 -o parent=eth0 macvlan-dhcp
+```
+
+3. Use compose-rdp file
+
+```bash
+docker compose -f compose-rdp.yml up
+```
+
+4. Find the IP address of the docker container
+
+via. Unifi ui
+
+5. Connect to it via RDP
+
+mstsc => 192.168.2.x:3389
+
+(Username: Docker, Password: admin)
+
+6. Use any server on the machine
+
+```bash
+curl 192.168.2.x:5050/healthcheck
 ```
