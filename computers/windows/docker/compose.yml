@@ -1,7 +1,7 @@
 services:
   windowscomputer:
     container_name: windowscomputer
-    image: lukaskellerstein/windows-computer:0.0.2
+    image: lukaskellerstein/windows-computer:0.0.4
     environment:
       RAM_SIZE: "4G"
       CPU_CORES: "2"
