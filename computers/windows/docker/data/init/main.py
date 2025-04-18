@@ -1,12 +1,6 @@
 import sys
 import os
-import json
-import requests
-import subprocess
 import pythoncom
-import glob
-import time
-import shutil
 import logging
 from logging_setup import configure_logging
 from dotenv import load_dotenv
@@ -78,9 +72,9 @@ if __name__ == "__main__":
         install_playwright()
         logger.info("Playwright Chromium installed successfully.")
 
-        logger.info("Setting up Teams configuration ...")
-        configure_teams(username)
-        logger.info("Teams configuration setup finished.")
+        # logger.info("Setting up Teams configuration ...")
+        # configure_teams(username)
+        # logger.info("Teams configuration setup finished.")
 
     except Exception as e:
         logger.error(f"Installation failed with error: {e}", exc_info=True)

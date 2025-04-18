@@ -4,8 +4,8 @@ import os
 import json
 
 # BASE_URL = "http://127.0.0.1:5050"
-BASE_URL = "http://test-11.4.155.164.237.nip.io/cc"
-
+# BASE_URL = "http://test-11.4.155.164.237.nip.io/cc"
+BASE_URL = "http://192.168.5.65:5050"
 
 
 screenshots_dir = "screenshots"
@@ -114,17 +114,32 @@ def test_close_all_windows():
     resp = requests.post(f"{BASE_URL}/setup/close_all")
     print("Close All Windows:", resp.text)
 
+def test_open_application():
+    # application_name = "notepad" # YES
+    # application_name = "explorer" # YES
+    # application_name = "appium" # YES
+    # application_name = "vscode" # YES
+    application_name = "teams" # YES
+    # application_name = "chrome" # YES
+
+    resp = requests.post(f"{BASE_URL}/setup/launch", json={"command": application_name})
+    if resp.status_code == 200:
+        print("Application launched successfully.")
+    else:
+        print("Failed to launch application:", resp.status_code, resp.text)
+
 if __name__ == "__main__":
-    test_healthcheck()
-    test_platform()
-    test_move_mouse()
-    test_cursor_position()
-    test_screen_size()
-    test_obs_winagent()
-    test_execute_command_windows()
-    test_list_directory()
-    test_capture_screen_with_cursor()
-    test_start_end_recording()
-    test_activate_window()
+    # test_healthcheck()
+    # test_platform()
+    # test_move_mouse()
+    # test_cursor_position()
+    # test_screen_size()
+    # test_obs_winagent()
+    # test_execute_command_windows()
+    # test_list_directory()
+    # test_capture_screen_with_cursor()
+    # test_start_end_recording()
+    # test_activate_window()
+    test_open_application()
     # Uncomment the line below if you are sure you want to close all windows.
     # test_close_all_windows()

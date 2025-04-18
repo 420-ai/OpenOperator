@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, HTTPException
 import logging
 import time
 
@@ -40,7 +40,6 @@ class SignInRequest(BaseModel):
 
     username: str
     password: str
-
 
 @app.post("/sign_in")
 def sign_in(request: SignInRequest):
@@ -147,6 +146,34 @@ def sign_in(request: SignInRequest):
         return {"message": f"Sign-in unsuccessful: ${e}. Traceback: {error_traceback}"}
 
     return {"message": "Sign-in successful."}
+
+
+@app.post("/configure")
+async def configure_teams(request: Request):
+    try:
+        username = os.getlogin()
+
+        # Read the JSON body
+        json_data = await request.json()
+
+        # Prepare config path
+        teams_path = os.path.expandvars(fr"C:\Users\{username}\AppData\Local\Packages\MSTeams_8wekyb3d8bbwe\LocalCache\Microsoft\MSTeams")
+        config_path = os.path.join(teams_path, "configuration.json")
+
+        # Ensure the Teams path exists
+        os.makedirs(os.path.dirname(config_path), exist_ok=True)
+
+        # Write the JSON to file
+        with open(config_path, "w", encoding="utf-8") as f:
+            import json
+            json.dump(json_data, f, indent=2)
+
+        return {"status": "success", "message": f"Configuration written to {config_path}"}
+
+    except Exception as e:
+        logger.error(f"Failed to configure Teams: {e}")
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
+
 
 
 if __name__ == "__main__":
