@@ -6,11 +6,12 @@ This folder contains setup for computers that are operated via OpenOperator. Bas
 
 In folder `windows/docker` is setup for a VM in docker.
 
-## 1.1 Download Windows 11 Evaluation .iso file:
+## 1.1 Download Windows 11 .iso file:
 
-1. Visit [Microsoft Evaluation Center](https://info.microsoft.com/ww-landing-windows-11-enterprise.html), accept the Terms of Service, and download a **Windows 11 Enterprise Evaluation (90-day trial, English, United States)** ISO file [~6GB]
+1a. Visit [Microsoft Evaluation Center](https://info.microsoft.com/ww-landing-windows-11-enterprise.html), accept the Terms of Service, and download a **Windows 11 Enterprise Evaluation (90-day trial, English, United States)** ISO file [~6GB] 64-bit edition !!
 
-> 64-bit edition !!
+1b. Visit [Windows Software Download center](https://www.microsoft.com/en-us/software-download/windows11), download **Windows 11 (multi-edition ISO for x64 devices)** - Win11_24H2_English_x64.iso [~6GB]
+
 
 2. After downloading, rename the file to `win.iso` and copy it to the directory `iso` (if does not exist, create one in this directory)
 

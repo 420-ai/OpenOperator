@@ -1,4 +1,5 @@
 import os
+import subprocess
 
 import logging
 logger = logging.getLogger("init.utils")
@@ -21,3 +22,10 @@ def update_system_path(new_path):
     except Exception as e:
         logger.error(f"Failed to update PATH: {e}")
 
+
+def update_path_globally_and_temporarily(new_path):
+    """Update system PATH permanently and for current process"""
+    update_system_path(new_path)  # persist for future sessions
+    if new_path not in os.environ["PATH"]:
+        os.environ["PATH"] = new_path + os.pathsep + os.environ["PATH"]  # temp fix
+        logger.info(f"Temporarily added '{new_path}' to current PATH.")

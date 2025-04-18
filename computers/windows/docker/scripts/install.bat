@@ -94,7 +94,7 @@ echo Python set to %PYTHON_PATH% >> "%LOGFILE%"
 echo Pythonw set to %PYTHONW_PATH% >> "%LOGFILE%"
 
 REM ---------------------------
-REM 3) Install software
+REM 3) Run Initialization Script
 REM ---------------------------
 
 REM Update pip

@@ -2,35 +2,75 @@ import os
 import shutil
 import subprocess
 import requests
+import re
 
 import logging
 logger = logging.getLogger("init.install_appium")
 
-def install_appium_cli():
-    npm_path = shutil.which("npm") or r"C:\Program Files\nodejs\npm.cmd"
-    if not os.path.exists(npm_path):
-        logger.error("npm not found. Make sure Node.js is installed and npm is in PATH.")
-        return
 
+def is_appium_installed_via_npm():
     try:
-        command = [npm_path, "install", "-g", "appium"]
-        logger.info(f"Installing Appium CLI with command: {command}")
-
-        subprocess.run(command, check=True)
-        logger.info("Appium CLI installed successfully.")
+        result = subprocess.run(
+            ["npm", "list", "-g"],
+            shell=True,
+            capture_output=True, text=True, check=True
+        )
+        return "appium@" in result.stdout.lower()
     except subprocess.CalledProcessError as e:
-        logger.error(f"Appium CLI installation failed: {e}")
+        logger.warning(f"Failed to check Appium installation via npm: {e}")
+        return False
+
+def ensure_appium_cli_ready():
+    if not is_appium_installed_via_npm():
+        logger.info("Appium CLI not found via npm. Installing...")
+        install_appium_cli()
+    else:
+        logger.info("Appium CLI is already installed via npm.")
+
+def is_winappdriver_installed():
+    # Default install path, change as needed
+    wad_path = r"C:\Program Files (x86)\Windows Application Driver\WinAppDriver.exe"
+    return os.path.exists(wad_path)
+
 
 def is_appium_driver_installed(driver_name, appium_cmd):
     try:
         result = subprocess.run(
             [appium_cmd, "driver", "list", "--installed"],
-            capture_output=True, text=True, check=True
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            shell=True,
+            check=True
         )
-        return driver_name.lower() in result.stdout.lower()
+        raw_output  = result.stdout
+        logger.debug("RAW repr(output): " + repr(raw_output ))
+
+        def strip_ansi_codes(text: str) -> str:
+            return re.sub(r'\x1b\[[0-9;]*m', '', text)
+
+        output = strip_ansi_codes(raw_output)
+        logger.debug("Cleaned output:\n" + output)
+
+        if f"- {driver_name.lower()}@" in output.lower():
+            logger.info(f"Found installed Appium driver '{driver_name}'")
+            return True
+
+        return False
     except subprocess.CalledProcessError as e:
         logger.warning(f"Could not check if Appium driver '{driver_name}' is installed: {e}")
         return False
+
+
+def install_appium_cli():
+    try:
+        command = ["npm", "install", "-g", "appium"]
+        logger.info(f"Installing Appium CLI with command: {command}")
+
+        subprocess.run(command, shell=True, check=True)
+        logger.info("Appium CLI installed successfully.")
+    except subprocess.CalledProcessError as e:
+        logger.error(f"Appium CLI installation failed: {e}")
 
 def install_appium_drivers(username):
     appium_cmd = fr"C:\Users\{username}\AppData\Roaming\npm\appium.cmd"
@@ -42,7 +82,7 @@ def install_appium_drivers(username):
             continue
 
         try:
-            subprocess.run([appium_cmd, "driver", "install", drv], check=True)
+            subprocess.run([appium_cmd, "driver", "install", drv], shell=True, check=True)
             logger.info(f"Appium driver '{drv}' installed.")
         except subprocess.CalledProcessError as e:
             logger.error(f"Failed to install Appium driver '{drv}': {e}")
@@ -69,9 +109,16 @@ def install_winappdriver_silent(TEMP_DIR):
 
 
 def install_appium(TEMP_DIR, username):
-    logger.info("Installing Appium CLI ...")
-    install_appium_cli()
-    logger.info("Installing Appium drivers ...")
+
+    # Install Appium CLI
+    ensure_appium_cli_ready()
+    
+    # Install Appium drivers
     install_appium_drivers(username)
-    logger.info("Installing WinAppDriver ...")
-    install_winappdriver_silent(TEMP_DIR)
+
+    # Install WinAppDriver
+    if not is_winappdriver_installed():
+        logger.info("WinAppDriver not found. Installing...")
+        install_winappdriver_silent(TEMP_DIR)
+    else:
+        logger.info("WinAppDriver is already installed.")
