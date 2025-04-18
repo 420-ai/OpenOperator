@@ -23,7 +23,7 @@ services:
       - 5056:5056
       - 9222:9222
     volumes:
-      - ./iso/win.iso:/custom.iso
+      - ./iso/Win11_24H2_English_x64.iso:/custom.iso
       - ./scripts:/oem
       - ./data:/data
       - ./storage:/storage

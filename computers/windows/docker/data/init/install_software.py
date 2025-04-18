@@ -5,7 +5,7 @@ import requests
 import subprocess
 import time
 
-from install_ffmpeg import extract_ffmpeg, find_ffmpeg_bin, update_system_path
+from install_ffmpeg import extract_ffmpeg, find_ffmpeg_bin
 from utils import update_system_path
 
 logger = logging.getLogger("init.install_software")

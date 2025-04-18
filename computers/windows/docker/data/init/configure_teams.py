@@ -1,3 +1,8 @@
+import os
+import shutil
+
+import logging
+logger = logging.getLogger("init.configure_teams")
 
 def configure_teams(username: str):
     try:
@@ -13,6 +18,6 @@ def configure_teams(username: str):
         )
 
     except Exception as e:
-        logging.error(f"Failed to copy Teams configuration: {e}")
+        logger.error(f"Failed to copy Teams configuration: {e}")
         raise
         

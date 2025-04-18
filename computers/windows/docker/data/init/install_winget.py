@@ -1,4 +1,5 @@
 import subprocess
+
 import logging
 logger = logging.getLogger("init.install_winget")
 
