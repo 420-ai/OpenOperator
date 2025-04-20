@@ -50,7 +50,45 @@ try:
     loop = None
 
 
-    def run_proxy(filename: str):
+    def install_mitmproxy_cert_if_needed():
+        import subprocess
+        import time
+
+        cert_path = os.path.expanduser("~/.mitmproxy/mitmproxy-ca-cert.cer")
+        if not os.path.exists(cert_path):
+            logger.info("Waiting for mitmproxy cert to be generated...")
+            for _ in range(10):  # Retry for a few seconds
+                time.sleep(1)
+                if os.path.exists(cert_path):
+                    break
+            else:
+                logger.error("Certificate not found after waiting — skipping install.")
+                return
+
+        try:
+            logger.debug("Checking if mitmproxy cert is already installed...")
+            result = subprocess.run(
+                ["certutil", "-verifystore", "Root"],
+                capture_output=True, text=True, check=True
+            )
+            if "mitmproxy" in result.stdout.lower():
+                logger.info("mitmproxy cert is already trusted.")
+                return
+        except subprocess.CalledProcessError as e:
+            logger.warning(f"certutil check failed: {e}")
+
+        logger.info("Installing mitmproxy certificate into Root store...")
+        try:
+            subprocess.run(
+                ["certutil", "-addstore", "Root", cert_path],
+                check=True
+            )
+            logger.info("mitmproxy cert installed successfully.")
+        except subprocess.CalledProcessError as e:
+            logger.error(f"Failed to install mitmproxy cert: {e}")
+
+
+    def run_proxy(filename: str, storeurl: str):
         global running, proxy_master, loop
 
         logger.info("run_proxy() started")
@@ -74,7 +112,7 @@ try:
             proxy_master = DumpMaster(
                 opts, loop=loop, with_termlog=False, with_dumper=False
             )
-            proxy_master.addons.add(TeamsTelemetryAddon(filename=filename))
+            proxy_master.addons.add(TeamsTelemetryAddon(filename=filename, storeurl=storeurl))
             logger.info("DumpMaster and TeamsTelemetryAddon initialized")
 
         running = True
@@ -82,6 +120,11 @@ try:
         try:
             logger.info("Starting proxy loop")
             proxy_task = loop.create_task(proxy_master.run())
+
+            # After mitmproxy starts, install cert if needed
+            install_mitmproxy_cert_if_needed()
+
+
             while not stop_event.is_set() and not proxy_task.done():
                 logger.debug("Proxy running... awaiting stop_event or completion")
                 loop.run_until_complete(asyncio.sleep(5))
@@ -118,10 +161,11 @@ try:
         
         params = await request.json()
         filename = params.get("filename", "telemetry")
-        logger.info(f"Starting proxy with logging into filename={filename}")
+        storeurl = params.get("storeurl", "http://localhost:9200")
+        logger.info(f"Starting proxy with logging into filename={filename} and storeurl={storeurl}")
 
         stop_event.clear()
-        proxy_thread = Thread(target=run_proxy, args=(filename,))
+        proxy_thread = Thread(target=run_proxy, args=(filename,storeurl,))
         proxy_thread.daemon = True
         proxy_thread.start()
         logger.info("Proxy thread started")

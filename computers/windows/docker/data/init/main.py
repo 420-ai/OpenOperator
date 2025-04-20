@@ -72,15 +72,14 @@ if __name__ == "__main__":
         logger.info("Installing Playwright Chromium ...")
         install_playwright()
         logger.info("Playwright Chromium installed successfully.")
+        
+        # logger.info("Installing MITM Proxy certificate ...")
+        # install_mitmproxy_certs()
+        # logger.info("MITM Proxy certificate installation finished.")
 
         logger.info("Setting up Teams configuration ...")
         configure_teams(username)
         logger.info("Teams configuration setup finished.")
-
-        logger.info("Installing MITM Proxy certificate ...")
-        install_mitmproxy_certs()
-        logger.info("MITM Proxy certificate installation finished.")
-
     except Exception as e:
         logger.error(f"Installation failed with error: {e}", exc_info=True)
     finally:

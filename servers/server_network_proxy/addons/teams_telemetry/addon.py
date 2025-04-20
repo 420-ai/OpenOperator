@@ -4,6 +4,7 @@ import logging
 from mitmproxy.http import HTTPFlow
 from mitmproxy.net.encoding import decode_gzip
 from .kusto_decoder import decode_kusto_request
+from elasticsearch import Elasticsearch
 
 logger = logging.getLogger("teams_addon")
 
@@ -19,8 +20,10 @@ else:
 
 
 class TeamsTelemetryAddon:
-    def __init__(self, filename: str = "teams-telemetry"):
+    def __init__(self, filename: str = "teams-telemetry", store_url: str = "http://localhost:9200"):
         self.filename = f"{filename}.log"
+        self.store_url = store_url
+        self.es = Elasticsearch(self.store_url)
 
     def request(self, flow: HTTPFlow):
         logger.debug(f"Incoming request to {flow.request.pretty_url}")
@@ -52,9 +55,28 @@ class TeamsTelemetryAddon:
                     records = body.splitlines()
                     logger.info(f"Decoded {len(records)} records from JSON stream")
                     for record in records:
+
+                        # Save into file
                         with open(f"{TELEMETRY_PATH}\\{self.filename}", "a") as f:
                             f.write(record + "\n")
-                    logger.debug(f"Wrote records to file {self.filename}")
+                        logger.debug(f"Wrote records to file {self.filename}")
+
+                        # Save into Elasticsearch
+                        try:
+                            doc = json.loads(record)
+                            if isinstance(doc, dict):
+                                self.es.index(index="teams-telemetry", document=doc)
+                            else:
+                                logger.warning("Decoded record is not a valid JSON object")
+                        except json.JSONDecodeError as e:
+                            logger.error(f"Failed to decode JSON record: {e}")
+                            logger.error(f"Record content: {record}")
+                        except Exception as e:
+                            logger.error(f"Failed to index record into Elasticsearch: {e}")
+                            logger.error(f"Record content: {record}")
+
+                    logger.info(f"Wrote {len(records)} records to file {self.filename}")
+
                 else:
                     logger.warning("Empty body in application/x-json-stream request")
 
@@ -69,9 +91,28 @@ class TeamsTelemetryAddon:
                 if body:
                     logger.info(f"Decoded {len(body)} Bond records")
                     for record in body:
+
+                        # Save into file
                         with open(f"{TELEMETRY_PATH}\\{self.filename}", "a") as f:
                             f.write(json.dumps(record.to_json(), indent=None) + "\n")
-                    logger.debug(f"Wrote Bond records to file {self.filename}")
+                        logger.debug(f"Wrote Bond records to file {self.filename}")
+
+                        # Save into Elasticsearch
+                        try:
+                            doc = record.to_json()
+                            if isinstance(doc, dict):
+                                self.es.index(index="teams-telemetry", document=doc)
+                            else:
+                                logger.warning("Decoded record is not a valid JSON object")
+                        except json.JSONDecodeError as e:
+                            logger.error(f"Failed to decode JSON record: {e}")
+                            logger.error(f"Record content: {record}")
+                        except Exception as e:
+                            logger.error(f"Failed to index record into Elasticsearch: {e}")
+                            logger.error(f"Record content: {record}")
+
+                    logger.info(f"Wrote {len(records)} records to file {self.filename}")
+
                 else:
                     logger.warning("No Bond records decoded")
 
@@ -85,9 +126,27 @@ class TeamsTelemetryAddon:
                         lines = body.splitlines()
                         logger.info(f"Decoded {len(lines)} lines from Web telemetry")
                         for line in lines:
+
+                            # Save into file
                             with open(f"{TELEMETRY_PATH}\\{self.filename}", "a") as f:
                                 f.write(line + "\n")
-                        logger.debug(f"Wrote Web telemetry lines to file {self.filename}")
+                            logger.debug(f"Wrote Web telemetry lines to file {self.filename}")
+
+                            # Save into Elasticsearch
+                            try:
+                                doc = json.loads(record)
+                                if isinstance(doc, dict):
+                                    self.es.index(index="teams-telemetry", document=doc)
+                                else:
+                                    logger.warning("Decoded record is not a valid JSON object")
+                            except json.JSONDecodeError as e:
+                                logger.error(f"Failed to decode JSON record: {e}")
+                                logger.error(f"Record content: {record}")
+                            except Exception as e:
+                                logger.error(f"Failed to index record into Elasticsearch: {e}")
+                                logger.error(f"Record content: {record}")
+
+                        logger.info(f"Wrote {len(records)} records to file {self.filename}")
                     else:
                         logger.warning("Empty body in gzip via query param request")
                 except Exception as e:

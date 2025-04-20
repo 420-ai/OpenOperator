@@ -20,18 +20,18 @@ To run computer that agent controls follows documentation [here](./computers/REA
 
 In case you want default way (Works on Windows and Linux):
 
-```
-$ cd computers/windows/docker
-$ docker compose up
+```bash
+cd computers/windows/docker
+docker compose up
 ```
 
 ### OmniParser server
 
 Start the OmniParser server.
 
-```
-$ cd servers/server_omniparser
-$ uv run server.py
+```bash
+cd servers/server_omniparser
+uv run server.py
 ```
 
 ### Agent
@@ -39,10 +39,16 @@ $ uv run server.py
 Start the agent.
 
 ```bash
-$ cd ./agents/agent_oo4
-$ uv venv
-$ source .venv/bin/activate
-$ uv sync
-$ cd ..
-$ uv run -m agent_oo4.main
+cd ./agents/agent_oo4
+uv venv
+source .venv/bin/activate
+uv sync
+cd ..
+uv run -m agent_oo4.main
 ```
+
+### Logs & Telemetry
+
+We are using Elasticsearch and Kibana to observe logs and telemetry.
+
+Open `http://localhost:5601`
