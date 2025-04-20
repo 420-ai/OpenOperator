@@ -11,10 +11,11 @@ import setproctitle
 from datetime import datetime
 from fastapi import Request
 
-from mitmproxy import options
+from mitmproxy import options, http
 from mitmproxy.tools.dump import DumpMaster
 from fastapi import FastAPI
 
+from certs import ensure_mitmproxy_cert_installed
 from addons.teams_telemetry import TeamsTelemetryAddon
 from logging_setup import configure_logging
 
@@ -39,6 +40,8 @@ try:
     # Named the process for easier identification
     setproctitle.setproctitle("network_proxy_server")
 
+    # Ensure the MITMProxy cert is installed
+    ensure_mitmproxy_cert_installed()
 
     app = FastAPI(title="Mitmproxy Controller")
 
@@ -48,45 +51,6 @@ try:
     stop_event = Event()
     running = False
     loop = None
-
-
-    def install_mitmproxy_cert_if_needed():
-        import subprocess
-        import time
-
-        cert_path = os.path.expanduser("~/.mitmproxy/mitmproxy-ca-cert.cer")
-        if not os.path.exists(cert_path):
-            logger.info("Waiting for mitmproxy cert to be generated...")
-            for _ in range(10):  # Retry for a few seconds
-                time.sleep(1)
-                if os.path.exists(cert_path):
-                    break
-            else:
-                logger.error("Certificate not found after waiting — skipping install.")
-                return
-
-        try:
-            logger.debug("Checking if mitmproxy cert is already installed...")
-            result = subprocess.run(
-                ["certutil", "-verifystore", "Root"],
-                capture_output=True, text=True, check=True
-            )
-            if "mitmproxy" in result.stdout.lower():
-                logger.info("mitmproxy cert is already trusted.")
-                return
-        except subprocess.CalledProcessError as e:
-            logger.warning(f"certutil check failed: {e}")
-
-        logger.info("Installing mitmproxy certificate into Root store...")
-        try:
-            subprocess.run(
-                ["certutil", "-addstore", "Root", cert_path],
-                check=True
-            )
-            logger.info("mitmproxy cert installed successfully.")
-        except subprocess.CalledProcessError as e:
-            logger.error(f"Failed to install mitmproxy cert: {e}")
-
 
     def run_proxy(filename: str, storeurl: str):
         global running, proxy_master, loop
@@ -120,10 +84,6 @@ try:
         try:
             logger.info("Starting proxy loop")
             proxy_task = loop.create_task(proxy_master.run())
-
-            # After mitmproxy starts, install cert if needed
-            install_mitmproxy_cert_if_needed()
-
 
             while not stop_event.is_set() and not proxy_task.done():
                 logger.debug("Proxy running... awaiting stop_event or completion")

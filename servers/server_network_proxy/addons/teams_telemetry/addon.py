@@ -20,21 +20,32 @@ else:
 
 
 class TeamsTelemetryAddon:
-    def __init__(self, filename: str = "teams-telemetry", store_url: str = "http://localhost:9200"):
+    def __init__(self, filename: str = "teams-telemetry", storeurl: str = "http://localhost:9200"):
         self.filename = f"{filename}.log"
-        self.store_url = store_url
+        self.store_url = storeurl
+
+        logger.info(f"Initializing TeamsTelemetryAddon with filename: {self.filename} and store URL: {self.store_url}")
+
         self.es = Elasticsearch(self.store_url)
 
     def request(self, flow: HTTPFlow):
-        logger.debug(f"Incoming request to {flow.request.pretty_url}")
-        logger.debug(f"Request headers: {flow.request.headers}")
-        logger.debug(f"Query params: {flow.request.query}")
 
+        # --------------------
+        # Filter for telemetry requests
+        # --------------------
         should_intercept = "teams.events.data.microsoft.com" in flow.request.host_header
-
         if not should_intercept:
             logger.debug("Request does not match telemetry host, skipping.")
             return
+
+        # --------------------
+        # Valid telemetry requests
+        # --------------------
+
+        # Log the request details
+        logger.debug(f"Incoming request to {flow.request.pretty_url}")
+        logger.debug(f"Request headers: {flow.request.headers}")
+        logger.debug(f"Query params: {flow.request.query}")
 
         try:
             # --- JSON stream (browser JS telemetry) ---

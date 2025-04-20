@@ -74,6 +74,10 @@ def download_and_install(name, mirrors, tools_config, TEMP_DIR):
                 "/install",
                 "/quiet",
                 "/norestart"
+            ],
+            "webview2": [
+                "/silent",
+                "/install",
             ]
         }
         args = silent_args.get(name.lower(), ["/S"])

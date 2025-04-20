@@ -3,3 +3,4 @@ mitmproxy
 pydantic
 uvicorn
 dotenv
+elasticsearch

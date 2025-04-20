@@ -23,11 +23,11 @@ def test_status():
     print(resp.status_code, resp.json())
 
 if __name__ == "__main__":
-    test_status()
+    # test_status()
 
     test_start_proxy()
 
-    # import time
-    # time.sleep(15)
+    # # import time
+    # # time.sleep(15)
 
     # test_stop_proxy() 

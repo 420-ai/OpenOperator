@@ -38,5 +38,10 @@
   },
   "VC++": {
     "mirrors": ["https://aka.ms/vs/17/release/vc_redist.x64.exe"]
+  },
+  "WebView2": {
+    "mirrors": [
+      "https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/76eb3dc4-7851-45b7-a392-460523b0e2bb/MicrosoftEdgeWebView2RuntimeInstallerX64.exe"
+    ]
   }
 }
