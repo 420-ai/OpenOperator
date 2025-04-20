@@ -39,6 +39,7 @@ from install_appium import install_appium
 from enable_developer_mode import enable_windows_developer_mode
 from install_playwright import install_playwright
 from configure_teams import configure_teams
+from install_mitmproxy_certs import install_mitmproxy_certs
 
 if __name__ == "__main__":
     try:
@@ -72,9 +73,13 @@ if __name__ == "__main__":
         install_playwright()
         logger.info("Playwright Chromium installed successfully.")
 
-        # logger.info("Setting up Teams configuration ...")
-        # configure_teams(username)
-        # logger.info("Teams configuration setup finished.")
+        logger.info("Setting up Teams configuration ...")
+        configure_teams(username)
+        logger.info("Teams configuration setup finished.")
+
+        logger.info("Installing MITM Proxy certificate ...")
+        install_mitmproxy_certs()
+        logger.info("MITM Proxy certificate installation finished.")
 
     except Exception as e:
         logger.error(f"Installation failed with error: {e}", exc_info=True)
