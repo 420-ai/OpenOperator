@@ -12,4 +12,5 @@ dependencies = [
     "requests>=2.32.3",
     "pillow>=10.3.0",
     "mcp>=1.6.0",
+    "psutil>=7.0.0",
 ]

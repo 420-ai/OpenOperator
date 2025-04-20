@@ -1,15 +1,16 @@
 import requests
-from utils import get_machine_ip
+from utils import get_lan_ip, get_machine_ip, get_real_lan_ip, get_windows_host_ip
 
 # BASE_URL = "http://127.0.0.1:5052"
 BASE_URL = "http://192.168.5.65:5052"
 
 
 def test_start_proxy():
-    machine_ip = get_machine_ip()
+    machine_ip = "192.168.2.114"
+    print(f"Machine IP: {machine_ip}")
 
     resp = requests.post(f"{BASE_URL}/start", json={
-        "filename": "my-telemetry",
+        "filename": "my-telemetry-9",
         "storeurl": f"http://{machine_ip}:9200"
     })
     print(resp.status_code)

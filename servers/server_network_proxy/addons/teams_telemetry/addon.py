@@ -13,7 +13,7 @@ logger = logging.getLogger("teams_addon")
 
 
 # Setup logging
-TELEMETRY_PATH = os.getenv("TELEMETRY_PATH", "/telemetry2")
+TELEMETRY_PATH = os.getenv("TELEMETRY_PATH", "/telemetry")
 print("TELEMETRY_PATH", TELEMETRY_PATH)
 if not os.path.exists(TELEMETRY_PATH):
     os.makedirs(TELEMETRY_PATH)
@@ -79,7 +79,7 @@ class TeamsTelemetryAddon:
                         try:
                             doc = json.loads(record)
                             if isinstance(doc, dict):
-                                self.es.index(index="teams-telemetry", document=doc)
+                                self.es.index(index=self.filename, document=doc)
                                 logger.debug(f"Indexed record into Elasticsearch")
                             else:
                                 logger.warning("Decoded record is not a valid JSON object")
@@ -116,7 +116,7 @@ class TeamsTelemetryAddon:
                         try:
                             doc = record.to_json()
                             if isinstance(doc, dict):
-                                self.es.index(index="teams-telemetry", document=doc)
+                                self.es.index(index=self.filename, document=doc)
                                 logger.debug(f"Indexed record into Elasticsearch")
                             else:
                                 logger.warning("Decoded record is not a valid JSON object")
@@ -152,7 +152,7 @@ class TeamsTelemetryAddon:
                             try:
                                 doc = json.loads(record)
                                 if isinstance(doc, dict):
-                                    self.es.index(index="teams-telemetry", document=doc)
+                                    self.es.index(index=self.filename, document=doc)
                                     logger.debug(f"Indexed record into Elasticsearch")
                                 else:
                                     logger.warning("Decoded record is not a valid JSON object")
