@@ -1,168 +1,228 @@
-from mitmproxy import options
-from mitmproxy.tools.dump import DumpMaster
+import os
+import sys
 import asyncio
 from threading import Thread, Event
-from fastapi import FastAPI
-import uvicorn
-import sys
 import signal
 import platform
+import uvicorn
+import logging
+import traceback
+import setproctitle
+from datetime import datetime
+from fastapi import Request
+
+from mitmproxy import options
+from mitmproxy.tools.dump import DumpMaster
+from fastapi import FastAPI
 
 from addons.teams_telemetry import TeamsTelemetryAddon
 from logging_setup import configure_logging
-import logging
-import traceback
-import os
-from logging_setup import configure_logging
 
-app = FastAPI(title="Mitmproxy Controller")
+from dotenv import load_dotenv
+load_dotenv()
 
-# Global variables to track proxy state
-proxy_thread = None
-proxy_master = None
-stop_event = Event()
-running = False
-loop = None
+try:
 
-port = 5052
+    # Port
+    port = os.getenv("PORT")
+    print("PORT", port)
+    port = int(port)  # Convert to integer
+
+    # Setup logging
+    logs_path = os.getenv("LOG_PATH")
+    print("LOG_PATH", logs_path)
+    configure_logging(logs_path)
+    logger = logging.getLogger("server_network_proxy")
+    print("Logging configured")
+
+    
+    # Named the process for easier identification
+    setproctitle.setproctitle("network_proxy_server")
 
 
-def run_proxy():
-    global running, proxy_master, loop
+    app = FastAPI(title="Mitmproxy Controller")
 
-    if loop is None:
-        loop = asyncio.new_event_loop()
+    # Global variables to track proxy state
+    proxy_thread = None
+    proxy_master = None
+    stop_event = Event()
+    running = False
+    loop = None
 
-    asyncio.set_event_loop(loop)
 
-    opts = options.Options(
-        listen_host="0.0.0.0",
-        listen_port=port,
-        mode=["local:msedgewebview2"],
-        ssl_insecure=True,
-        showhost=True,
-    )
+    def run_proxy(filename: str):
+        global running, proxy_master, loop
 
-    if proxy_master is None:
-        proxy_master = DumpMaster(
-            opts, loop=loop, with_termlog=False, with_dumper=False
+        logger.info("run_proxy() started")
+
+        if loop is None:
+            loop = asyncio.new_event_loop()
+            logger.debug("New asyncio event loop created")
+
+        asyncio.set_event_loop(loop)
+
+        opts = options.Options(
+            listen_host="0.0.0.0",
+            listen_port=port,
+            mode=["local:msedgewebview2"],
+            ssl_insecure=True,
+            showhost=True,
         )
-        proxy_master.addons.add(TeamsTelemetryAddon())
+        logger.debug(f"Proxy options configured: {opts.__dict__}")
 
-    running = True
+        if proxy_master is None:
+            proxy_master = DumpMaster(
+                opts, loop=loop, with_termlog=False, with_dumper=False
+            )
+            proxy_master.addons.add(TeamsTelemetryAddon(filename=filename))
+            logger.info("DumpMaster and TeamsTelemetryAddon initialized")
 
-    try:
-        # Create a task for the proxy and add a check for the stop event
-        logging.info("Starting proxy...")
-        proxy_task = loop.create_task(proxy_master.run())
-        while not stop_event.is_set() and not proxy_task.done():
-            loop.run_until_complete(asyncio.sleep(0.25))
+        running = True
 
-        # If stop was requested and task is still running
-        if stop_event.is_set() and not proxy_task.done():
-            logging.info("Stopping proxy...")
-            proxy_master.shutdown()
-            proxy_task.cancel()
-            try:
-                loop.run_until_complete(proxy_task)
-            except asyncio.CancelledError:
-                pass
-    except Exception as e:
-        logging.error(f"Proxy error: {e}")
-    finally:
-        running = False
+        try:
+            logger.info("Starting proxy loop")
+            proxy_task = loop.create_task(proxy_master.run())
+            while not stop_event.is_set() and not proxy_task.done():
+                logger.debug("Proxy running... awaiting stop_event or completion")
+                loop.run_until_complete(asyncio.sleep(5))
+
+            # If stop was requested and task is still running
+            if stop_event.is_set() and not proxy_task.done():
+                logger.info("Stop event set — shutting down proxy")
+                proxy_master.shutdown()
+                proxy_task.cancel()
+                try:
+                    loop.run_until_complete(proxy_task)
+                except asyncio.CancelledError:
+                    logger.warning("Proxy task cancelled during shutdown")
+                    pass
+
+        except Exception as e:
+            logger.error(f"Proxy encountered an exception: {e}")
+            logger.error(traceback.format_exc())
+        finally:
+            logger.info("Exiting proxy run loop")
+            running = False
+            stop_event.clear()
+
+
+    @app.post("/start")
+    async def start_proxy(request: Request):
+        logger.info("Received request to start proxy")
+
+        global proxy_thread, running
+
+        if proxy_thread and proxy_thread.is_alive():
+            logger.warning("Proxy start requested but already running")
+            return {"status": "already_running", "port": port}
+        
+        params = await request.json()
+        filename = params.get("filename", "telemetry")
+        logger.info(f"Starting proxy with logging into filename={filename}")
+
         stop_event.clear()
+        proxy_thread = Thread(target=run_proxy, args=(filename,))
+        proxy_thread.daemon = True
+        proxy_thread.start()
+        logger.info("Proxy thread started")
+
+        # Give the proxy a moment to start
+        await asyncio.sleep(0.5)
+
+        return {"status": "started", "port": port}
 
 
-@app.post("/start")
-async def start_proxy():
-    global proxy_thread, running
+    @app.post("/stop")
+    async def stop_proxy():
+        logger.info("Received request to stop proxy")
 
-    if proxy_thread and proxy_thread.is_alive():
-        return {"status": "already_running", "port": 8080}
-
-    stop_event.clear()
-    proxy_thread = Thread(target=run_proxy)
-    proxy_thread.daemon = True
-    proxy_thread.start()
-
-    # Give the proxy a moment to start
-    await asyncio.sleep(0.5)
-
-    return {"status": "started", "port": 8080}
-
-
-@app.post("/stop")
-async def stop_proxy():
-    global proxy_thread, running
-
-    if not proxy_thread or not proxy_thread.is_alive():
-        return {"status": "not_running"}
-
-    # Signal the proxy thread to stop
-    stop_event.set()
-
-    # Wait for the thread to finish (with timeout)
-    proxy_thread.join(timeout=3.0)
-
-    if proxy_thread.is_alive():
-        return {"status": "stopping_failed"}
-
-    return {"status": "stopped"}
-
-
-@app.get("/status")
-async def status():
-    if running:
-        return {"status": "running", "port": 8080}
-    return {"status": "stopped"}
-
-
-if __name__ == "__main__":
-
-    def signal_handler(sig, frame):
-        # Stop the proxy via the stop event
         global proxy_thread, running
 
         if not proxy_thread or not proxy_thread.is_alive():
-            return
+            logger.warning("Stop requested but proxy is not running")
+            return {"status": "not_running"}
 
         # Signal the proxy thread to stop
         stop_event.set()
+        logger.info("Stop event set, waiting for proxy thread to terminate")
 
         # Wait for the thread to finish (with timeout)
         proxy_thread.join(timeout=3.0)
 
-        sys.exit(0)
+        if proxy_thread.is_alive():
+            logger.error("Proxy thread did not stop in time")
+            return {"status": "stopping_failed"}
 
-    # Register signal handlers based on platform
-    signal.signal(signal.SIGINT, signal_handler)  # Ctrl+C works on all platforms
+        logger.info("Proxy stopped successfully")
+        return {"status": "stopped"}
 
-    if platform.system() != "Windows":
-        # SIGTERM is not supported on Windows
-        signal.signal(signal.SIGTERM, signal_handler)
-    else:
-        # On Windows, we can also handle Ctrl+Break
+
+    @app.get("/status")
+    async def status():
+        logger.debug("Status requested")
+        return {"status": "running" if running else "stopped", "port": port}
+
+
+
+    # ---------------------------
+    # Run Server
+    # ---------------------------
+    if __name__ == "__main__":
+        logger.info(f"Server starting on port {port} at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+
+
+        def signal_handler(sig, frame):
+            logger.warning(f"Signal {sig} received — shutting down")
+
+            # Stop the proxy via the stop event
+            global proxy_thread, running
+
+            if not proxy_thread or not proxy_thread.is_alive():
+                logger.debug("No proxy thread running, exiting")
+                return
+
+            # Signal the proxy thread to stop
+            stop_event.set()
+            logger.info("Stop event set from signal handler")
+
+            # Wait for the thread to finish (with timeout)
+            proxy_thread.join(timeout=3.0)
+            logger.info("Proxy thread joined")
+
+            sys.exit(0)
+
+        # Register signal handlers based on platform
+        signal.signal(signal.SIGINT, signal_handler)  # Ctrl+C works on all platforms
+        logger.debug("SIGINT signal handler registered")
+
+        if platform.system() != "Windows":
+            # SIGTERM is not supported on Windows
+            signal.signal(signal.SIGTERM, signal_handler)
+            logger.debug("SIGTERM signal handler registered")
+        else:
+            # On Windows, we can also handle Ctrl+Break
+            try:
+                signal.signal(signal.SIGBREAK, signal_handler)
+                logger.debug("SIGBREAK signal handler registered (Windows only)")
+            except AttributeError:
+                logger.warning("SIGBREAK not supported on this Windows version")
+                pass
+
         try:
-            signal.signal(signal.SIGBREAK, signal_handler)
-        except AttributeError:
-            pass
+            uvicorn.run(
+                app,
+                host="0.0.0.0",
+                port=port,
+                log_config=None,
+                timeout_graceful_shutdown=0,
+            )
 
-    LOG_PATH = os.getenv("LOG_PATH", r"C:\Logs")
-    configure_logging(LOG_PATH)
+            logger.info("Uvicorn server started successfully")
+        except Exception as e:
+            logger.error(f"Exception while running Uvicorn: {e}")
+            logger.error(traceback.format_exc())
 
-    logger = logging.getLogger("server_network_proxy")
-    logger.info("starting network proxy server...")
 
-    try:
-        uvicorn.run(
-            app,
-            host="0.0.0.0",
-            port=port,
-            log_config=None,
-            timeout_graceful_shutdown=0,
-        )
-    except Exception as e:
-        logger.error(f"Error starting server: {e}")
-        error_traceback = traceback.format_exc()
-        print(error_traceback)
+except Exception as ee:
+    logger.critical("Fatal error during startup")
+    logger.critical(traceback.format_exc())

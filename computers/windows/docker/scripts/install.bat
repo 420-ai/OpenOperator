@@ -231,6 +231,7 @@ schtasks /Run /TN "StartServer-MCPComputerControl"
 schtasks /Run /TN "StartServer-BrowserControl"
 schtasks /Run /TN "StartServer-NetworkProxy"
 schtasks /Run /TN "StartServer-Evaluator"
+schtasks /Run /TN "StartServer-TeamsControl"
 REM Appium
 schtasks /Run /TN "StartServer-Appium"
 echo 'Scheduled tasks' for servers started >> "%LOGFILE%"

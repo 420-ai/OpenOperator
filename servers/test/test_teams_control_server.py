@@ -24,5 +24,5 @@ def test_configure():
 
 
 if __name__ == "__main__":
-    test_configure()
-    # test_sign_in()
+    # test_configure()
+    test_sign_in()

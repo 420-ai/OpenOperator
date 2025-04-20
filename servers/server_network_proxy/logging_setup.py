@@ -1,7 +1,6 @@
 import logging.config
 import os
 
-
 def configure_logging(directory: str) -> None:
 
     os.makedirs(directory, exist_ok=True)
@@ -9,37 +8,76 @@ def configure_logging(directory: str) -> None:
 
     LOGGING_CONFIG = {
         "version": 1,
-        "disable_existing_loggers": True,
+        "disable_existing_loggers": False,
+
         "formatters": {
             "detailed": {
                 "format": "%(asctime)s - %(levelname)s - %(name)s - %(funcName)s - %(message)s",
                 "datefmt": "%Y-%m-%d %H:%M:%S",
+                "style": "%"
+            },
+            "uvicorn_format": {
+                "format": "%(message)s"
             }
         },
+
         "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
+                "formatter": "detailed",
+                "level": "DEBUG",
+            },
             "file": {
                 "class": "logging.FileHandler",
                 "filename": LOG_FILE,
                 "formatter": "detailed",
-                "level": "FATAL",
+                "level": "DEBUG",
             },
-            "console": {
+            "uvicorn_console": {
                 "class": "logging.StreamHandler",
-                "formatter": "detailed",
-                "level": "FATAL",
+                "formatter": "uvicorn_format",
+                "level": "INFO",
             },
-            "default": {
+            "uvicorn_file": {
                 "class": "logging.FileHandler",
                 "filename": LOG_FILE,
-                "formatter": "detailed",
-                "level": "FATAL",
+                "formatter": "uvicorn_format",
+                "level": "INFO",
             },
         },
+
         "root": {
             "handlers": ["console", "file"],
-            "level": "FATAL",
+            "level": "DEBUG",
         },
+
+        "loggers": {
+            "uvicorn": {
+                "handlers": ["uvicorn_console", "uvicorn_file"],
+                "level": "INFO",
+                "propagate": False
+            },
+            "uvicorn.error": {
+                "handlers": ["uvicorn_console", "uvicorn_file"],
+                "level": "INFO",
+                "propagate": False
+            },
+            "uvicorn.access": {
+                "handlers": ["uvicorn_console", "uvicorn_file"],
+                "level": "INFO",
+                "propagate": False
+            },
+            "kubernetes.client.rest": {
+                "handlers": ["console", "file"],
+                "level": "WARNING",
+                "propagate": False
+            },
+            "hpack": {
+                "handlers": ["console", "file"],
+                "level": "INFO",
+                "propagate": False
+            },
+        }
     }
 
     logging.config.dictConfig(LOGGING_CONFIG)
-    logging.basicConfig(level=logging.FATAL)
