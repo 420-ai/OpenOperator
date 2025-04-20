@@ -39,7 +39,6 @@ from install_appium import install_appium
 from enable_developer_mode import enable_windows_developer_mode
 from install_playwright import install_playwright
 from configure_teams import configure_teams
-# from install_mitmproxy_certs import install_mitmproxy_certs
 
 if __name__ == "__main__":
     try:

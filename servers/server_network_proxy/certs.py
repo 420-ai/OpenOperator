@@ -2,7 +2,6 @@ import os
 import time
 import subprocess
 from mitmproxy import certs, options
-# from mitmproxy.certs import SSLCert
 from cryptography.hazmat.primitives import serialization
 import logging
 
