@@ -3,4 +3,4 @@ mitmproxy
 pydantic
 uvicorn
 dotenv
-elasticsearch
+elasticsearch==9.0.0

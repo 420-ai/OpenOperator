@@ -16,11 +16,11 @@ from mitmproxy.tools.dump import DumpMaster
 from fastapi import FastAPI
 
 from certs import ensure_mitmproxy_cert_installed
-from addons.teams_telemetry import TeamsTelemetryAddon
 from logging_setup import configure_logging
 
 from dotenv import load_dotenv
 load_dotenv()
+
 
 try:
 
@@ -35,6 +35,10 @@ try:
     configure_logging(logs_path)
     logger = logging.getLogger("server_network_proxy")
     print("Logging configured")
+
+
+    # Load addons
+    from addons.teams_telemetry import TeamsTelemetryAddon
 
     
     # Named the process for easier identification

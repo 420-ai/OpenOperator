@@ -6,11 +6,14 @@ from mitmproxy.net.encoding import decode_gzip
 from .kusto_decoder import decode_kusto_request
 from elasticsearch import Elasticsearch
 
+from dotenv import load_dotenv
+load_dotenv()
+
 logger = logging.getLogger("teams_addon")
 
 
 # Setup logging
-TELEMETRY_PATH = os.getenv("TELEMETRY_PATH", "/telemetry")
+TELEMETRY_PATH = os.getenv("TELEMETRY_PATH", "/telemetry2")
 print("TELEMETRY_PATH", TELEMETRY_PATH)
 if not os.path.exists(TELEMETRY_PATH):
     os.makedirs(TELEMETRY_PATH)
@@ -77,6 +80,7 @@ class TeamsTelemetryAddon:
                             doc = json.loads(record)
                             if isinstance(doc, dict):
                                 self.es.index(index="teams-telemetry", document=doc)
+                                logger.debug(f"Indexed record into Elasticsearch")
                             else:
                                 logger.warning("Decoded record is not a valid JSON object")
                         except json.JSONDecodeError as e:
@@ -113,6 +117,7 @@ class TeamsTelemetryAddon:
                             doc = record.to_json()
                             if isinstance(doc, dict):
                                 self.es.index(index="teams-telemetry", document=doc)
+                                logger.debug(f"Indexed record into Elasticsearch")
                             else:
                                 logger.warning("Decoded record is not a valid JSON object")
                         except json.JSONDecodeError as e:
@@ -148,6 +153,7 @@ class TeamsTelemetryAddon:
                                 doc = json.loads(record)
                                 if isinstance(doc, dict):
                                     self.es.index(index="teams-telemetry", document=doc)
+                                    logger.debug(f"Indexed record into Elasticsearch")
                                 else:
                                     logger.warning("Decoded record is not a valid JSON object")
                             except json.JSONDecodeError as e:

@@ -77,6 +77,16 @@ def configure_logging(directory: str) -> None:
                 "level": "INFO",
                 "propagate": False
             },
+            "smoltcp": {
+                "handlers": ["console", "file"],
+                "level": "INFO",
+                "propagate": False
+            },
+            "urllib3": {
+                "handlers": ["console", "file"],
+                "level": "INFO",
+                "propagate": False
+            },
         }
     }
 
