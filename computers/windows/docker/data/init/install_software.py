@@ -70,6 +70,11 @@ def download_and_install(name, mirrors, tools_config, TEMP_DIR):
                 "/quiet",
                 "/norestart",
             ],
+            "vc++": [
+                "/install",
+                "/quiet",
+                "/norestart"
+            ]
         }
         args = silent_args.get(name.lower(), ["/S"])
 

@@ -8,9 +8,6 @@
           "PackageIdentifier": "astral-sh.uv"
         },
         {
-          "PackageIdentifier": "mitmproxy.mitmproxy"
-        },
-        {
           "PackageIdentifier": "OpenJS.NodeJS.LTS"
         }
       ],

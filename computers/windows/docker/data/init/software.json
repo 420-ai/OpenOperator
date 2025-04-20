@@ -35,5 +35,8 @@
       "https://mirror.raiolanetworks.com/videolan/vlc/3.0.21/win64/vlc-3.0.21-win64.exe"
     ],
     "alias": "vlc"
+  },
+  "VC++": {
+    "mirrors": ["https://aka.ms/vs/17/release/vc_redist.x64.exe"]
   }
 }
