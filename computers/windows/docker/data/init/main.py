@@ -77,9 +77,9 @@ if __name__ == "__main__":
         # install_mitmproxy_certs()
         # logger.info("MITM Proxy certificate installation finished.")
 
-        logger.info("Setting up Teams configuration ...")
-        configure_teams(username)
-        logger.info("Teams configuration setup finished.")
+        # logger.info("Setting up Teams configuration ...")
+        # configure_teams(username)
+        # logger.info("Teams configuration setup finished.")
     except Exception as e:
         logger.error(f"Installation failed with error: {e}", exc_info=True)
     finally:
