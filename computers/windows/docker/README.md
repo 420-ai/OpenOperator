@@ -6,11 +6,12 @@ This folder contains setup for computers that are operated via OpenOperator. Bas
 
 In folder `windows/docker` is setup for a VM in docker.
 
-## 1.1 Download Windows 11 Evaluation .iso file:
+## 1.1 Download Windows 11 .iso file:
 
-1. Visit [Microsoft Evaluation Center](https://info.microsoft.com/ww-landing-windows-11-enterprise.html), accept the Terms of Service, and download a **Windows 11 Enterprise Evaluation (90-day trial, English, United States)** ISO file [~6GB]
+1a. Visit [Microsoft Evaluation Center](https://info.microsoft.com/ww-landing-windows-11-enterprise.html), accept the Terms of Service, and download a **Windows 11 Enterprise Evaluation (90-day trial, English, United States)** ISO file [~6GB] 64-bit edition !!
 
-> 64-bit edition !!
+1b. Visit [Windows Software Download center](https://www.microsoft.com/en-us/software-download/windows11), download **Windows 11 (multi-edition ISO for x64 devices)** - Win11_24H2_English_x64.iso [~6GB]
+
 
 2. After downloading, rename the file to `win.iso` and copy it to the directory `iso` (if does not exist, create one in this directory)
 
@@ -40,9 +41,27 @@ Navigate yourself into folder `windows/docker` and open terminal. Run command `d
 
 We can run version with pre-builded docker container `lukaskellerstein/windows-computer:<VERSION>` or we can build locally new docker container. Navigate to `windows/docker` and run command `docker compose -f compose-local.yml up`
 
-### 1.5 RDP
+### 1.5 VNC
 
-You can open the VM via `http://localhost:8006`
+You can open the VM via VNC => `http://localhost:8006`
+
+### 1.6 RDP
+
+1. Change a default `Docker` user password from "" to "1234" via VNC
+
+```bash
+net user Docker 1234
+```
+
+2. Set an `admin` connection in Microsoft Remote Desktop software
+
+**On Windows**
+
+Run mstsc via command
+
+```bash
+mstsc /admin
+```
 
 ### 1.6 Test in Docker
 

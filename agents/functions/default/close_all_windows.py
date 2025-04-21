@@ -4,5 +4,5 @@ import os
 
 def close_all_windows():
     logging.info("Close all windows")
-    computer_control_url = os.environ["COMPUTER_CONTROL_URL"] or "http://localhost:5051"
+    computer_control_url = os.getenv("COMPUTER_CONTROL_URL","http://localhost:5050")
     requests.post(f"{computer_control_url}/setup/close_all")

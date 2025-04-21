@@ -5,6 +5,9 @@ class ConfigObject:
     """Helper class to convert a dictionary into an object with attribute access."""
     def __init__(self, dictionary):
         for key, value in dictionary.items():
+            # Handle 'instruction' normalization here
+            if key == "instruction" and isinstance(value, list):
+                value = "\n".join(value)
             setattr(self, key, self._convert(value))
 
     def get(self, key, default=None):

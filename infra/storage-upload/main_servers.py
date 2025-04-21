@@ -1,12 +1,14 @@
 import os
 from azure.storage.fileshare import ShareServiceClient, ShareDirectoryClient
+
 from dotenv import load_dotenv
+from azure.identity import DefaultAzureCredential
 load_dotenv()
 
 # === Configuration ===
-AZURE_STORAGE_CONNECTION_STRING = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
-if not AZURE_STORAGE_CONNECTION_STRING:
-    raise ValueError("AZURE_STORAGE_CONNECTION_STRING is not set in the environment variables.")
+ACCOUNT_NAME = os.getenv("AZURE_STORAGE_ACCOUNT_NAME")
+if not ACCOUNT_NAME:
+    raise ValueError("AZURE_STORAGE_ACCOUNT_NAME is not set in the environment variables.")
 
 SHARE_NAME = "oo-servers"
 
@@ -14,14 +16,18 @@ SHARE_NAME = "oo-servers"
 ROOT_FOLDER = "../../servers"
 SELECTED_FOLDERS = [
     "mcp_server_computer_control",
-    "server_browser_control",
     "server_computer_control",
+    "server_browser_control",
     "server_evaluator",
-    "server_network_proxy"
+    "server_network_proxy",
+    "server_appium",
+    "server_teams_control"
 ]
 
 # === Init client ===
-service_client = ShareServiceClient.from_connection_string(AZURE_STORAGE_CONNECTION_STRING)
+credential = DefaultAzureCredential()
+account_url = f"https://{ACCOUNT_NAME}.file.core.windows.net"
+service_client = ShareServiceClient(account_url=account_url, credential=credential)
 share_client = service_client.get_share_client(SHARE_NAME)
 
 # Create or use the existing share

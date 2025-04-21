@@ -18,8 +18,11 @@ Zone.Identifier
 !servers/server_evaluator/.env
 !servers/server_omniparser/.env
 !servers/mcp_server_computer_control/.env
+!servers/server_appium/.env
+!servers/server_teams_control/.env
 !computers/windows/docker/data/init/.env
 !computers/windows/parallels_vm/data/init/.env
+!infra/storage-upload/.env
 
 # Ignore all logs
 logs
@@ -33,12 +36,16 @@ computers/windows/docker/data/server_computer_control
 computers/windows/docker/data/mcp_server_computer_control
 computers/windows/docker/data/server_evaluator
 computers/windows/docker/data/server_network_proxy
+computers/windows/docker/data/server_appium
+computers/windows/docker/data/server_teams_control
 !computers/windows/parallels_vm/data/logs
 computers/windows/parallels_vm/data/server_browser_control
 computers/windows/parallels_vm/data/server_computer_control
 computers/windows/parallels_vm/data/mcp_server_computer_control
 computers/windows/parallels_vm/data/server_evaluator
 computers/windows/parallels_vm/data/server_network_proxy
+computers/windows/parallels_vm/data/server_teams_control
+computers/windows/parallels_vm/data/server_appium
 computers/**/iso
 computers/**/storage
 computers/**/storage*
@@ -50,6 +57,7 @@ servers/**/parsed
 servers/**/screenshots
 servers/**/user_data
 servers/**/weights
+servers/test/**/telemetry
 
 # Agents
 agents/**/recordings
@@ -63,6 +71,7 @@ agents/**/tmp
 agents/**/state
 agents/**/logs
 agents/**/cache
+!agents/**/.env
 
 old_agents/**/recordings
 old_agents/**/traces

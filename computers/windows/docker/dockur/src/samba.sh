@@ -14,16 +14,21 @@ if [[ "$DHCP" == [Yy1]* ]]; then
   interface="$VM_NET_DEV"
 fi
 
+if [[ "${NETWORK,,}" == "user"* ]]; then
+  interface="127.0.0.1"
+fi
+
 addShare() {
   local dir="$1"
   local name="$2"
   local comment="$3"
 
   mkdir -p "$dir" || return 1
+  ls -A "$dir" >/dev/null 2>&1 || return 1
 
   if [ -z "$(ls -A "$dir")" ]; then
 
-    chmod 777 "$dir"
+    chmod 777 "$dir" || return 1
 
     {      echo "--------------------------------------------------------"
             echo " $APP for Docker v$(</run/version)..."
@@ -87,10 +92,17 @@ share="/data"
 [ ! -d "$share" ] && [ -d "/shared" ] && share="/shared"
 [ ! -d "$share" ] && [ -d "$STORAGE/shared" ] && share="$STORAGE/shared"
 
-addShare "$share" "Data" "Shared" || error "Failed to create shared folder!"
+if ! addShare "$share" "Data" "Shared"; then
+  error "Failed to add shared folder '$share'. Please check its permissions." && return 0
+fi
 
-[ -d "/data2" ] && addShare "/data2" "Data2" "Shared"
-[ -d "/data3" ] && addShare "/data3" "Data3" "Shared"
+if [ -d "/data2" ]; then
+  addShare "/data2" "Data2" "Shared" || error "Failed to add shared folder '/data2'. Please check its permissions."
+fi
+
+if [ -d "/data3" ]; then
+  addShare "/data3" "Data3" "Shared" || error "Failed to add shared folder '/data3'. Please check its permissions."
+fi
 
 IFS=',' read -r -a dirs <<< "${SHARES:-}"
 for dir in "${dirs[@]}"; do
@@ -98,6 +110,11 @@ for dir in "${dirs[@]}"; do
   dir_name=$(basename "$dir")
   addShare "$dir" "$dir_name" "Shared $dir_name" || error "Failed to create shared folder for $dir!"
 done
+
+# Fix Samba permissions
+[ -d /run/samba/msg.lock ] && chmod -R 0755 /run/samba/msg.lock
+[ -d /var/log/samba/cores ] && chmod -R 0700 /var/log/samba/cores
+[ -d /var/cache/samba/msg.lock ] && chmod -R 0755 /var/cache/samba/msg.lock
 
 if ! smbd; then
   error "Samba daemon failed to start!"

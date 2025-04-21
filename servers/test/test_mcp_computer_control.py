@@ -5,7 +5,8 @@ from mcp.client.sse import sse_client
 from mcp import ClientSession
 
 # BASE_URL = "http://127.0.0.1:5055"
-BASE_URL = "http://test-11.4.155.164.237.nip.io/mcp-cc"
+# BASE_URL = "http://test-11.4.155.164.237.nip.io/mcp-cc"
+BASE_URL = "http://192.168.5.65:5055/mcp-cc"
 
 
 async def test_ping_async():

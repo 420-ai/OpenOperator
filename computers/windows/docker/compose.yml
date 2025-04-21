@@ -1,10 +1,10 @@
 services:
   windowscomputer:
     container_name: windowscomputer
-    image: lukaskellerstein/windows-computer:0.0.2
+    image: lukaskellerstein/windows-computer:0.0.4
     environment:
-      BOOT_MODE: "windows_plain"
-      DEBUG: "y"
+      RAM_SIZE: "4G"
+      CPU_CORES: "2"
     devices:
       - /dev/kvm
       - /dev/net/tun
@@ -19,16 +19,20 @@ services:
       - 5052:5052
       - 5053:5053
       - 5055:5055
+      - 4723:4723
+      - 5056:5056
       - 9222:9222
     volumes:
-      - ./iso/win.iso:/custom.iso
+      - ./iso/Win11_24H2_English_x64.iso:/custom.iso
       - ./scripts:/oem
       - ./data:/data
-      - ../../../servers/server_browser_control:/data/server_browser_control
-      - ../../../servers/server_computer_control:/data/server_computer_control
+      - ./storage:/storage
       - ../../../servers/mcp_server_computer_control:/data/mcp_server_computer_control
+      - ../../../servers/server_computer_control:/data/server_computer_control
+      - ../../../servers/server_browser_control:/data/server_browser_control
       - ../../../servers/server_evaluator:/data/server_evaluator
       - ../../../servers/server_network_proxy:/data/server_network_proxy
-      - ./storage:/storage
-    restart: always
+      - ../../../servers/server_appium:/data/server_appium
+      - ../../../servers/server_teams_control:/data/server_teams_control
+    restart: no
     stop_grace_period: 2m

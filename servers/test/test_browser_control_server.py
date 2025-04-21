@@ -3,7 +3,8 @@ import os
 import time
 
 # BASE_URL = "http://127.0.0.1:5051"
-BASE_URL = "http://test-11.4.155.164.237.nip.io/bc"
+# BASE_URL = "http://test-11.4.155.164.237.nip.io/bc"
+BASE_URL = "http://192.168.5.65:5051"
 
 screenshots_dir = "screenshots"
 os.makedirs(screenshots_dir, exist_ok=True)

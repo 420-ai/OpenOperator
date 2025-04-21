@@ -23,3 +23,5 @@ Push
 ```bash
 docker push lukaskellerstein/omniparser-server:0.0.1
 ```
+
+[Docker Hub tags](https://hub.docker.com/r/lukaskellerstein/omniparser-server/tags)

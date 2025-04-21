@@ -1,52 +1,56 @@
 services:
 
-  windowscomputer:
-    container_name: windows-computer
-    image: lukaskellerstein/windows-computer:0.0.2
-    # build: 
-    #   context: ./computers/windows/docker/dockur
-    #   dockerfile: Dockerfile
-    environment:
-      BOOT_MODE: "windows_plain"
-      DEBUG: "y"
-    devices:
-      - /dev/kvm
-      - /dev/net/tun
-    cap_add:
-      - NET_ADMIN
-    ports:
-      - 8006:8006
-      - 3389:3389/tcp
-      - 3389:3389/udp
-      - 5050:5050
-      - 5051:5051
-      - 5052:5052
-      - 5053:5053
-      - 5055:5055
-      - 9222:9222
-    volumes:
-      - ./computers/windows/docker/iso/win.iso:/custom.iso
-      - ./computers/windows/docker/scripts:/oem
-      - ./computers/windows/docker/storage:/storage
-      - ./computers/windows/docker/data:/data
-      - ./servers/server_browser_control:/data/server_browser_control
-      - ./servers/server_computer_control:/data/server_computer_control
-      - ./servers/mcp_server_computer_control:/data/mcp_server_computer_control
-      - ./servers/server_evaluator:/data/server_evaluator
-      - ./servers/server_network_proxy:/data/server_network_proxy
-    restart: always
-    stop_grace_period: 2m
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://host.docker.internal:5050/healthcheck || exit 1"]
-      interval: 20s
-      timeout: 5s
-      retries: 60
-    networks:
-      - default
+  # windowscomputer:
+  #   container_name: windows-computer
+  #   image: lukaskellerstein/windows-computer:0.0.2
+  #   # build: 
+  #   #   context: ./computers/windows/docker/dockur
+  #   #   dockerfile: Dockerfile
+  #   environment:
+  #     BOOT_MODE: "windows_plain"
+  #     DEBUG: "y"
+  #   devices:
+  #     - /dev/kvm
+  #     - /dev/net/tun
+  #   cap_add:
+  #     - NET_ADMIN
+  #   ports:
+  #     - 8006:8006
+  #     - 3389:3389/tcp
+  #     - 3389:3389/udp
+  #     - 5050:5050
+  #     - 5051:5051
+  #     - 5052:5052
+  #     - 5053:5053
+  #     - 5055:5055
+  #     - 4723:4723
+  #     - 5056:5056
+  #     - 9222:9222
+  #   volumes:
+  #     - ./computers/windows/docker/iso/win.iso:/custom.iso
+  #     - ./computers/windows/docker/scripts:/oem
+  #     - ./computers/windows/docker/storage:/storage
+  #     - ./computers/windows/docker/data:/data
+  #     - ./servers/server_browser_control:/data/server_browser_control
+  #     - ./servers/server_computer_control:/data/server_computer_control
+  #     - ./servers/mcp_server_computer_control:/data/mcp_server_computer_control
+  #     - ./servers/server_evaluator:/data/server_evaluator
+  #     - ./servers/server_network_proxy:/data/server_network_proxy
+  #     - ./servers/server_appium:/data/server_appium
+  #     - ./servers/server_teams_control:/data/server_teams_control
+  #   restart: always
+  #   stop_grace_period: 2m
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "curl -f http://host.docker.internal:5050/healthcheck || exit 1"]
+  #     interval: 20s
+  #     timeout: 5s
+  #     retries: 60
+  #   networks:
+  #     - default
 
   omniparserserver:
     container_name: omniparser-server
-    image: lukaskellerstein/omniparser-server:0.0.1
+    image: lukaskellerstein/omniparser-server:0.0.2
     # build:
     #   context: ./servers/server_omniparser
     #   dockerfile: Dockerfile
@@ -65,28 +69,70 @@ services:
     networks:
       - default
 
-  agentoo1:
-    container_name: agent-oo1
-    build:
-      context: ./agents
-      dockerfile: ./agent_oo1/Dockerfile
-    depends_on:
-      windowscomputer:
-        condition: service_healthy
-      omniparserserver:
-        condition: service_healthy
+  # agentoo1:
+  #   container_name: agent-oo1
+  #   build:
+  #     context: ./agents
+  #     dockerfile: ./agent_oo1/Dockerfile
+  #   depends_on:
+  #     windowscomputer:
+  #       condition: service_healthy
+  #     omniparserserver:
+  #       condition: service_healthy
+  #   environment:
+  #     AZURE_OPENAI_BASEURL: https://oo-openai-1.openai.azure.com/
+  #     AZURE_API_KEY: 9ODjnpbo2wYr8yQkNNGi3dHQcSMf3mu2N2rac6Lc1z0uCIzLERbjJQQJ99BCACHYHv6XJ3w3AAABACOGKwm5
+  #     AZURE_OPENAI_API_VERSION: 2025-01-01-preview
+  #     AZURE_MODEL: gpt-4o
+  #     AZURE_MODEL_DEPLOYMENT_NAME: gpt-4o-deployment
+  #     # SoM server
+  #     OMNIPARSER_URL: http://omniparserserver:8000
+  #     # OO servers
+  #     COMPUTER_CONTROL_URL: http://windowscomputer:5050
+  #     BROWSER_CONTROL_URL: http://windowscomputer:5051
+  #     NETWORK_PROXY_CONTROL_URL: http://windowscomputer:5052
+  #     EVALUATOR_URL: http://windowscomputer:5053
+  #     TEAMS_CONTROL_URL: http://windowscomputer:5056
+  #     # Other models
+  #     OLLAMA_URL: http://0.0.0.0:11434
+  #     OPENAI_API_KEY: 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
+  #     ANTHROPIC_API_KEY: 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
+  #   networks:
+  #     - default
+
+
+  elasticsearch:
+    container_name: elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.0.0
     environment:
-      COMPUTER_CONTROL_URL: http://windowscomputer:5050
-      BROWSER_CONTROL_URL: http://windowscomputer:5051
-      OMNIPARSER_URL: http://omniparserserver:8000
-      OLLAMA_URL: http://0.0.0.0:11434
-      ANTHROPIC_API_KEY: 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
-      OPENAI_API_KEY: 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
-      AZURE_OPENAI_API_VERSION: 2025-01-01-preview
-      AZURE_OPENAI_BASEURL: https://oo-openai-1.openai.azure.com/
-      AZURE_API_KEY: 9ODjnpbo2wYr8yQkNNGi3dHQcSMf3mu2N2rac6Lc1z0uCIzLERbjJQQJ99BCACHYHv6XJ3w3AAABACOGKwm5
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - xpack.security.transport.ssl.enabled=false
+      - xpack.security.http.ssl.enabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - default
+
+  kibana:
+    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:9.0.0
+    ports:
+      - 5601:5601
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
     networks:
       - default
 
 networks:
   default:
+volumes:
+  esdata:

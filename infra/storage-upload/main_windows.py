@@ -1,12 +1,14 @@
 import os
 from azure.storage.fileshare import ShareServiceClient, ShareDirectoryClient
+from azure.identity import DefaultAzureCredential
 from dotenv import load_dotenv
 load_dotenv()
 
 # === Configuration ===
-AZURE_STORAGE_CONNECTION_STRING = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
-if not AZURE_STORAGE_CONNECTION_STRING:
-    raise ValueError("AZURE_STORAGE_CONNECTION_STRING is not set in the environment variables.")
+ACCOUNT_NAME = os.getenv("AZURE_STORAGE_ACCOUNT_NAME")
+if not ACCOUNT_NAME:
+    raise ValueError("AZURE_STORAGE_ACCOUNT_NAME is not set in the environment variables.")
+
 
 SHARE_NAME = "windows-data"
 
@@ -14,12 +16,12 @@ SHARE_NAME = "windows-data"
 SELECTED_PATHS = {
     "../../computers/windows/docker/scripts/install.bat": "oem/install.bat",
     "../../computers/windows/docker/data/init": "data/init",
-    "../../computers/windows/docker/data/edit_teams_config.bat": "data/edit_teams_config.bat",
-    "../../computers/windows/docker/data/run_mitmproxy.bat": "data/run_mitmproxy.bat",
 }
 
 # === Init client ===
-service_client = ShareServiceClient.from_connection_string(AZURE_STORAGE_CONNECTION_STRING)
+credential = DefaultAzureCredential()
+account_url = f"https://{ACCOUNT_NAME}.file.core.windows.net"
+service_client = ShareServiceClient(account_url=account_url, credential=credential)
 share_client = service_client.get_share_client(SHARE_NAME)
 
 try:

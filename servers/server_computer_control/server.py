@@ -33,6 +33,8 @@ from human import Human
 from uuid import uuid4
 import getpass
 import setproctitle
+
+from load_apps import load_app_paths
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -103,6 +105,10 @@ elif platform_name=="Windows":
 human = Human()
 
 app = Flask(__name__)
+
+
+APP_PATHS = load_app_paths("software.json")
+
 
 pyautogui.PAUSE = 0
 pyautogui.DARWIN_CATCH_UP_TIME = 0
@@ -419,6 +425,7 @@ def launch_app():
 
     command: List[str] = data.get("command", "" if shell else [])
 
+
     if isinstance(command, str) and not shell:
         command = shlex.split(command)
 
@@ -428,17 +435,26 @@ def launch_app():
             command[i] = os.path.expanduser(arg)
 
     try:
-        user_platform = platform.system()
-        if 'google-chrome' in command and user_platform == 'Windows':
-            index = command.index('google-chrome')
-            command[index] = 'chrome'
+        # user_platform = platform.system()
+        # if 'google-chrome' in command and user_platform == 'Windows':
+        #     index = command.index('google-chrome')
+        #     command[index] = 'chrome'
 
 
-        if 'google-chrome' in command and _get_machine_architecture() == 'arm':
-            index = command.index('google-chrome')
-            command[index] = 'chromium-browser' # arm64 chrome is not available yet, can only use chromium
-        subprocess.Popen(command, shell=shell)
-        return "{:} launched successfully".format(command if shell else " ".join(command))
+        # if 'google-chrome' in command and _get_machine_architecture() == 'arm':
+        #     index = command.index('google-chrome')
+        #     command[index] = 'chromium-browser' # arm64 chrome is not available yet, can only use chromium
+
+
+        
+        app_path = APP_PATHS[command]
+
+        if app_path:
+            subprocess.Popen([app_path], shell=shell)
+            return f"{command if shell else ' '.join(command)} launched successfully from path {app_path}"
+        else:
+            subprocess.Popen(command, shell=shell)
+            return "{:} launched successfully".format(command if shell else " ".join(command))
     except Exception as e:
         
 
