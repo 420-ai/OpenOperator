@@ -47,7 +47,7 @@ cd ..
 uv run -m agent_oo4.main
 ```
 
-### Logs & Telemetry
+### Analytics
 
 We are using Elasticsearch and Kibana to observe logs and telemetry.
 
