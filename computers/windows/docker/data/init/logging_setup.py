@@ -32,6 +32,13 @@ def configure_logging(directory: str) -> None:
             "handlers": ["console", "file"],
             "level": "DEBUG",
         },
+        "loggers": {
+            "urllib3": {
+                "handlers": ["console", "file"],
+                "level": "WARNING",
+                "propagate": False
+            },
+        }
     }
 
     logging.config.dictConfig(LOGGING_CONFIG)

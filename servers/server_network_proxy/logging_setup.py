@@ -87,6 +87,11 @@ def configure_logging(directory: str) -> None:
                 "level": "INFO",
                 "propagate": False
             },
+            "quic": {
+                "handlers": ["console", "file"],
+                "level": "WARNING",
+                "propagate": False
+            },
         }
     }
 

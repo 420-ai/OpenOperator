@@ -12,6 +12,9 @@ def configure_teams(username: str):
             teams_path, "configuration.json"
         )
 
+        # Ensure the Teams path exists
+        os.makedirs(os.path.dirname(teams_config_path), exist_ok=True)
+
         shutil.copyfile(
             os.path.join(os.path.dirname(__file__), "configuration.json"),
             teams_config_path,
