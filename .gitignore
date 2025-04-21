@@ -22,6 +22,7 @@ Zone.Identifier
 !servers/server_teams_control/.env
 !computers/windows/docker/data/init/.env
 !computers/windows/parallels_vm/data/init/.env
+!infra/storage-upload/.env
 
 # Ignore all logs
 logs
