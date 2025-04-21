@@ -52,3 +52,13 @@ uv run -m agent_oo4.main
 We are using Elasticsearch and Kibana to observe logs and telemetry.
 
 Open `http://localhost:5601`
+
+# TODO
+
+Deploy ElasticSearch, Kibana and Grafana into k8s
+
+- OOObservability => new nodepool
+
+Deploy new versions of Servers and Windows-scripts into OOStorage
+
+Test to install new computer with new server and test it !!
