@@ -4,7 +4,7 @@ import logging
 from mitmproxy.http import HTTPFlow
 from mitmproxy.net.encoding import decode_gzip
 from .kusto_decoder import decode_kusto_request
-from elasticsearch import Elasticsearch
+# from elasticsearch import Elasticsearch
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -23,13 +23,10 @@ else:
 
 
 class TeamsTelemetryAddon:
-    def __init__(self, filename: str = "teams-telemetry", storeurl: str = "http://localhost:9200"):
+    def __init__(self, filename: str = "teams-telemetry"):
         self.filename = f"{filename}.log"
-        self.store_url = storeurl
-
-        logger.info(f"Initializing TeamsTelemetryAddon with filename: {self.filename} and store URL: {self.store_url}")
-
-        self.es = Elasticsearch(self.store_url)
+        # self.store_url = storeurl
+        # self.es = Elasticsearch(self.store_url)
 
     def request(self, flow: HTTPFlow):
 
@@ -76,19 +73,19 @@ class TeamsTelemetryAddon:
                         logger.debug(f"Wrote records to file {self.filename}")
 
                         # Save into Elasticsearch
-                        try:
-                            doc = json.loads(record)
-                            if isinstance(doc, dict):
-                                self.es.index(index=self.filename, document=doc)
-                                logger.debug(f"Indexed record into Elasticsearch")
-                            else:
-                                logger.warning("Decoded record is not a valid JSON object")
-                        except json.JSONDecodeError as e:
-                            logger.error(f"Failed to decode JSON record: {e}")
-                            logger.error(f"Record content: {record}")
-                        except Exception as e:
-                            logger.error(f"Failed to index record into Elasticsearch: {e}")
-                            logger.error(f"Record content: {record}")
+                        # try:
+                        #     doc = json.loads(record)
+                        #     if isinstance(doc, dict):
+                        #         self.es.index(index=self.filename, document=doc)
+                        #         logger.debug(f"Indexed record into Elasticsearch")
+                        #     else:
+                        #         logger.warning("Decoded record is not a valid JSON object")
+                        # except json.JSONDecodeError as e:
+                        #     logger.error(f"Failed to decode JSON record: {e}")
+                        #     logger.error(f"Record content: {record}")
+                        # except Exception as e:
+                        #     logger.error(f"Failed to index record into Elasticsearch: {e}")
+                        #     logger.error(f"Record content: {record}")
 
                     logger.info(f"Wrote {len(records)} records to file {self.filename}")
 
@@ -113,19 +110,19 @@ class TeamsTelemetryAddon:
                         logger.debug(f"Wrote Bond records to file {self.filename}")
 
                         # Save into Elasticsearch
-                        try:
-                            doc = record.to_json()
-                            if isinstance(doc, dict):
-                                self.es.index(index=self.filename, document=doc)
-                                logger.debug(f"Indexed record into Elasticsearch")
-                            else:
-                                logger.warning("Decoded record is not a valid JSON object")
-                        except json.JSONDecodeError as e:
-                            logger.error(f"Failed to decode JSON record: {e}")
-                            logger.error(f"Record content: {record}")
-                        except Exception as e:
-                            logger.error(f"Failed to index record into Elasticsearch: {e}")
-                            logger.error(f"Record content: {record}")
+                        # try:
+                        #     doc = record.to_json()
+                        #     if isinstance(doc, dict):
+                        #         self.es.index(index=self.filename, document=doc)
+                        #         logger.debug(f"Indexed record into Elasticsearch")
+                        #     else:
+                        #         logger.warning("Decoded record is not a valid JSON object")
+                        # except json.JSONDecodeError as e:
+                        #     logger.error(f"Failed to decode JSON record: {e}")
+                        #     logger.error(f"Record content: {record}")
+                        # except Exception as e:
+                        #     logger.error(f"Failed to index record into Elasticsearch: {e}")
+                        #     logger.error(f"Record content: {record}")
 
                     logger.info(f"Wrote {len(records)} records to file {self.filename}")
 
@@ -149,19 +146,19 @@ class TeamsTelemetryAddon:
                             logger.debug(f"Wrote Web telemetry lines to file {self.filename}")
 
                             # Save into Elasticsearch
-                            try:
-                                doc = json.loads(record)
-                                if isinstance(doc, dict):
-                                    self.es.index(index=self.filename, document=doc)
-                                    logger.debug(f"Indexed record into Elasticsearch")
-                                else:
-                                    logger.warning("Decoded record is not a valid JSON object")
-                            except json.JSONDecodeError as e:
-                                logger.error(f"Failed to decode JSON record: {e}")
-                                logger.error(f"Record content: {record}")
-                            except Exception as e:
-                                logger.error(f"Failed to index record into Elasticsearch: {e}")
-                                logger.error(f"Record content: {record}")
+                            # try:
+                            #     doc = json.loads(record)
+                            #     if isinstance(doc, dict):
+                            #         self.es.index(index=self.filename, document=doc)
+                            #         logger.debug(f"Indexed record into Elasticsearch")
+                            #     else:
+                            #         logger.warning("Decoded record is not a valid JSON object")
+                            # except json.JSONDecodeError as e:
+                            #     logger.error(f"Failed to decode JSON record: {e}")
+                            #     logger.error(f"Record content: {record}")
+                            # except Exception as e:
+                            #     logger.error(f"Failed to index record into Elasticsearch: {e}")
+                            #     logger.error(f"Record content: {record}")
 
                         logger.info(f"Wrote {len(records)} records to file {self.filename}")
                     else:

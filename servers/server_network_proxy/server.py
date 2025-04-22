@@ -97,9 +97,10 @@ try:
 
         params = await request.json()
         filename = params.get("filename", "telemetry")
-        storeurl = params.get("storeurl", "http://localhost:9200")
+        # storeurl = params.get("storeurl", "http://localhost:9200")
 
-        logger.info(f"Adding telemetry addon: filename={filename}, storeurl={storeurl}")
+        logger.info(f"Adding telemetry addon: filename={filename}")
+        # logger.info(f"Adding telemetry addon: storeurl={storeurl}")
 
         if not proxy_master:
             return {"status": "error", "message": "Proxy not running"}
@@ -108,7 +109,7 @@ try:
             logger.info("Removing existing telemetry addon")
             proxy_master.addons.remove(active_addon)
 
-        active_addon = TeamsTelemetryAddon(filename=filename, storeurl=storeurl)
+        active_addon = TeamsTelemetryAddon(filename=filename)
         proxy_master.addons.add(active_addon)
         logger.info("New telemetry addon added")
 
@@ -193,7 +194,6 @@ try:
                 timeout_graceful_shutdown=0,
             )
 
-            logger.info("Uvicorn server started successfully")
         except Exception as e:
             logger.error(f"Exception while running Uvicorn: {e}")
             logger.error(traceback.format_exc())

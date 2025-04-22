@@ -21,7 +21,10 @@ SELECTED_PATHS = {
 # === Init client ===
 credential = DefaultAzureCredential()
 account_url = f"https://{ACCOUNT_NAME}.file.core.windows.net"
-service_client = ShareServiceClient(account_url=account_url, credential=credential)
+service_client = ShareServiceClient(
+    account_url=account_url, 
+    credential=credential,
+    token_intent="backup")
 share_client = service_client.get_share_client(SHARE_NAME)
 
 try:
@@ -73,5 +76,57 @@ def upload_selected_paths(selected_paths, share_client):
         else:
             print(f"⚠️ Path not found: {local_path}")
 
+def list_all_paths(share_client):
+    """Recursively lists all file and directory paths in the share."""
+    paths = set()
+
+    def walk_directory(dir_client, current_path=""):
+        items = dir_client.list_directories_and_files()
+        for item in items:
+            full_path = os.path.join(current_path, item['name']).replace("\\", "/")
+            paths.add(full_path)
+            if item['is_directory']:
+                sub_dir_client = dir_client.get_subdirectory_client(item['name'])
+                walk_directory(sub_dir_client, full_path)
+
+    root_dir_client = share_client.get_directory_client("")
+    walk_directory(root_dir_client)
+    return paths
+
+def clean_removed_paths(selected_paths, share_client):
+    current_paths = set()
+
+    for local_path, dest_path in selected_paths.items():
+        if os.path.isfile(local_path):
+            current_paths.add(dest_path)
+        elif os.path.isdir(local_path):
+            for root, dirs, files in os.walk(local_path):
+                rel_root = os.path.relpath(root, local_path)
+                for file in files:
+                    remote_path = os.path.normpath(os.path.join(dest_path, rel_root, file)).replace("\\", "/")
+                    current_paths.add(remote_path)
+
+    remote_paths = list_all_paths(share_client)
+
+    to_delete = remote_paths - current_paths
+    for path in sorted(to_delete, reverse=True):  # delete deeper files/folders first
+        dir_path, filename = os.path.split(path)
+        dir_client = share_client.get_directory_client(dir_path)
+
+        try:
+            if path in current_paths:
+                continue
+            if "/" not in path or "." in filename:  # crude check for files
+                dir_client.delete_file(filename)
+                print(f"🗑️ Deleted file: {path}")
+            else:
+                dir_client.delete_subdirectory(filename)
+                print(f"🗑️ Deleted directory: {path}")
+        except Exception as e:
+            print(f"⚠️ Error deleting {path}: {e}")
+
+
 if __name__ == "__main__":
+    clean_removed_paths(SELECTED_PATHS, share_client)
     upload_selected_paths(SELECTED_PATHS, share_client)
+    print("Upload complete.")

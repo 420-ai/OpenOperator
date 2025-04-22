@@ -1,7 +1,9 @@
 import requests
 
 # BASE_URL = "http://127.0.0.1:5056"
-BASE_URL = "http://192.168.5.65:5056"
+# BASE_URL = "http://192.168.5.65:5056"
+BASE_URL = "http://win-1.4.155.164.237.nip.io/tc"
+
 
 def test_sign_in():
     resp = requests.post(f"{BASE_URL}/sign_in", json=
@@ -25,5 +27,5 @@ def test_configure():
 
 if __name__ == "__main__":
     # test_configure()
-    # test_sign_in()
+    test_sign_in()
     print("do nothing")

@@ -58,6 +58,7 @@ servers/**/screenshots
 servers/**/user_data
 servers/**/weights
 servers/test/**/telemetry
+servers/server_evaluator/sample
 
 # Agents
 agents/**/recordings
