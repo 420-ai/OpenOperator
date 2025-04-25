@@ -1,0 +1,75 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36" version="26.2.13" pages="5">
+  <diagram id="qvaUJO5rc9b2S8ltJ9bE" name="Computers">
+    <mxGraphModel dx="2948" dy="1185" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="Agents" id="YJenzvs1oemFKsIqWZ_6">
+    <mxGraphModel dx="2292" dy="1393" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="uw73krRxPRky_deAzNO2-1" value="Agents" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="130" y="270" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uw73krRxPRky_deAzNO2-3" value="OO1" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-70" y="410" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uw73krRxPRky_deAzNO2-4" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Settings&lt;/h1&gt;&lt;p&gt;&lt;b&gt;Docker Image&lt;/b&gt;&lt;/p&gt;&lt;p&gt;lukaskellerstein/agent-oo1&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;b&gt;Version&lt;/b&gt;&lt;/p&gt;&lt;p&gt;0.0.4&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;AzureOpenAI&lt;/p&gt;&lt;p&gt;model: GPT-4o&lt;/p&gt;&lt;p&gt;Omniparser&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="-140" y="500" width="180" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="uw73krRxPRky_deAzNO2-5" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Workflow Settings&lt;/h1&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;b&gt;Params&lt;/b&gt;&lt;/p&gt;&lt;p&gt;max_paln_versions&lt;/p&gt;&lt;p&gt;max_plan_step_iterations&lt;/p&gt;&lt;p&gt;max_plan_step_action&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="-360" y="500" width="180" height="290" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="74dCDHjHDc8NQ-7LNOI4" name="Tasks">
+    <mxGraphModel dx="1226" dy="1184" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="lnA2WTRZlYVk-SaoqUHG-1" value="Tasks" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="620" y="270" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="lnA2WTRZlYVk-SaoqUHG-2" value="MSTeams" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="500" y="410" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="lnA2WTRZlYVk-SaoqUHG-3" value="Outlook" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="670" y="410" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="lnA2WTRZlYVk-SaoqUHG-4" value="Word" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="500" y="510" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="lnA2WTRZlYVk-SaoqUHG-5" value="Excel" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="670" y="510" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="lnA2WTRZlYVk-SaoqUHG-6" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Instruction&lt;/h1&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;Open MSTeams. find chat ....&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="390" y="620" width="180" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="lnA2WTRZlYVk-SaoqUHG-7" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Telemetry markers&lt;/h1&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="389" y="760" width="390" height="120" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="JhxSQpPqCf0bBCIKcCLZ" name="Benchmark">
+    <mxGraphModel dx="2948" dy="1185" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="9ztRA6mKeXaVnuet3xYa" name="Activity Dashboard">
+    <mxGraphModel dx="1226" dy="1184" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
