@@ -2,9 +2,10 @@ import traceback
 from fastapi import FastAPI, HTTPException
 import uvicorn
 from logging_setup import configure_logging
-from evaluators.teams_telemetry import evaluate
 from datetime import datetime
 from models import EvaluationRequest
+from executor import FunctionExecutor
+from evaluators import FUNCTIONS  # Registry of available functions
 import setproctitle
 import logging
 import os
@@ -27,20 +28,30 @@ try:
 
     app = FastAPI(title="OO Evaluator")
 
+    # Validation Function executor
+    executor = FunctionExecutor(FUNCTIONS)
 
+    # ---------------------------
+    # Healthcheck Endpoint
+    # ---------------------------
+    @app.get('/healthcheck')
+    def healthcheck_endpoint():
+        return {
+            "status": "Successful", 
+            "message": "Service is operational!"
+        }
+
+    # ---------------------------
+    # Evaluate Endpoint
+    # ---------------------------
     @app.post("/evaluate")
     async def evaluate_endpoint(body: EvaluationRequest):
-        filename = body.telemetry_file
-        markers = body.markers
-
-        logger.info("filename: %s", filename)
-        logger.info("markers: %s", markers)
-
-        response = evaluate(filename, markers)
-
-        logger.info(f"Evaluation response: {response}")
-        return response
-
+        try:
+            result = executor.execute({"func": body.name, "args": body.args})
+            return {"result": result}
+        except Exception as e:
+            logger.error(f"Error during function execution: {e}")
+            raise HTTPException(status_code=500, detail=str(e))
 
     # ---------------------------
     # Run Server

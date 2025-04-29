@@ -72,6 +72,8 @@ Tag
 docker tag agent-oo1:0.0.1 lukaskellerstein/agent-oo1:0.0.1
 ```
 
+[Docker Hub tag](https://hub.docker.com/repository/docker/lukaskellerstein/agent-oo1/tags)
+
 Push
 
 ```bash

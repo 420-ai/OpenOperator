@@ -5,20 +5,22 @@ import shlex
 import subprocess
 import traceback
 
-def execute_python_command(command: Any):
+def execute_python_command(command: str):
 
-    print(command)
-    print(type(command))
+    # print(command)
+    # print(type(command))
 
-    data = command
+    # data = command
 
 
-    # The 'command' key in the JSON request should contain the command to be executed.
-    shell = data.get('shell', False)
-    command = data.get('command', "" if shell else [])
+    # # The 'command' key in the JSON request should contain the command to be executed.
+    # shell = data.get('shell', False)
+    # command = data.get('command', "" if shell else [])
 
-    if isinstance(command, str) and not shell:
-        command = shlex.split(command)
+    # if isinstance(command, str) and not shell:
+    #     command = shlex.split(command)
+
+    command = shlex.split(command)
 
     # Expand user directory
     for i, arg in enumerate(command):

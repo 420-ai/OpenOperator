@@ -1,7 +1,7 @@
 from pydantic import BaseModel
-from typing import List, Dict
+from typing import Dict, Any
 
 
 class EvaluationRequest(BaseModel):
-    telemetry_file: str
-    markers: List[Dict[str, str]]  # flexible key-value dict per marker
+    name: str  # Function name to call
+    args: Dict[str, Any] = {}  # Flexible arguments

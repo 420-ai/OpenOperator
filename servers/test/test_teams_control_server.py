@@ -5,6 +5,11 @@ import requests
 BASE_URL = "http://win-1.4.155.164.237.nip.io/tc"
 
 
+def test_healthcheck():
+    resp = requests.get(f"{BASE_URL}/healthcheck")
+    print("Healthcheck:", resp.status_code, resp.json())
+
+
 def test_sign_in():
     resp = requests.post(f"{BASE_URL}/sign_in", json=
                          {
@@ -26,6 +31,7 @@ def test_configure():
 
 
 if __name__ == "__main__":
-    # test_configure()
-    test_sign_in()
+    test_healthcheck()
+    test_configure()
+    # test_sign_in()
     print("do nothing")

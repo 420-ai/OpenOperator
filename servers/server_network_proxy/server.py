@@ -48,6 +48,22 @@ try:
 
     app = FastAPI(title="Mitmproxy Controller")
 
+
+    # ---------------------------
+    # Healthcheck Endpoint
+    # ---------------------------
+    @app.get('/healthcheck')
+    def healthcheck_endpoint():
+        return {
+            "status": "Successful", 
+            "message": "Service is operational!"
+        }
+    
+
+    # ---------------------------
+    # Network Proxy Endpoints
+    # ---------------------------
+
     # Global variables to track proxy state
     proxy_master = None
     proxy_thread = None

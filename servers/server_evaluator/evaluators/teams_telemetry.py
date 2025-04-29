@@ -25,7 +25,7 @@ def match_marker(obj: dict, marker: dict) -> bool:
     return True
 
 
-def evaluate(filename: str, markers: List[Dict[str, str]]) -> Dict[str, Any]:
+def check_teams_telemetry(filename: str, markers: List[Dict[str, str]]) -> Dict[str, Any]:
     log_path = Path(filename)
     if not log_path.exists():
         raise FileNotFoundError(f"Log file not found: {filename}")

@@ -28,7 +28,7 @@ state = State(d, t)
 
 # Configuration object for agent
 config = OOConfig()
-config.load("teams", "scenario-2")
+config.load("teams", "scenario-0")
 # tracker.save_config(config)
 state.save_config(config)
 

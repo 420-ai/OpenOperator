@@ -35,6 +35,19 @@ logger = logging.getLogger("server_teams_control")
 port = os.getenv("PORT", 5056)
 
 
+# ---------------------------
+# Healthcheck Endpoint
+# ---------------------------
+@app.get('/healthcheck')
+def healthcheck_endpoint():
+    return {
+        "status": "Successful", 
+        "message": "Service is operational!"
+    }
+
+# ---------------------------
+# Teams control Endpoints
+# ---------------------------
 class SignInRequest(BaseModel):
     """Request model for sign-in."""
 

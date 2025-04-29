@@ -1,0 +1,14 @@
+{
+  "instruction": "Open MS Teams application, login as user 'oo-test-user-1@outlook.com' with password 'Some_Very-Secret_Password..?', and send message to yourself with text 'Hello from AI agent!'.",
+  "workflow": {
+    "params": {
+      "max_plan_versions": 10,
+      "max_plan_step_iterations": 5,
+      "max_plan_step_actions": 5
+    }
+  },
+  "environment": {
+    "start": [],
+    "end": []
+  }
+}

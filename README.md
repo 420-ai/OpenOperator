@@ -55,10 +55,20 @@ Open `http://localhost:5601`
 
 # TODO
 
-Deploy new versions of Servers and Windows-scripts into OOStorage
-
-Test to install new computer with new server and test it !!
-
 Deploy ElasticSearch, Kibana and Grafana into k8s
 
-- OOObservability => new nodepool
+- OOOAnalytics => new nodepool
+
+SHOW:
+
+1. Snapshots
+2. RDP - fix
+3. Agent running
+4. Telemetry collection + Evaluation
+
+NEED:
+
+- Buffy APM user + Login + snapshot
+- Proper Scenarion + Markers
+
+Ken PR

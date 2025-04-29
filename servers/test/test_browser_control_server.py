@@ -4,7 +4,9 @@ import time
 
 # BASE_URL = "http://127.0.0.1:5051"
 # BASE_URL = "http://test-11.4.155.164.237.nip.io/bc"
-BASE_URL = "http://192.168.5.65:5051"
+# BASE_URL = "http://192.168.5.65:5051"
+BASE_URL = "http://test-final-2.4.242.123.121.nip.io/bc"
+
 
 screenshots_dir = "screenshots"
 os.makedirs(screenshots_dir, exist_ok=True)
@@ -91,21 +93,21 @@ def test_cursor_position():
 
 if __name__ == "__main__":
     test_healthcheck()
-    test_launch_browser(headless=False)
-    time.sleep(2)
-    page_id = test_open_page("https://arxiv.org/abs/1706.03762")
-    if page_id:
-        time.sleep(3)
-        test_screenshot(page_id)
-        test_get_cookies(page_id)
-        test_get_local_storage(page_id)
-        test_execute_js(page_id, "document.title")
-        test_cdp(page_id, "Page.getFrameTree", {})
-    test_get_platform()
-    test_cursor_position()
-    test_start_tracing()
-    time.sleep(5)
-    trace_file = test_stop_tracing()
-    if trace_file:
-        test_download_trace(trace_file)
-    test_close_browser()
+    # test_launch_browser(headless=False)
+    # time.sleep(2)
+    # page_id = test_open_page("https://arxiv.org/abs/1706.03762")
+    # if page_id:
+    #     time.sleep(3)
+    #     test_screenshot(page_id)
+    #     test_get_cookies(page_id)
+    #     test_get_local_storage(page_id)
+    #     test_execute_js(page_id, "document.title")
+    #     test_cdp(page_id, "Page.getFrameTree", {})
+    # test_get_platform()
+    # test_cursor_position()
+    # test_start_tracing()
+    # time.sleep(5)
+    # trace_file = test_stop_tracing()
+    # if trace_file:
+    #     test_download_trace(trace_file)
+    # test_close_browser()
