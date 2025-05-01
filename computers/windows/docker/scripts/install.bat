@@ -214,14 +214,14 @@ REM Without /IT, the task will not run interactively = will not be able to catch
 REM Without /DELAY is needed in order to wait until network storage is available and user is logged in
 echo Creating 'scheduled tasks' for servers >> "%LOGFILE%"
 REM OO Servers
-schtasks /Create /TN "StartServer-ComputerControl" /SC ONSTART /TR "\"%STARTUP_SERVER_COMPUTER_CONTROL_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /DELAY 0000:30 /F
-schtasks /Create /TN "StartServer-MCPComputerControl" /SC ONSTART /TR "\"%STARTUP_MCP_SERVER_COMPUTER_CONTROL_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /DELAY 0000:30 /F
-schtasks /Create /TN "StartServer-BrowserControl" /SC ONSTART /TR "\"%STARTUP_SERVER_BROWSER_CONTROL_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /DELAY 0000:30 /F
-schtasks /Create /TN "StartServer-NetworkProxy" /SC ONSTART /TR "\"%STARTUP_SERVER_NETWORK_PROXY_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /DELAY 0000:30 /F
-schtasks /Create /TN "StartServer-Evaluator" /SC ONSTART /TR "\"%STARTUP_SERVER_EVALUATOR_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /DELAY 0000:30 /F
-schtasks /Create /TN "StartServer-TeamsControl" /SC ONSTART /TR "\"%STARTUP_SERVER_TEAMS_CONTROL_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /DELAY 0000:30 /F
+schtasks /Create /TN "StartServer-ComputerControl" /SC ONSTART /TR "\"%STARTUP_SERVER_COMPUTER_CONTROL_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /DELAY 0000:10 /F
+schtasks /Create /TN "StartServer-MCPComputerControl" /SC ONSTART /TR "\"%STARTUP_MCP_SERVER_COMPUTER_CONTROL_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /DELAY 0000:10 /F
+schtasks /Create /TN "StartServer-BrowserControl" /SC ONSTART /TR "\"%STARTUP_SERVER_BROWSER_CONTROL_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /DELAY 0000:10 /F
+schtasks /Create /TN "StartServer-NetworkProxy" /SC ONSTART /TR "\"%STARTUP_SERVER_NETWORK_PROXY_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /DELAY 0000:10 /F
+schtasks /Create /TN "StartServer-Evaluator" /SC ONSTART /TR "\"%STARTUP_SERVER_EVALUATOR_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /DELAY 0000:10 /F
+schtasks /Create /TN "StartServer-TeamsControl" /SC ONSTART /TR "\"%STARTUP_SERVER_TEAMS_CONTROL_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /DELAY 0000:10 /F
 REM Appium
-schtasks /Create /TN "StartServer-Appium" /SC ONSTART /TR "\"%STARTUP_APPIUM_SERVER_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /DELAY 0000:30 /F
+schtasks /Create /TN "StartServer-Appium" /SC ONSTART /TR "\"%STARTUP_APPIUM_SERVER_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /DELAY 0000:10 /F
 echo 'Scheduled tasks' for servers created >> "%LOGFILE%"
 
 echo Triggering 'scheduled tasks' for servers >> "%LOGFILE%"
