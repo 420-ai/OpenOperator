@@ -92,6 +92,23 @@ try:
         proxy_master = DumpMaster(opts, loop=loop, with_termlog=False, with_dumper=False)
         logger.info("DumpMaster initialized")
 
+        # ----------------------------
+        # In case it is deployed to the AKS cluster, we got IP (ex. 20.20.20.21)
+        # which is considered to be a public IP. 
+        # => ERROR: 
+        # 2025-05-01 00:33:05 - INFO - mitmproxy.proxy.server - log - client connect
+        # 2025-05-01 00:33:05 - WARNING - root - client_connected - Client connection from 20.20.20.21 killed by block_global option.
+        # 2025-05-01 00:33:05 - INFO - mitmproxy.proxy.server - log - client kill connection
+        # 2025-05-01 00:33:05 - INFO - mitmproxy.proxy.server - log - client disconnect
+
+        # For that reason we need to remove the "Block" addon from proxy.
+        block_addon = proxy_master.addons.get("block")
+        proxy_master.addons.remove(block_addon)
+        logger.debug("List of current addons:")
+        logger.debug(proxy_master.addons)
+
+        # ----------------------------
+
         running = True
 
         try:
@@ -128,6 +145,9 @@ try:
         active_addon = TeamsTelemetryAddon(filename=filename)
         proxy_master.addons.add(active_addon)
         logger.info("New telemetry addon added")
+
+        logger.debug("List of current addons:")
+        logger.debug(proxy_master.addons)
 
         return {"status": "telemetry_started"}
 
