@@ -7,7 +7,7 @@ import json
 # BASE_URL = "http://test-11.4.155.164.237.nip.io/cc"
 # BASE_URL = "http://192.168.5.65:5050"
 # BASE_URL = "http://computer-6810c96f841039074308a398.4.242.123.121.nip.io/cc"
-BASE_URL = "http://test-final-2.4.242.123.121.nip.io/cc"
+BASE_URL = "http://computer-681148f0416e887bd8bc71b7.4.242.123.121.nip.io/cc"
 
 screenshots_dir = "screenshots"
 os.makedirs(screenshots_dir, exist_ok=True)
@@ -130,7 +130,7 @@ def test_open_application():
         print("Failed to launch application:", resp.status_code, resp.text)
 
 if __name__ == "__main__":
-    test_healthcheck()
+    # test_healthcheck()
     # test_platform()
     # test_move_mouse()
     # test_cursor_position()
@@ -141,6 +141,6 @@ if __name__ == "__main__":
     # test_capture_screen_with_cursor()
     # test_start_end_recording()
     # test_activate_window()
-    # test_open_application()
+    test_open_application()
     # Uncomment the line below if you are sure you want to close all windows.
     # test_close_all_windows()

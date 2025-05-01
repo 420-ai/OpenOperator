@@ -2,7 +2,8 @@ import requests
 
 # BASE_URL = "http://127.0.0.1:5056"
 # BASE_URL = "http://192.168.5.65:5056"
-BASE_URL = "http://win-1.4.155.164.237.nip.io/tc"
+# BASE_URL = "http://win-1.4.155.164.237.nip.io/tc"
+BASE_URL = "http://comp-1.4.242.123.121.nip.io/tc"
 
 
 def test_healthcheck():

@@ -3,7 +3,7 @@ import requests
 
 # BASE_URL = "http://127.0.0.1:5053"
 # BASE_URL = "http://win-1.4.155.164.237.nip.io/eval"
-BASE_URL = "http://test-final-2.4.242.123.121.nip.io/eval"
+BASE_URL = "http://comp-1.4.242.123.121.nip.io/eval"
 
 def test_healthcheck():
     resp = requests.get(f"{BASE_URL}/healthcheck")

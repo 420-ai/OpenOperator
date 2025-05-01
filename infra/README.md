@@ -8,5 +8,6 @@ We upload a files relevant for the Computers in k8s via script.
 
 ```bash
 cd storage-upload
-uv run main.py
+uv run main_servers.py
+uv run main_windows.py
 ```
