@@ -93,6 +93,27 @@ def list_all_paths(share_client):
     walk_directory(root_dir_client)
     return paths
 
+def delete_directory_recursive(dir_client: ShareDirectoryClient, path=""):
+    try:
+        items = list(dir_client.list_directories_and_files())
+    except Exception as e:
+        print(f"⚠️ Cannot list {path or dir_client.path}: {e}")
+        return
+
+    for item in items:
+        item_path = os.path.join(path, item["name"]).replace("\\", "/")
+        try:
+            if item["is_directory"]:
+                sub_dir_client = dir_client.get_subdirectory_client(item["name"])
+                delete_directory_recursive(sub_dir_client, item_path)
+                dir_client.delete_subdirectory(item["name"])
+                print(f"🗂️ Deleted directory: {item_path}")
+            else:
+                dir_client.delete_file(item["name"])
+                print(f"🗑️ Deleted file: {item_path}")
+        except Exception as e:
+            print(f"⚠️ Error deleting {item_path}: {e}")
+
 def clean_removed_paths(selected_paths, share_client):
     current_paths = set()
 
@@ -116,12 +137,18 @@ def clean_removed_paths(selected_paths, share_client):
         try:
             if path in current_paths:
                 continue
-            if "/" not in path or "." in filename:  # crude check for files
-                dir_client.delete_file(filename)
-                print(f"🗑️ Deleted file: {path}")
-            else:
-                dir_client.delete_subdirectory(filename)
-                print(f"🗑️ Deleted directory: {path}")
+            try:
+                file_path = os.path.join(dir_path, filename).replace("\\", "/")
+                if "." in filename:  # Better check for files
+                    dir_client.delete_file(filename)
+                    print(f"🗑️ Deleted file: {path}")
+                else:
+                    sub_dir_client = share_client.get_directory_client(path)
+                    delete_directory_recursive(sub_dir_client, path)
+                    dir_client.delete_subdirectory(filename)
+                    print(f"🗂️ Deleted directory: {path}")
+            except Exception as e:
+                print(f"⚠️ Error deleting {path}: {e}")
         except Exception as e:
             print(f"⚠️ Error deleting {path}: {e}")
 

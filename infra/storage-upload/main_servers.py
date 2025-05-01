@@ -23,6 +23,7 @@ SELECTED_FOLDERS = [
     "server_appium",
     "server_teams_control"
 ]
+IGNORE_NAMES = {".venv", "__pycache__", ".DS_Store"}
 
 # === Init client ===
 credential = DefaultAzureCredential()
@@ -42,6 +43,9 @@ except Exception:
 
 def upload_dir(current_local_path, current_dir_client: ShareDirectoryClient):
     for item in os.listdir(current_local_path):
+        if item in IGNORE_NAMES:
+            continue
+
         full_local_path = os.path.join(current_local_path, item)
         if os.path.isdir(full_local_path):
             try:
@@ -51,10 +55,35 @@ def upload_dir(current_local_path, current_dir_client: ShareDirectoryClient):
                 print(f"  Directory {item} already exists, using existing one.")
             upload_dir(full_local_path, subdir_client)
         else:
+            if item in IGNORE_NAMES:
+                continue
             with open(full_local_path, "rb") as source_file:
                 current_dir_client.upload_file(item, source_file)
                 print(f"  Uploaded: {full_local_path}")
 
+
+def delete_directory_recursive(dir_client: ShareDirectoryClient, path=""):
+    try:
+        items = list(dir_client.list_directories_and_files())
+    except Exception as e:
+        print(f"⚠️ Cannot list {path or dir_client.path}: {e}")
+        return
+
+    for item in items:
+        item_name = item["name"]
+        item_path = os.path.join(path, item_name).replace("\\", "/")
+
+        try:
+            if item["is_directory"]:
+                sub_dir_client = dir_client.get_subdirectory_client(item_name)
+                delete_directory_recursive(sub_dir_client, item_path)
+                dir_client.delete_subdirectory(item_name)
+                print(f"🗂️ Deleted directory: {item_path}")
+            else:
+                dir_client.delete_file(item_name)
+                print(f"🗑️ Deleted file: {item_path}")
+        except Exception as e:
+            print(f"⚠️ Error deleting {item_path}: {e}")
 
 def clean_removed_server_folders(share_client, root_folder, selected_folders):
     deleted_files = []
@@ -102,6 +131,23 @@ def clean_removed_server_folders(share_client, root_folder, selected_folders):
 
             local_files = set(filenames)
             for item in remote_files:
+                if item['name'] in IGNORE_NAMES:
+                    try:
+                        if item['is_directory']:
+                            sub_dir_client = azure_subdir.get_subdirectory_client(item['name'])
+                            delete_directory_recursive(sub_dir_client, os.path.join(folder, rel_path, item['name']))
+                            try:
+                                azure_subdir.delete_subdirectory(item['name'])
+                                deleted_dirs.append(os.path.join(folder, rel_path, item['name']).replace("\\", "/"))
+                            except Exception as e:
+                                print(f"⚠️ Failed to delete ignored folder {item['name']}: {e}")
+                        else:
+                            azure_subdir.delete_file(item['name'])
+                            deleted_files.append(os.path.join(folder, rel_path, item['name']).replace("\\", "/"))
+                    except Exception as e:
+                        print(f"⚠️ Deleting ignored item {item['name']}: {e}")
+                    continue
+
                 if not item['is_directory'] and item['name'] not in local_files:
                     try:
                         azure_subdir.delete_file(item['name'])
