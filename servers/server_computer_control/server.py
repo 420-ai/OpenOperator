@@ -13,6 +13,7 @@ import platform
 import shlex
 import subprocess, signal
 from pathlib import Path
+import shutil
 from typing import Any, Optional
 from typing import List, Dict, Tuple
 import json
@@ -33,6 +34,8 @@ from human import Human
 from uuid import uuid4
 import getpass
 import setproctitle
+import win32con
+from datetime import datetime, timezone
 
 from load_apps import load_app_paths
 from dotenv import load_dotenv
@@ -115,15 +118,19 @@ pyautogui.DARWIN_CATCH_UP_TIME = 0
 
 
 computer = Computer()
-recording_process = None  # fixme: this is a temporary solution for recording, need to be changed to support multiple-process
 
 
-recording_path = os.path.join(os.path.dirname(__file__), "recordings")
+
+recording_output_path = ""
+recording_dir = os.path.join(os.path.dirname(__file__), "recordings")
 # create tmp directory if not exists
-os.makedirs(recording_path, exist_ok=True)
-recording_path = os.path.join(recording_path, "recording.mp4")
-logging.info("recording dir set to " + recording_path)
+os.makedirs(recording_dir, exist_ok=True)
+# recording_path = os.path.join(recording_path, "recording.mp4")
+logging.info("recording dir set to " + recording_dir)
 
+
+recording_processes: Dict[str, subprocess.Popen] = {}
+recording_paths: Dict[str, str] = {}
 
 
 # ---------------------------
@@ -225,38 +232,61 @@ def capture_screen_with_cursor():
 # ---------------------------
 # Recordings Endpoint
 # ---------------------------
-
-
 @app.route('/start_recording', methods=['POST'])
 def start_recording():
     try:
 
-        global recording_process
+        global recording_process, recording_output_path
+
         if recording_process:
             return jsonify({'status': 'error', 'message': 'Recording is already in progress.'}), 400
+        
+        data = request.get_json()
+        filename = data.get('filename')
+        if not filename:
+            return jsonify({'status': 'error', 'message': 'Filename is required'}), 400
+
+        recording_output_path = os.path.join(recording_dir, f"{filename}.mp4")
 
         if platform_name == 'Linux':
             d = display.Display()
             screen_width = d.screen().width_in_pixels
             screen_height = d.screen().height_in_pixels
 
-            start_command = f"ffmpeg -y -f x11grab -draw_mouse 1 -s {screen_width}x{screen_height} -i :0.0 -pix_fmt yuv420p -c:v libx264 -r 30 '{recording_path}'"
+            start_command = f"ffmpeg -y -f x11grab -draw_mouse 1 -s {screen_width}x{screen_height} -i :0.0 -pix_fmt yuv420p -c:v libx264 -r 30 '{recording_output_path}'"
 
             recording_process = subprocess.Popen(shlex.split(start_command), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         elif platform_name == 'Windows':
             screen_width, screen_height = pyautogui.size()
-            start_command = f"ffmpeg -y -f gdigrab -draw_mouse 1 -video_size {screen_width}x{screen_height} -i desktop -pix_fmt yuv420p -c:v libx264 -r 30 '{recording_path}'"
+            screen_width, screen_height = pyautogui.size()
+
+            ffmpeg_path = shutil.which("ffmpeg")
+            if not ffmpeg_path:
+                raise RuntimeError("ffmpeg not found in PATH")
+            start_command = [
+                ffmpeg_path,
+                '-y',
+                '-f', 'gdigrab',
+                '-draw_mouse', '1',
+                '-video_size', f'{screen_width}x{screen_height}',
+                '-i', 'desktop',
+                '-pix_fmt', 'yuv420p',
+                '-c:v', 'libx264',
+                '-r', '30',
+                recording_output_path
+            ]
 
             recording_process = subprocess.Popen(
-                shlex.split(start_command), 
-                stdin=subprocess.PIPE, 
-                stdout=subprocess.DEVNULL, 
+                start_command,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
-                creationflags=subprocess.CREATE_NO_WINDOW)
+                creationflags=subprocess.CREATE_NO_WINDOW
+            )
         else:
             return jsonify({'status': 'error', 'message': 'Recording is not supported on this platform.'}), 400
         
-        return jsonify({'status': 'success', 'message': f'Started recording to: {recording_path}.\nCOMMAND: {start_command}'})
+        return jsonify({'status': 'success', 'message': f'Started recording to: {recording_output_path}.\nCOMMAND: {start_command}'})
 
     except Exception as e:
         logging.error(f"Error starting recording: {e}")
@@ -268,13 +298,15 @@ def start_recording():
 def end_recording():
     try:
 
-        global recording_process
+        global recording_process, recording_output_path
 
         if not recording_process:
             return jsonify({'status': 'error', 'message': 'No recording in progress to stop.'}), 400
 
 
         logging.info(f"Recording process: {recording_process}")
+
+        logging.info(f"recording_output_path {recording_output_path}")
 
         # recording_process.send_signal(signal.SIGINT)
         # ps_childrend = recording_process.children()
@@ -295,8 +327,8 @@ def end_recording():
         recording_process = None
         # return recording video file
 
-        if os.path.exists(recording_path):
-            return  jsonify({'status': 'success', 'message': f'record saved to: {recording_path}'}), 200
+        if os.path.exists(recording_output_path):
+            return  jsonify({'status': 'success', 'message': f'record saved to: {recording_output_path}'}), 200
         else:
             return abort(404, description="Recording failed")
         
@@ -306,14 +338,116 @@ def end_recording():
 
         return jsonify({'status': 'error', 'message': f'Failed to start recording: {e}'}), 500
 
-@app.route('/get_recording', methods=['GET'])
+@app.route('/get_recording', methods=['POST'])
 def get_recording():
+    data = request.get_json()
+    filename = data.get('filename')
+    if not filename:
+        return jsonify({'status': 'error', 'message': 'Filename is required.'}), 400
 
-    if os.path.exists(recording_path):
-        return send_file(recording_path, as_attachment=True)
+    path = os.path.join(recording_dir, f"{filename}.mp4")
+    if os.path.exists(path):
+        return send_file(path, as_attachment=True)
     else:
         return jsonify({'status': 'error', 'message': 'Recording file not found.'}), 404
 
+
+
+@app.route('/setup/launch', methods=["POST"])
+def launch_app():
+    data = request.json
+    # log the request data 
+    logging.info('/setup/launch')
+    logging.info(f"Start time: {datetime.now(timezone.utc).isoformat()}")
+    logging.info(data)
+    shell = data.get("shell", False)
+    shell = True
+
+    command: List[str] = data.get("command", "" if shell else [])
+
+
+    if isinstance(command, str) and not shell:
+        command = shlex.split(command)
+
+    # Expand user directory
+    for i, arg in enumerate(command):
+        if arg.startswith("~/"):
+            command[i] = os.path.expanduser(arg)
+
+    try:
+        # user_platform = platform.system()
+        # if 'google-chrome' in command and user_platform == 'Windows':
+        #     index = command.index('google-chrome')
+        #     command[index] = 'chrome'
+
+
+        # if 'google-chrome' in command and _get_machine_architecture() == 'arm':
+        #     index = command.index('google-chrome')
+        #     command[index] = 'chromium-browser' # arm64 chrome is not available yet, can only use chromium
+
+        
+        app_path = APP_PATHS[command]
+
+        if app_path:
+            subprocess.Popen([app_path], shell=shell)
+
+            logging.info(f"End time: {datetime.now(timezone.utc).isoformat()}")
+            return f"{command if shell else ' '.join(command)} launched successfully from path {app_path}"
+        else:
+            subprocess.Popen(command, shell=shell)
+
+            logging.info(f"End time: {datetime.now(timezone.utc).isoformat()}")
+            return "{:} launched successfully".format(command if shell else " ".join(command))
+    except Exception as e:
+        logging.info(f"End time: {datetime.now(timezone.utc).isoformat()}")
+        logging.error("\n" + traceback.format_exc() + "\n")
+        # return jsonify({"status": "error", "message": str(e)}), 500
+        return jsonify({"status": "error", 
+                        "message": str(e),
+                        'shell': str(shell),
+                        'command': command,
+                        'data': data
+                        }), 500    
+
+@app.route('/setup/maximize', methods=["POST"])
+def maximize_window():
+    try:
+        data = request.get_json()
+        title_keyword = data.get("title_contains")
+
+        if not title_keyword:
+            return jsonify({"status": "error", "message": "'title_contains' is required"}), 400
+
+        matching_windows = []
+
+        def enum_handler(hwnd, result):
+            if win32gui.IsWindowVisible(hwnd):
+                title = win32gui.GetWindowText(hwnd)
+                if title_keyword.lower() in title.lower():
+                    result.append((hwnd, title))
+
+        win32gui.EnumWindows(enum_handler, matching_windows)
+
+        if not matching_windows:
+            return jsonify({"status": "error", "message": f"No window found containing '{title_keyword}'"}), 404
+
+        hwnd, title = matching_windows[0]
+
+        # Restore if minimized
+        win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
+        # Bring to foreground
+        win32gui.SetForegroundWindow(hwnd)
+        # Maximize the window
+        win32gui.ShowWindow(hwnd, win32con.SW_MAXIMIZE)
+
+        return jsonify({
+            "status": "success",
+            "message": f"Window '{title}' maximized",
+            "matched_title": title
+        })
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 
 
@@ -413,60 +547,6 @@ def shutdown_endpoint():
     os.system("shutdown /s /t 2")
 
     return jsonify({"status": "Shutdown started successfully", "message": "Shutdown started successfully"}), 200
-
-@app.route('/setup/launch', methods=["POST"])
-def launch_app():
-    data = request.json
-    # log the request data 
-    logging.info('/setup/launch')
-    logging.info(data)
-    shell = data.get("shell", False)
-    shell = True
-
-    command: List[str] = data.get("command", "" if shell else [])
-
-
-    if isinstance(command, str) and not shell:
-        command = shlex.split(command)
-
-    # Expand user directory
-    for i, arg in enumerate(command):
-        if arg.startswith("~/"):
-            command[i] = os.path.expanduser(arg)
-
-    try:
-        # user_platform = platform.system()
-        # if 'google-chrome' in command and user_platform == 'Windows':
-        #     index = command.index('google-chrome')
-        #     command[index] = 'chrome'
-
-
-        # if 'google-chrome' in command and _get_machine_architecture() == 'arm':
-        #     index = command.index('google-chrome')
-        #     command[index] = 'chromium-browser' # arm64 chrome is not available yet, can only use chromium
-
-
-        
-        app_path = APP_PATHS[command]
-
-        if app_path:
-            subprocess.Popen([app_path], shell=shell)
-            return f"{command if shell else ' '.join(command)} launched successfully from path {app_path}"
-        else:
-            subprocess.Popen(command, shell=shell)
-            return "{:} launched successfully".format(command if shell else " ".join(command))
-    except Exception as e:
-        
-
-        logging.error("\n" + traceback.format_exc() + "\n")
-        # return jsonify({"status": "error", "message": str(e)}), 500
-        return jsonify({"status": "error", 
-                        "message": str(e),
-                        'shell': str(shell),
-                        'command': command,
-                        'data': data
-                        }), 500    
-
 
 def _has_active_terminal(desktop: Accessible) -> bool:
     """ A quick check whether the terminal window is open and active.
