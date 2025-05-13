@@ -3,3 +3,4 @@ pillow
 pyautogui
 setproctitle
 uvicorn
+python-dotenv

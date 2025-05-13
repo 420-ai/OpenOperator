@@ -15,7 +15,8 @@ from agent_oo1.workflow.tools.mouse_move import mouse_move
 from agent_oo1.workflow.tools.mouse_scroll import mouse_scroll
 from agent_oo1.workflow.tools.mouse_left_click import mouse_left_click
 from agent_oo1.workflow.tools.mouse_double_click import mouse_double_click
-
+from dotenv import load_dotenv
+load_dotenv()
 
 import logging
 logger = logging.getLogger("agent_me")

@@ -27,10 +27,14 @@ Share folder `computers/windows/parallels_vm` into VM. Then you will see new net
 
 ## 1.4 Setup VM
 
-1. Create a folder `C:\INSTALL`
-2. Create a folder `C:\TEMP`
+1. Create a folder `C:\OEM`
+2. Copy `computers/windows/docker/scripts/*` into `C:\OEM\*`
 
-3. Copy a folders below into the `data` folder in this directory
+3. Create a folder `C:\TEMP`
+
+4. Create a folder `C:\Data`
+5. Copy `computers/windows/docker/data/init` into `C:\Data\init`
+6. Copy a folders below into the `C:\Data\*`
 
 - `../../servers/mcp_server_computer_control`
 - `../../servers/server_browser_control`
@@ -39,26 +43,23 @@ Share folder `computers/windows/parallels_vm` into VM. Then you will see new net
 - `../../servers/network_proxy`
 - `../../servers/teams_control`
 
-4. Adjust the `.env` files in each server => Uncomment the section for `# Parallels - Windows` and comment out the other variants
-
-5. **Copy the content of this folder into path `C:\INSTALL`**
-
 6. Open Command Prompt as Administrator
-7. Run the `install.bat` file with your username in the command prompt. Ex. `C:\INSTALL>install.bat lukaskellerstein`
-
+7. Run the `install.bat` file with your username in the command prompt. Ex. `C:\OEM>install.bat lukaskellerstein parallels`
 8. When you see `Press any key to continue ...` in the command prompt, CLOSE IT!
 
-> All logs are collected in the folder `C:\INSTALL\data\logs` for troubleshooting
+> All logs are collected in the folder `C:\Logs` for troubleshooting
 
 ## 1.4 Port forwarding
 
 On the `VM` are running a open-operator servers:
 
+- MCP server computer control on port `5055`
 - server computer control on port `5050`
 - server browser control on port `5051`
 - server network proxy on port `5052`
 - server evaluator on port `5053`
 - server teams control on port `5056`
+- server appium on port `4723`
 
 You can test them if they are running correctly by opening browser with urls:
 

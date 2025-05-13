@@ -15,6 +15,7 @@ SHARE_NAME = "windows-data"
 # === Map of local path -> destination path in Azure File Share ===
 SELECTED_PATHS = {
     "../../computers/windows/docker/scripts/install.bat": "oem/install.bat",
+    "../../computers/windows/docker/scripts/on_startup.ps1": "oem/on_startup.ps1",
     "../../computers/windows/docker/data/init": "data/init",
 }
 

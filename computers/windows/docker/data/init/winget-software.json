@@ -9,6 +9,9 @@
         },
         {
           "PackageIdentifier": "OpenJS.NodeJS.LTS"
+        },
+        {
+          "PackageIdentifier": "Gyan.FFmpeg"
         }
       ],
       "SourceDetails": {

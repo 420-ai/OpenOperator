@@ -36,6 +36,13 @@ DITL user
 ditluser-g1-14@TESTTESTDITL1TENANTTEST.onmicrosoft.com
 4~Ms3_no.YJw_3-L
 
+DITL user - Beafy
+ditluser80@TESTTESTDITL3TEST.onmicrosoft.com
+K~NiifFf1l21~3AL
+
+ditluser80@TESTTESTDITL3TENANTTEST.onmicrosoft.com
+K~NiifFf1l21~3AL
+
 ## MacOS
 
 No Apple account. Just local user

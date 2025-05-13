@@ -1,6 +1,15 @@
+import os
 import json
 from pathlib import Path
 from typing import List, Dict, Any
+from dotenv import load_dotenv
+load_dotenv()
+
+telemetry_path = os.getenv("TELEMETRY_PATH")
+print("TELEMETRY_PATH", telemetry_path)
+
+if not telemetry_path:
+    raise ValueError("TELEMETRY_PATH environment variable is not set.")
 
 
 def deep_get(dictionary: Dict[str, Any], keys: str):
@@ -26,9 +35,12 @@ def match_marker(obj: dict, marker: dict) -> bool:
 
 
 def check_teams_telemetry(filename: str, markers: List[Dict[str, str]]) -> Dict[str, Any]:
-    log_path = Path(filename)
-    if not log_path.exists():
+    teams_telemetry_path = Path(telemetry_path, filename)
+
+    if not teams_telemetry_path.exists():
         raise FileNotFoundError(f"Log file not found: {filename}")
+    else:
+        print(f"Log file found: {filename}")
 
     found = []
     not_found = markers.copy()
@@ -36,7 +48,7 @@ def check_teams_telemetry(filename: str, markers: List[Dict[str, str]]) -> Dict[
 
     marker_index = 0
 
-    with open(log_path, "r", encoding="utf-8") as f:
+    with open(teams_telemetry_path, "r", encoding="utf-8") as f:
         for line_num, line in enumerate(f):
             try:
                 record = json.loads(line)

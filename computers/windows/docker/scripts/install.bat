@@ -4,8 +4,22 @@ setlocal EnableDelayedExpansion
 REM ---------------------------
 REM 0) Set Username
 REM ---------------------------
-set "USERNAME=Docker"
+if "%~1"=="" (
+    set "USERNAME=Docker"
+) else (
+    set "USERNAME=%~1"
+)
+
 echo Using username: %USERNAME%
+
+if "%~2"=="" (
+    set "DESTINATION=Docker"
+) else (
+    set "DESTINATION=%~2" 
+)
+
+echo Using destination: %DESTINATION%
+
 
 REM ---------------------------
 REM ---------------------------
@@ -31,27 +45,31 @@ echo ================================================= >> "%LOGFILE%"
 REM ---------------------------
 REM 0.5) Copy all required files to C:\Data
 REM ---------------------------
-set "SOURCE=\\host.lan\Data"
-set "DEST=C:\Data"
+if /I "%DESTINATION%"=="Docker" (
 
-echo Ensuring %DEST% exists... >> "%LOGFILE%"
-if not exist "%DEST%" (
-    mkdir "%DEST%"
-    if %ERRORLEVEL% neq 0 (
-        echo Failed to create %DEST% folder. >> "%LOGFILE%"
+    set "SOURCE=\\host.lan\Data"
+    set "DEST=C:\Data"
+
+    echo Ensuring %DEST% exists... >> "%LOGFILE%"
+    if not exist "%DEST%" (
+        mkdir "%DEST%"
+        if %ERRORLEVEL% neq 0 (
+            echo Failed to create %DEST% folder. >> "%LOGFILE%"
+            exit /b %ERRORLEVEL%
+        )
+    )
+
+    echo Copying data from %SOURCE% to %DEST%... >> "%LOGFILE%"
+    robocopy "%SOURCE%" "%DEST%" /MIR /Z /NP /NFL /NDL /NJH /NJS /R:3 /W:5 >> "%LOGFILE%" 2>&1
+
+    if %ERRORLEVEL% GEQ 8 (
+        echo File copy failed with error code %ERRORLEVEL%. >> "%LOGFILE%"
         exit /b %ERRORLEVEL%
     )
+
+    echo Files successfully copied to %DEST% >> "%LOGFILE%"
+    
 )
-
-echo Copying data from %SOURCE% to %DEST%... >> "%LOGFILE%"
-robocopy "%SOURCE%" "%DEST%" /MIR /Z /NP /NFL /NDL /NJH /NJS /R:3 /W:5 >> "%LOGFILE%" 2>&1
-
-if %ERRORLEVEL% GEQ 8 (
-    echo File copy failed with error code %ERRORLEVEL%. >> "%LOGFILE%"
-    exit /b %ERRORLEVEL%
-)
-
-echo Files successfully copied to %DEST% >> "%LOGFILE%"
 
 REM ---------------------------
 REM ---------------------------
@@ -166,65 +184,138 @@ echo Creating .bat files for servers >> "%LOGFILE%"
 set "STARTUP_SERVER_COMPUTER_CONTROL_BAT=%~dp0start_server_computer_control.bat"
 (
     echo @echo off
-    echo start /b "ComputerControlServer" "%PYTHONW_PATH%" "C:\Data\server_computer_control\server.py"
+    echo set LOGFILE=C:\Logs\ComputerControlServer-startup.txt
+    echo call :logTime ^>^> %%LOGFILE%%
+    echo start /b "ComputerControlServer" "C:\Program Files\Python310\pythonw.exe" "C:\Data\server_computer_control\server.py"
+    echo exit /b
+    echo.
+    echo :logTime
+    echo setlocal ENABLEEXTENSIONS
+    echo set "ts=%%date%% %%time%%"
+    echo echo [%%ts%%] Triggered: ComputerControlServer
+    echo exit /b
 ) > "%STARTUP_SERVER_COMPUTER_CONTROL_BAT%"
 
 set "STARTUP_MCP_SERVER_COMPUTER_CONTROL_BAT=%~dp0start_mcp_server_computer_control.bat"
 (
     echo @echo off
+    echo set LOGFILE=C:\Logs\MCPComputerControlServer-startup.txt
+    echo call :logTime ^>^> %%LOGFILE%%
     echo start /b "MCPComputerControlServer" "%PYTHONW_PATH%" "C:\Data\mcp_server_computer_control\server.py"
+    echo exit /b
+    echo.
+    echo :logTime
+    echo setlocal ENABLEEXTENSIONS
+    echo set "ts=%%date%% %%time%%"
+    echo echo [%%ts%%] Triggered: MCPComputerControlServer
+    echo exit /b
 ) > "%STARTUP_MCP_SERVER_COMPUTER_CONTROL_BAT%"
 
 set "STARTUP_SERVER_BROWSER_CONTROL_BAT=%~dp0start_server_browser_control.bat"
 (
     echo @echo off
+    echo set LOGFILE=C:\Logs\BrowserControlServer-startup.txt
+    echo call :logTime ^>^> %%LOGFILE%%
     echo start /b "BrowserControlServer" "%PYTHONW_PATH%" "C:\Data\server_browser_control\server.py"
+    echo exit /b
+    echo.
+    echo :logTime
+    echo setlocal ENABLEEXTENSIONS
+    echo set "ts=%%date%% %%time%%"
+    echo echo [%%ts%%] Triggered: BrowserControlServer
+    echo exit /b
 ) > "%STARTUP_SERVER_BROWSER_CONTROL_BAT%"
 
 set "STARTUP_SERVER_NETWORK_PROXY_BAT=%~dp0start_server_network_proxy.bat"
 (
     echo @echo off
+    echo set LOGFILE=C:\Logs\NetworkProxyServer-startup.txt
+    echo call :logTime ^>^> %%LOGFILE%%
     echo start /b "NetworkProxyServer" "%PYTHONW_PATH%" "C:\Data\server_network_proxy\server.py"
+    echo exit /b
+    echo.
+    echo :logTime
+    echo setlocal ENABLEEXTENSIONS
+    echo set "ts=%%date%% %%time%%"
+    echo echo [%%ts%%] Triggered: NetworkProxyServer
+    echo exit /b
 ) > "%STARTUP_SERVER_NETWORK_PROXY_BAT%"
 
 set "STARTUP_SERVER_EVALUATOR_BAT=%~dp0start_server_evaluator.bat"
 (
     echo @echo off
+    echo set LOGFILE=C:\Logs\ServerEvaluatorServer-startup.txt
+    echo call :logTime ^>^> %%LOGFILE%%
     echo start /b "ServerEvaluatorServer" "%PYTHONW_PATH%" "C:\Data\server_evaluator\server.py"
+    echo exit /b
+    echo.
+    echo :logTime
+    echo setlocal ENABLEEXTENSIONS
+    echo set "ts=%%date%% %%time%%"
+    echo echo [%%ts%%] Triggered: ServerEvaluatorServer
+    echo exit /b
 ) > "%STARTUP_SERVER_EVALUATOR_BAT%"
 
 set "STARTUP_SERVER_TEAMS_CONTROL_BAT=%~dp0start_server_teams_control.bat"
 (
     echo @echo off
+    echo set LOGFILE=C:\Logs\TeamsControlServer-startup.txt
+    echo call :logTime ^>^> %%LOGFILE%%
     echo start /b "TeamsControlServer" "%PYTHONW_PATH%" "C:\Data\server_teams_control\server.py"
+    echo exit /b
+    echo.
+    echo :logTime
+    echo setlocal ENABLEEXTENSIONS
+    echo set "ts=%%date%% %%time%%"
+    echo echo [%%ts%%] Triggered: TeamsControlServer
+    echo exit /b
 ) > "%STARTUP_SERVER_TEAMS_CONTROL_BAT%"
 
 set "STARTUP_APPIUM_SERVER_BAT=%~dp0start_server_appium.bat"
 (
     echo @echo off
+    echo set LOGFILE=C:\Logs\AppiumServer-startup.txt
+    echo call :logTime ^>^> %%LOGFILE%%
     echo start /b "AppiumServer" "%PYTHONW_PATH%" "C:\Data\server_appium\server.py" "%USERNAME%"
+    echo exit /b
+    echo.
+    echo :logTime
+    echo setlocal ENABLEEXTENSIONS
+    echo set "ts=%%date%% %%time%%"
+    echo echo [%%ts%%] Triggered: AppiumServer
+    echo exit /b
 ) > "%STARTUP_APPIUM_SERVER_BAT%"
 
 echo .bat files for servers created >> "%LOGFILE%"
 
 REM ---------------------------
-REM 7) Schedule Startup Task
+REM 7) Enable Task Scheduler History
+REM ---------------------------
+echo Enabling Task Scheduler history >> "%LOGFILE%"
+wevtutil set-log "Microsoft-Windows-TaskScheduler/Operational" /enabled:true >> "%LOGFILE%" 2>&1
+
+REM ---------------------------
+REM 8) Schedule Startup Task
 REM ---------------------------
 REM Without /IT, the task will not run interactively = will not be able to catch screenshots and record videos
 REM Without /DELAY is needed in order to wait until network storage is available and user is logged in
 echo Creating 'scheduled tasks' for servers >> "%LOGFILE%"
+REM Logging
+schtasks /Create /TN "Log-OnStartup" /SC ONLOGON /TR "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"C:\OEM\on_startup.ps1\"" /RU "%USERNAME%" /RL HIGHEST /IT /F
 REM OO Servers
-schtasks /Create /TN "StartServer-ComputerControl" /SC ONSTART /TR "\"%STARTUP_SERVER_COMPUTER_CONTROL_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /DELAY 0000:10 /F
-schtasks /Create /TN "StartServer-MCPComputerControl" /SC ONSTART /TR "\"%STARTUP_MCP_SERVER_COMPUTER_CONTROL_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /DELAY 0000:10 /F
-schtasks /Create /TN "StartServer-BrowserControl" /SC ONSTART /TR "\"%STARTUP_SERVER_BROWSER_CONTROL_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /DELAY 0000:10 /F
-schtasks /Create /TN "StartServer-NetworkProxy" /SC ONSTART /TR "\"%STARTUP_SERVER_NETWORK_PROXY_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /DELAY 0000:10 /F
-schtasks /Create /TN "StartServer-Evaluator" /SC ONSTART /TR "\"%STARTUP_SERVER_EVALUATOR_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /DELAY 0000:10 /F
-schtasks /Create /TN "StartServer-TeamsControl" /SC ONSTART /TR "\"%STARTUP_SERVER_TEAMS_CONTROL_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /DELAY 0000:10 /F
+schtasks /Create /TN "StartServer-ComputerControl" /SC ONLOGON /TR "\"%STARTUP_SERVER_COMPUTER_CONTROL_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /F
+schtasks /Create /TN "StartServer-MCPComputerControl" /SC ONLOGON /TR "\"%STARTUP_MCP_SERVER_COMPUTER_CONTROL_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /F
+schtasks /Create /TN "StartServer-BrowserControl" /SC ONLOGON /TR "\"%STARTUP_SERVER_BROWSER_CONTROL_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /F
+schtasks /Create /TN "StartServer-NetworkProxy" /SC ONLOGON /TR "\"%STARTUP_SERVER_NETWORK_PROXY_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /F
+schtasks /Create /TN "StartServer-Evaluator" /SC ONLOGON /TR "\"%STARTUP_SERVER_EVALUATOR_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /F
+schtasks /Create /TN "StartServer-TeamsControl" /SC ONLOGON /TR "\"%STARTUP_SERVER_TEAMS_CONTROL_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /F
 REM Appium
-schtasks /Create /TN "StartServer-Appium" /SC ONSTART /TR "\"%STARTUP_APPIUM_SERVER_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /DELAY 0000:10 /F
+schtasks /Create /TN "StartServer-Appium" /SC ONLOGON /TR "\"%STARTUP_APPIUM_SERVER_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /F
 echo 'Scheduled tasks' for servers created >> "%LOGFILE%"
 
 echo Triggering 'scheduled tasks' for servers >> "%LOGFILE%"
+REM Logging
+schtasks /Run /TN "Log-OnStartup"
 REM OO Servers
 schtasks /Run /TN "StartServer-ComputerControl"
 schtasks /Run /TN "StartServer-MCPComputerControl"

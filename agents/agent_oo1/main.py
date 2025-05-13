@@ -5,7 +5,6 @@ import logging
 from core.state import State
 from core.tracker import Tracker
 from core.config import OOConfig
-from functions.executor import FunctionExecutor
 from agent_oo1.logging_setup import configure_logging
 from agent_oo1.workflow.agent_me import OOAgentMe
 from datetime import datetime
@@ -13,8 +12,17 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-d = os.path.dirname(__file__)
+agent_name = os.getenv("AGENT_NAME", "agent_oo1")
+print("AGENT_NAME", agent_name)
+
+agent_pvc_path = os.getenv("AGENT_PVC_PATH", os.path.dirname(__file__))
+print("AGENT_PVC_PATH", agent_pvc_path)
+
+d = os.path.join(agent_pvc_path, agent_name)
 t = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+print("final_dir", d)
+print("timestamp", t)
 
 # Logging
 configure_logging(t)
@@ -39,18 +47,11 @@ async def start() -> None:
         logger.info("Starting task execution...")
         # tracker.start_recording()
 
-        # Trigger the start functions
-        executor = FunctionExecutor()
-        executor.execute_from_list(config.environment.start, state=state)
-
         # -----------------------
         # Agent ME
         # -----------------------
         agent_me = OOAgentMe(state, tracker)
         _ = await agent_me.run()
-
-        # Trigger the end functions
-        executor.execute_from_list(config.environment.end, state=state)
 
     except Exception as e:
         logger.error(f"An error occurred: {e}")

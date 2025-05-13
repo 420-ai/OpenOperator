@@ -52,23 +52,3 @@ uv run -m agent_oo4.main
 We are using Elasticsearch and Kibana to observe logs and telemetry.
 
 Open `http://localhost:5601`
-
-# TODO
-
-Deploy ElasticSearch, Kibana and Grafana into k8s
-
-- OOOAnalytics => new nodepool
-
-SHOW:
-
-1. Snapshots
-2. RDP - fix
-3. Agent running
-4. Telemetry collection + Evaluation
-
-NEED:
-
-- Buffy APM user + Login + snapshot
-- Proper Scenarion + Markers
-
-Ken PR

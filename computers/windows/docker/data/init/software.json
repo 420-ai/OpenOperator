@@ -23,11 +23,6 @@
     ],
     "alias": "teams"
   },
-  "ffmpeg": {
-    "mirrors": [
-      "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.7z"
-    ]
-  },
   "VLC": {
     "mirrors": [
       "https://ftp.free.org/mirrors/videolan/vlc/3.0.21/win64/vlc-3.0.21-win64.exe",

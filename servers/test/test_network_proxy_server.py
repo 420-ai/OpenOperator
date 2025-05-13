@@ -3,7 +3,7 @@ import requests
 # BASE_URL = "http://127.0.0.1:5052"
 # BASE_URL = "http://192.168.5.65:5052"
 # BASE_URL = "http://win-1.4.155.164.237.nip.io/np"
-BASE_URL = "http://comp-1.4.242.123.121.nip.io/np"
+BASE_URL = "http://computer-6823417694dd47734aef8fb2.4.242.123.121.nip.io/np"
 
 
 def test_healthcheck():
@@ -32,11 +32,11 @@ def test_status():
 if __name__ == "__main__":
     # test_healthcheck()
 
-    # test_status()
+    test_status()
 
-    test_start_proxy()
+    # test_start_proxy()
 
     # # import time
     # # time.sleep(15)
 
-    # test_stop_proxy() 
+    test_stop_proxy() 

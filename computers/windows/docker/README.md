@@ -12,7 +12,6 @@ In folder `windows/docker` is setup for a VM in docker.
 
 1b. Visit [Windows Software Download center](https://www.microsoft.com/en-us/software-download/windows11), download **Windows 11 (multi-edition ISO for x64 devices)** - Win11_24H2_English_x64.iso [~6GB]
 
-
 2. After downloading, rename the file to `win.iso` and copy it to the directory `iso` (if does not exist, create one in this directory)
 
 ## 1.2 Configure
@@ -110,3 +109,34 @@ You can test the openoperator servers from host by running command `curl -v http
 }
 * Closing connection
 ```
+
+# 2. Post-installation procedure
+
+## 2.1 Show hidden files
+
+Control Panel > File Explorer Options > View > Show hidden files
+
+## 2.2 Check mitmproxy certs
+
+Check that mitmproxy certs are installed.
+
+Search > Manage computer certificates > Truster Root Certification Authorities > Certificates > mitmproxy
+
+## 2.3 Check Teams has installed configuration
+
+Check that `configuration.json` exist on path `C:\Users\Docker\AppData\Local\Packages\MSTeams_8wekyb3d8bbwe\LocalCache\Microsoft\MSTeams\configuration.json`.
+
+If not, call the `teams_control_server` on the computer.
+
+A) via test script - `openoperator/servers/test/test_teams_control_server.py`
+
+B) via curl
+
+## 2.4 Prepare Teams
+
+1. Open Teams > Finish the "Last Step" dialog
+2. Login into Teams
+
+## 2.9 Notepad
+
+Notepad - set open alway in new window

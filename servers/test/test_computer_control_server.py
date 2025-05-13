@@ -2,12 +2,14 @@ import requests
 import base64
 import os
 import json
+import time
 
-# BASE_URL = "http://127.0.0.1:5050"
+BASE_URL = "http://127.0.0.1:5050"
 # BASE_URL = "http://test-11.4.155.164.237.nip.io/cc"
 # BASE_URL = "http://192.168.5.65:5050"
-# BASE_URL = "http://computer-6810c96f841039074308a398.4.242.123.121.nip.io/cc"
-BASE_URL = "http://computer-681148f0416e887bd8bc71b7.4.242.123.121.nip.io/cc"
+# BASE_URL = "http://computer-6823417694dd47734aef8fb2.4.242.123.121.nip.io/cc"
+# BASE_URL = "http://comp-7.4.242.123.121.nip.io/cc"
+# BASE_URL = "http://my-test-comp.4.242.123.121.nip.io/cc"
 
 screenshots_dir = "screenshots"
 os.makedirs(screenshots_dir, exist_ok=True)
@@ -79,11 +81,12 @@ def test_capture_screen_with_cursor():
     print("Screenshot with cursor saved as screenshot.png")
 
 def test_start_end_recording():
+    filename = "my_recording_1"
+
     # Start recording
-    resp_start = requests.post(f"{BASE_URL}/start_recording")
+    resp_start = requests.post(f"{BASE_URL}/start_recording", json={"filename": filename})
     print("Start Recording:", resp_start.json())
 
-    import time
     time.sleep(10)  # Record for 5 seconds
 
     # End recording
@@ -91,9 +94,9 @@ def test_start_end_recording():
     print("End Recording:", resp_end.json())
 
     # Download recording
-    resp_get = requests.get(f"{BASE_URL}/get_recording")
+    resp_get = requests.post(f"{BASE_URL}/get_recording", json={"filename": filename})
     if resp_get.status_code == 200:
-        file_path = os.path.join(recordings_dir, "recording.mp4")
+        file_path = os.path.join(recordings_dir, f"{filename}.mp4")
         with open(file_path, "wb") as f:
             f.write(resp_get.content)
         print("Recording downloaded successfully.")
@@ -106,6 +109,56 @@ def end_recording():
         print("Recording ended successfully.")
     else:
         print("Failed to end recording. Status code:", resp_end.status_code)
+
+def get_recording():
+    filename = "my_recording_1"
+
+    resp_get = requests.post(f"{BASE_URL}/get_recording", json={"filename": filename})
+    if resp_get.status_code == 200:
+        file_path = os.path.join(recordings_dir, f"{filename}.mp4")
+        with open(file_path, "wb") as f:
+            f.write(resp_get.content)
+        print("Recording downloaded successfully.")
+    else:
+        print("Failed to download recording:", resp_get.json())
+
+def test_multiple_recordings():
+    filename1 = "my_recording_10"
+    filename2 = "my_recording_11"
+
+    # Start first recording
+    resp1_start = requests.post(f"{BASE_URL}/start_recording", json={"filename": filename1})
+    print("Start Recording 1:", resp1_start.json())
+
+    time.sleep(2)  # wait a bit before starting second
+
+    # Start second recording
+    resp2_start = requests.post(f"{BASE_URL}/start_recording", json={"filename": filename2})
+    print("Start Recording 2:", resp2_start.json())
+
+    time.sleep(5)  # Record for 5 seconds total
+
+    # End second recording first
+    resp2_end = requests.post(f"{BASE_URL}/end_recording", json={"filename": filename2})
+    print("End Recording 2:", resp2_end.json())
+
+    time.sleep(2)  # Allow first to keep recording longer
+
+    # End first recording
+    resp1_end = requests.post(f"{BASE_URL}/end_recording", json={"filename": filename1})
+    print("End Recording 1:", resp1_end.json())
+
+    # Download both recordings
+    for fname in [filename1, filename2]:
+        resp_get = requests.post(f"{BASE_URL}/get_recording", json={"filename": fname})
+        if resp_get.status_code == 200:
+            file_path = os.path.join(recordings_dir, f"{fname}.mp4")
+            with open(file_path, "wb") as f:
+                f.write(resp_get.content)
+            print(f"{fname} downloaded successfully.")
+        else:
+            print(f"Failed to download {fname}:", resp_get.json())
+
 
 def test_activate_window():
     resp = requests.post(f"{BASE_URL}/setup/activate_window", json={"window_name": "Notepad"})
@@ -129,8 +182,15 @@ def test_open_application():
     else:
         print("Failed to launch application:", resp.status_code, resp.text)
 
+def test_maximize_window():
+    resp = requests.post(f"{BASE_URL}/setup/maximize", json={"title_contains": "Teams"})
+    if resp.status_code == 200:
+        print("Window maximized successfully.")
+    else:
+        print("Failed to maximize window:", resp.status_code, resp.text)
+
 if __name__ == "__main__":
-    # test_healthcheck()
+    test_healthcheck()
     # test_platform()
     # test_move_mouse()
     # test_cursor_position()
@@ -140,7 +200,9 @@ if __name__ == "__main__":
     # test_list_directory()
     # test_capture_screen_with_cursor()
     # test_start_end_recording()
+    # test_multiple_recordings()
     # test_activate_window()
-    test_open_application()
+    # test_open_application()
+    # test_maximize_window()
     # Uncomment the line below if you are sure you want to close all windows.
     # test_close_all_windows()

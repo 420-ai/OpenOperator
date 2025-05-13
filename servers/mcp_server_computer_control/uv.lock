@@ -371,6 +371,7 @@ dependencies = [
     { name = "mcp" },
     { name = "pillow" },
     { name = "pyautogui" },
+    { name = "python-dotenv" },
     { name = "setproctitle" },
     { name = "uvicorn" },
 ]
@@ -380,6 +381,7 @@ requires-dist = [
     { name = "mcp", specifier = ">=1.5.0" },
     { name = "pillow", specifier = ">=11.1.0" },
     { name = "pyautogui", specifier = ">=0.9.54" },
+    { name = "python-dotenv", specifier = ">=1.1.0" },
     { name = "setproctitle", specifier = ">=1.3.5" },
     { name = "uvicorn", specifier = ">=0.34.0" },
 ]

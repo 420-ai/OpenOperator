@@ -1,7 +1,0 @@
-{
-  "core/localStorageKeyValues": "{\"dG1wLnNldHRpbmdz\":\"eyJ0ZWxlbWV0cnkiOnsiZW5hYmxlQ29tcHJlc3Npb24iOmZhbHNlLCJpc1NpbGVudCI6ZmFsc2UsIm5vcm1hbFByaW9yaXR5U2VuZFRpbWVJblNlY3MiOjIsImhpZ2hQcmlvcml0eVNlbmRUaW1lSW5TZWNzIjoxLCJzYW1wbGluZ1J1bGVzIjp7InNjZW5hcmlvbnMiOnsiKiI6MTAwfSwibG9nZ2luZ25zIjp7IioiOjB9LCJodHRwbnMiOnsiKiI6MH0sImVuZHBvaW50bnMiOnsiKiI6MH0sInVzZXJiaW5zIjp7IioiOjEwMH19LCJlbmFibGVVc2VySWRTYW1wbGluZ1YyIjp0cnVlLCJlbmFibGVCbG9ja1plcm9TYW1wbGluZ1JhdGUiOnRydWV9LCJkaWFnbm9zdGljcyI6eyJpc0RpYWdub3N0aWNzUGFuZWxFbmFibGVkIjp0cnVlLCJkaWFnbm9zdGljc1BhbmVsRW5hYmxlZEFwcHMiOlsiKiJdfSwic2hvcnRjdXRzIjp7ImVuYWJsZURldlNob3J0Y3V0cyI6dHJ1ZX19\"}",
-  "core/devMenuEnabled": true,
-  "app/testModeEnabled": true,
-  "app/remoteDebuggingPort": 9222,
-  "auth/disableSSO": true
-}

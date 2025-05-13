@@ -116,7 +116,10 @@ def clean_removed_server_folders(share_client, root_folder, selected_folders):
             print(f"⚠️ Folder {folder} does not exist in Azure yet, skipping cleanup.")
             continue
 
-        for dirpath, _, filenames in os.walk(folder_path):
+        for dirpath, dirnames, filenames in os.walk(folder_path):
+            # Filter ignored directories
+            dirnames[:] = [d for d in dirnames if d not in IGNORE_NAMES]
+            
             rel_path = os.path.relpath(dirpath, folder_path).replace("\\", "/")
             azure_subdir = folder_dir_client
             if rel_path != ".":

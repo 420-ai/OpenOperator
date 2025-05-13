@@ -2,5 +2,5 @@ fastapi
 mitmproxy
 pydantic
 uvicorn
-dotenv
+python-dotenv
 elasticsearch==9.0.0

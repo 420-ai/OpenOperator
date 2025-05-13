@@ -1,10 +1,10 @@
 [project]
-name = "echo-server-omniparser"
+name = "server-omniparser"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 authors = [
-    { name = "Ken Chau", email = "kchau@microsoft.com" }
+    { name = "Lukas Kellerstein", email = "lukas.kellerstein@microsoft.com" }
 ]
 requires-python = ">=3.12"
 dependencies = [

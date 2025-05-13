@@ -235,48 +235,37 @@ def capture_screen_with_cursor():
 @app.route('/start_recording', methods=['POST'])
 def start_recording():
     try:
-
-        global recording_process, recording_output_path
-
-        if recording_process:
-            return jsonify({'status': 'error', 'message': 'Recording is already in progress.'}), 400
-        
         data = request.get_json()
         filename = data.get('filename')
         if not filename:
             return jsonify({'status': 'error', 'message': 'Filename is required'}), 400
 
-        recording_output_path = os.path.join(recording_dir, f"{filename}.mp4")
+        if filename in recording_processes:
+            return jsonify({'status': 'error', 'message': f'Recording with name {filename} already in progress.'}), 400
+
+        output_path = os.path.join(recording_dir, f"{filename}.mp4")
+        recording_paths[filename] = output_path
 
         if platform_name == 'Linux':
             d = display.Display()
             screen_width = d.screen().width_in_pixels
             screen_height = d.screen().height_in_pixels
+            start_command = f"ffmpeg -y -f x11grab -draw_mouse 1 -s {screen_width}x{screen_height} -i :0.0 -pix_fmt yuv420p -c:v libx264 -r 30 '{output_path}'"
+            proc = subprocess.Popen(shlex.split(start_command), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-            start_command = f"ffmpeg -y -f x11grab -draw_mouse 1 -s {screen_width}x{screen_height} -i :0.0 -pix_fmt yuv420p -c:v libx264 -r 30 '{recording_output_path}'"
-
-            recording_process = subprocess.Popen(shlex.split(start_command), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         elif platform_name == 'Windows':
             screen_width, screen_height = pyautogui.size()
-            screen_width, screen_height = pyautogui.size()
-
             ffmpeg_path = shutil.which("ffmpeg")
             if not ffmpeg_path:
                 raise RuntimeError("ffmpeg not found in PATH")
-            start_command = [
-                ffmpeg_path,
-                '-y',
-                '-f', 'gdigrab',
-                '-draw_mouse', '1',
-                '-video_size', f'{screen_width}x{screen_height}',
-                '-i', 'desktop',
-                '-pix_fmt', 'yuv420p',
-                '-c:v', 'libx264',
-                '-r', '30',
-                recording_output_path
-            ]
 
-            recording_process = subprocess.Popen(
+            start_command = [
+                ffmpeg_path, '-y', '-f', 'gdigrab', '-draw_mouse', '1',
+                '-video_size', f'{screen_width}x{screen_height}',
+                '-i', 'desktop', '-pix_fmt', 'yuv420p',
+                '-c:v', 'libx264', '-r', '30', output_path
+            ]
+            proc = subprocess.Popen(
                 start_command,
                 stdin=subprocess.PIPE,
                 stdout=subprocess.DEVNULL,
@@ -284,59 +273,44 @@ def start_recording():
                 creationflags=subprocess.CREATE_NO_WINDOW
             )
         else:
-            return jsonify({'status': 'error', 'message': 'Recording is not supported on this platform.'}), 400
-        
-        return jsonify({'status': 'success', 'message': f'Started recording to: {recording_output_path}.\nCOMMAND: {start_command}'})
+            return jsonify({'status': 'error', 'message': 'Unsupported platform.'}), 400
+
+        recording_processes[filename] = proc
+        return jsonify({'status': 'success', 'message': f'Recording started for {filename}'}), 200
 
     except Exception as e:
-        logging.error(f"Error starting recording: {e}")
-        logging.error("\n" + traceback.format_exc() + "\n")
+        logging.error(traceback.format_exc())
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
-        return jsonify({'status': 'error', 'message': f'Failed to start recording: {e}'}), 500
 
 @app.route('/end_recording', methods=['POST'])
 def end_recording():
     try:
+        data = request.get_json()
+        filename = data.get('filename')
+        if not filename or filename not in recording_processes:
+            return jsonify({'status': 'error', 'message': 'No such recording in progress.'}), 400
 
-        global recording_process, recording_output_path
+        proc = recording_processes[filename]
 
-        if not recording_process:
-            return jsonify({'status': 'error', 'message': 'No recording in progress to stop.'}), 400
-
-
-        logging.info(f"Recording process: {recording_process}")
-
-        logging.info(f"recording_output_path {recording_output_path}")
-
-        # recording_process.send_signal(signal.SIGINT)
-        # ps_childrend = recording_process.children()
-        # logging.info(f"Children: {ps_childrend}")
-
-        # for c in ps_childrend:
-        #     c.send_signal(signal.CTRL_C_EVENT)
-        # os.killpg(os.getpgid(recording_process.pid), signal.SIGTERM)
-        # os.kill(recording_process.pid, signal.CTRL_C_EVENT)
-        recording_process.communicate(b'q') 
-        # os.kill(recording_process.pid, signal.SIGINT)
-        # os.kill(recording_process.pid, signal.SIGINT)
-        code = recording_process.wait()
-        recording_process.terminate()
-        # if recording_process.poll() is None:  
-        #     # Forcefully kill the process if it did not terminate  
-        #     recording_process.kill()
-        recording_process = None
-        # return recording video file
-
-        if os.path.exists(recording_output_path):
-            return  jsonify({'status': 'success', 'message': f'record saved to: {recording_output_path}'}), 200
+        if platform_name == 'Windows':
+            proc.communicate(b'q')
         else:
-            return abort(404, description="Recording failed")
-        
-    except Exception as e:
-        logging.error(f"Error starting recording: {e}")
-        logging.error("\n" + traceback.format_exc() + "\n")
+            proc.terminate()
 
-        return jsonify({'status': 'error', 'message': f'Failed to start recording: {e}'}), 500
+        proc.wait()
+        del recording_processes[filename]
+
+        path = recording_paths.get(filename)
+        if path and os.path.exists(path):
+            return jsonify({'status': 'success', 'message': f'Recording saved: {path}'}), 200
+        else:
+            return jsonify({'status': 'error', 'message': 'Recording file not found after termination.'}), 404
+
+    except Exception as e:
+        logging.error(traceback.format_exc())
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
 
 @app.route('/get_recording', methods=['POST'])
 def get_recording():
@@ -1918,5 +1892,5 @@ def get_check_if_world_clock_exists():
 # ---------------------------
 if __name__ == '__main__':
     logging.info("Server started")
-    app.run(debug=True, host="0.0.0.0", port=port)
+    app.run(debug=False, use_reloader=False, host="0.0.0.0", port=port)
 
