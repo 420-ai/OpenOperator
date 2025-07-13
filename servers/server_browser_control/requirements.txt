@@ -6,3 +6,5 @@ uvicorn
 fastapi
 pyautogui
 python-dotenv
+psutil
+requests

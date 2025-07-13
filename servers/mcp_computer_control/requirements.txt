@@ -1,0 +1,35 @@
+# Core MCP and server dependencies
+mcp>=1.9.4
+pydantic>=2.10.6
+uvicorn>=0.34.0
+starlette>=0.37.2
+
+# Computer automation
+pyautogui>=0.9.54
+
+# Image processing for screenshots
+pillow>=10.0.0
+
+# GUI framework for dialogs (optional)
+pyqt6>=6.7.0
+
+# HTTP requests for file downloads
+requests>=2.31.0
+
+# System information
+psutil>=5.9.0
+
+# Environment variables
+python-dotenv>=1.0.0
+
+# Platform-specific dependencies (optional)
+# Windows
+# pywin32>=306 ; platform_system == "Windows"
+# win10toast>=0.9 ; platform_system == "Windows"
+
+# macOS
+# pyobjc>=10.0 ; platform_system == "Darwin"
+
+# Linux (install via system package manager)
+# xdotool - for window management on Linux
+# libnotify-bin - for notifications on Linux

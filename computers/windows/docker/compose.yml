@@ -21,6 +21,8 @@ services:
       - 5055:5055
       - 4723:4723
       - 5056:5056
+      - 8003:8003
+      - 8931:8931
       - 9222:9222
     volumes:
       - ./iso/Win11_24H2_English_x64.iso:/custom.iso
@@ -34,5 +36,7 @@ services:
       - ../../../servers/server_network_proxy:/data/server_network_proxy
       - ../../../servers/server_appium:/data/server_appium
       - ../../../servers/server_teams_control:/data/server_teams_control
+      - ../../../servers/mcp_computer_control:/data/mcp_computer_control
+      - ../../../servers/mcp_playwright_direct:/data/mcp_playwright_direct
     restart: no
     stop_grace_period: 2m

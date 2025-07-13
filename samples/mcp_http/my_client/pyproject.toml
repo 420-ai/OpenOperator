@@ -1,0 +1,10 @@
+[project]
+name = "my_client"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "mcp>=1.9.4",
+    "yfinance>=0.2.54",
+]

@@ -161,6 +161,21 @@ echo Installing Python libraries for 'server appium' ... >> "%LOGFILE%"
 echo Python libraries for 'server appium' were installed >> "%LOGFILE%"
 
 
+echo Installing Python libraries for 'MCP Computer Control' ... >> "%LOGFILE%"
+"%PYTHON_PATH%" -m pip install -r "C:\Data\mcp_computer_control\requirements.txt" >> "%LOGFILE%" 2>&1
+echo Python libraries for 'MCP Computer Control' were installed >> "%LOGFILE%"
+
+REM ---------------------------
+REM 4.1) Install MCP Playwright Direct
+REM ---------------------------
+echo Installing MCP Playwright Direct... >> "%LOGFILE%"
+if exist "C:\Data\mcp_playwright_direct\install_snippet.bat" (
+    call "C:\Data\mcp_playwright_direct\install_snippet.bat" "%USERNAME%" "%LOGFILE%" "%~dp0"
+    echo MCP Playwright Direct installation completed >> "%LOGFILE%"
+) else (
+    echo WARNING: MCP Playwright Direct install script not found at C:\Data\mcp_playwright_direct\install_snippet.bat >> "%LOGFILE%"
+)
+
 REM ---------------------------
 REM 5) Add Firewall Rules
 REM ---------------------------
@@ -171,10 +186,11 @@ netsh advfirewall firewall add rule name="SERVER_BROWSER_CONTROL" dir=in action=
 netsh advfirewall firewall add rule name="SERVER_NETWORK_PROXY" dir=in action=allow protocol=TCP localport=5052
 netsh advfirewall firewall add rule name="SERVER_EVALUATOR" dir=in action=allow protocol=TCP localport=5053
 netsh advfirewall firewall add rule name="SERVER_TEAMS_CONTROL" dir=in action=allow protocol=TCP localport=5056
-REM Add firewall rule for Chrome DevTools (port 9222)
-netsh advfirewall firewall add rule name="Chrome Remote Debugging Port" dir=in action=allow protocol=TCP localport=9222
 REM Add firewall rule for Appium (port 4723)
 netsh advfirewall firewall add rule name="Appium" dir=in action=allow protocol=TCP localport=4723
+REM Firewall rule for Playwright MCP is handled by its install script
+REM Add firewall rule for MCP Computer Control (port 8003)
+netsh advfirewall firewall add rule name="MCP_COMPUTER_CONTROL" dir=in action=allow protocol=TCP localport=8003
 echo Firewall rules added >> "%LOGFILE%"
 
 REM ---------------------------
@@ -286,6 +302,23 @@ set "STARTUP_APPIUM_SERVER_BAT=%~dp0start_server_appium.bat"
     echo exit /b
 ) > "%STARTUP_APPIUM_SERVER_BAT%"
 
+REM MCP Playwright startup script is created by its install script
+
+set "STARTUP_MCP_COMPUTER_CONTROL_BAT=%~dp0start_mcp_computer_control.bat"
+(
+    echo @echo off
+    echo set LOGFILE=C:\Logs\MCPComputerControl-startup.txt
+    echo call :logTime ^>^> %%LOGFILE%%
+    echo start /b "MCPComputerControl" "%PYTHONW_PATH%" "C:\Data\mcp_computer_control\server.py"
+    echo exit /b
+    echo.
+    echo :logTime
+    echo setlocal ENABLEEXTENSIONS
+    echo set "ts=%%date%% %%time%%"
+    echo echo [%%ts%%] Triggered: MCPComputerControl
+    echo exit /b
+) > "%STARTUP_MCP_COMPUTER_CONTROL_BAT%"
+
 echo .bat files for servers created >> "%LOGFILE%"
 
 REM ---------------------------
@@ -304,13 +337,16 @@ REM Logging
 schtasks /Create /TN "Log-OnStartup" /SC ONLOGON /TR "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"C:\OEM\on_startup.ps1\"" /RU "%USERNAME%" /RL HIGHEST /IT /F
 REM OO Servers
 schtasks /Create /TN "StartServer-ComputerControl" /SC ONLOGON /TR "\"%STARTUP_SERVER_COMPUTER_CONTROL_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /F
-schtasks /Create /TN "StartServer-MCPComputerControl" /SC ONLOGON /TR "\"%STARTUP_MCP_SERVER_COMPUTER_CONTROL_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /F
+schtasks /Create /TN "StartServer-MCPComputerControlOld" /SC ONLOGON /TR "\"%STARTUP_MCP_SERVER_COMPUTER_CONTROL_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /F
 schtasks /Create /TN "StartServer-BrowserControl" /SC ONLOGON /TR "\"%STARTUP_SERVER_BROWSER_CONTROL_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /F
 schtasks /Create /TN "StartServer-NetworkProxy" /SC ONLOGON /TR "\"%STARTUP_SERVER_NETWORK_PROXY_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /F
 schtasks /Create /TN "StartServer-Evaluator" /SC ONLOGON /TR "\"%STARTUP_SERVER_EVALUATOR_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /F
 schtasks /Create /TN "StartServer-TeamsControl" /SC ONLOGON /TR "\"%STARTUP_SERVER_TEAMS_CONTROL_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /F
 REM Appium
 schtasks /Create /TN "StartServer-Appium" /SC ONLOGON /TR "\"%STARTUP_APPIUM_SERVER_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /F
+REM MCP Playwright scheduled task is created by its install script
+REM MCP Computer Control
+schtasks /Create /TN "StartServer-MCPComputerControl" /SC ONLOGON /TR "\"%STARTUP_MCP_COMPUTER_CONTROL_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /F
 echo 'Scheduled tasks' for servers created >> "%LOGFILE%"
 
 echo Triggering 'scheduled tasks' for servers >> "%LOGFILE%"
@@ -318,13 +354,16 @@ REM Logging
 schtasks /Run /TN "Log-OnStartup"
 REM OO Servers
 schtasks /Run /TN "StartServer-ComputerControl"
-schtasks /Run /TN "StartServer-MCPComputerControl"
+schtasks /Run /TN "StartServer-MCPComputerControlOld"
 schtasks /Run /TN "StartServer-BrowserControl"
 schtasks /Run /TN "StartServer-NetworkProxy"
 schtasks /Run /TN "StartServer-Evaluator"
 schtasks /Run /TN "StartServer-TeamsControl"
 REM Appium
 schtasks /Run /TN "StartServer-Appium"
+REM MCP Playwright task is triggered by its install script
+REM MCP Computer Control
+schtasks /Run /TN "StartServer-MCPComputerControl"
 echo 'Scheduled tasks' for servers started >> "%LOGFILE%"
 
 echo Installation completed at %date% %time% >> "%LOGFILE%"
