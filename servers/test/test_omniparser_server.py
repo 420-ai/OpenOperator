@@ -6,7 +6,8 @@ from io import BytesIO
 from PIL import Image
 
 # BASE_URL = "http://127.0.0.1:8000"
-BASE_URL = "http://192.168.5.65:8000"
+# BASE_URL = "http://192.168.5.65:8000"
+BASE_URL = "https://omniparser-server-app.wittyocean-011afa73.westus3.azurecontainerapps.io"
 
 testimg_dir = "test-img"
 parsed_dir = "parsed"
@@ -29,7 +30,7 @@ def send_parse_request(server_url, base64_image):
     """
     payload = {"base64_image": base64_image}
     try:
-        response = requests.post(f"{server_url}/parse/", json=payload)
+        response = requests.post(f"{server_url}/parse", json=payload)
         response.raise_for_status()  # Raise an exception for HTTP errors
         return response.json()
     except requests.RequestException as e:

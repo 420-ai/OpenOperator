@@ -9,7 +9,6 @@ from agent_oo1.logging_setup import configure_logging
 from agent_oo1.workflow.agent_me import OOAgentMe
 from datetime import datetime
 from dotenv import load_dotenv
-
 load_dotenv()
 
 agent_name = os.getenv("AGENT_NAME", "agent_oo1")

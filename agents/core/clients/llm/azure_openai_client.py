@@ -5,15 +5,30 @@ from core.clients.llm.parsers import parse_openai_response
 from core.clients.llm.utils import detect_tool_use
 from core.models import LLMResponse, Message
 from openai import AzureOpenAI
-from azure.identity import DefaultAzureCredential, get_bearer_token_provider
+from azure.identity import DefaultAzureCredential, get_bearer_token_provider, WorkloadIdentityCredential
 from dotenv import load_dotenv
 load_dotenv()
+
+
+# Security
+TENANT_ID = os.getenv("AZURE_TENANT_ID", "bbb")
+print("AZURE_TENANT_ID", TENANT_ID)
+IDENTITY = os.getenv("AZURE_CLIENT_ID", "ccc")
+print("AZURE_CLIENT_ID", IDENTITY)
+
 
 class OOAzureOpenAIClient:
     def __init__(self, deployment: str, model: str):
 
+        # self.credential = DefaultAzureCredential()
+        self.credential = WorkloadIdentityCredential(
+            tenant_id=TENANT_ID,
+            client_id=IDENTITY,
+            token_file_path="/var/run/secrets/azure/tokens/azure-identity-token"
+        )
+
         token_provider = get_bearer_token_provider(
-            DefaultAzureCredential(), "https://cognitiveservices.azure.com/.default"
+            self.credential, "https://cognitiveservices.azure.com/.default"
         )
 
         self.client = AzureOpenAI(

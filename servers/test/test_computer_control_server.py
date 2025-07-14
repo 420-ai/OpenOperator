@@ -4,12 +4,12 @@ import os
 import json
 import time
 
-BASE_URL = "http://127.0.0.1:5050"
+# BASE_URL = "http://127.0.0.1:5050"
 # BASE_URL = "http://test-11.4.155.164.237.nip.io/cc"
 # BASE_URL = "http://192.168.5.65:5050"
 # BASE_URL = "http://computer-6823417694dd47734aef8fb2.4.242.123.121.nip.io/cc"
 # BASE_URL = "http://comp-7.4.242.123.121.nip.io/cc"
-# BASE_URL = "http://my-test-comp.4.242.123.121.nip.io/cc"
+BASE_URL = "http://my-test-comp.4.242.123.121.nip.io/cc"
 
 screenshots_dir = "screenshots"
 os.makedirs(screenshots_dir, exist_ok=True)

@@ -4,6 +4,31 @@
       "provider": "azure",
       "models": [
         {
+          "name": "gpt-4.1",
+          "input": 2,
+          "output": 8
+        },
+        {
+          "name": "gpt-4.1-mini",
+          "input": 0.4,
+          "output": 1.6
+        },
+        {
+          "name": "gpt-4.1-nano",
+          "input": 0.1,
+          "output": 0.4
+        },
+        {
+          "name": "gpt-4.5",
+          "input": 75,
+          "output": 150
+        },
+        {
+          "name": "o1",
+          "input": 15,
+          "output": 60
+        },
+        {
           "name": "o3-mini",
           "input": 1.1,
           "output": 4.4
@@ -23,6 +48,31 @@
     {
       "provider": "openai",
       "models": [
+        {
+          "name": "gpt-4.1",
+          "input": 2,
+          "output": 8
+        },
+        {
+          "name": "gpt-4.1-mini",
+          "input": 0.4,
+          "output": 1.6
+        },
+        {
+          "name": "gpt-4.1-nano",
+          "input": 0.1,
+          "output": 0.4
+        },
+        {
+          "name": "gpt-4.5",
+          "input": 75,
+          "output": 150
+        },
+        {
+          "name": "o1",
+          "input": 15,
+          "output": 60
+        },
         {
           "name": "o3-mini",
           "input": 1.1,

@@ -10,6 +10,8 @@ import traceback
 import setproctitle
 from datetime import datetime
 from fastapi import Request
+from fastapi.responses import FileResponse
+from fastapi import HTTPException, Query
 import threading
 import subprocess
 
@@ -22,6 +24,8 @@ from logging_setup import configure_logging
 
 from dotenv import load_dotenv
 load_dotenv()
+
+
 
 try:
 
@@ -41,6 +45,16 @@ try:
     configure_logging(logs_path)
     logger = logging.getLogger("server_network_proxy")
     print("Logging configured")
+
+    # Setup logging
+    TELEMETRY_PATH = os.getenv("TELEMETRY_PATH", "/telemetry")
+    print("TELEMETRY_PATH", TELEMETRY_PATH)
+    if not os.path.exists(TELEMETRY_PATH):
+        os.makedirs(TELEMETRY_PATH)
+        logger.info(f"Created telemetry logs directory: {TELEMETRY_PATH}")
+    else:
+        logger.info(f"Telemetry logs directory already exists: {TELEMETRY_PATH}")
+
 
 
     # Load addons
@@ -151,7 +165,6 @@ try:
 
         return {"status": "telemetry_started"}
 
-
     @app.post("/stop")
     async def stop_telemetry():
         global active_addon
@@ -170,7 +183,6 @@ try:
 
         return {"status": "telemetry_stopped"}
 
-
     @app.post("/shutdown")
     async def shutdown():
         logger.warning("Shutdown requested")
@@ -188,6 +200,21 @@ try:
             "telemetry": "active" if active_addon else "inactive",
             "port": proxy_port,
         }
+
+    @app.get("/get_telemetry")
+    async def get_telemetry(filename: str = Query(..., description="Telemetry filename to download")):
+        full_path = os.path.join(TELEMETRY_PATH, filename)
+
+        if not os.path.isfile(full_path):
+            logger.warning(f"Requested telemetry file does not exist: {full_path}")
+            raise HTTPException(status_code=404, detail="Telemetry file not found")
+
+        logger.info(f"Sending telemetry file: {full_path}")
+        return FileResponse(
+            path=full_path,
+            filename=filename,
+            media_type='text/plain'  # Adjust if you support other types
+        )
 
     # ---------------------------
     # Run Server
