@@ -132,14 +132,6 @@ echo Python script INITIALIZE executed. >> %LOGFILE%
 REM ---------------------------
 REM 4) Install Required Python Packages for SERVERS
 REM ---------------------------
-echo Installing Python libraries for 'server computer control' ... >> "%LOGFILE%"
-"%PYTHON_PATH%" -m pip install -r "C:\Data\server_computer_control\requirements.txt" >> "%LOGFILE%" 2>&1
-echo Python libraries for 'server computer control' were installed >> "%LOGFILE%"
-
-echo Installing Python libraries for 'MCP server computer control' ... >> "%LOGFILE%"
-"%PYTHON_PATH%" -m pip install -r "C:\Data\mcp_server_computer_control\requirements.txt" >> "%LOGFILE%" 2>&1
-echo Python libraries for 'MCP server computer control' were installed >> "%LOGFILE%"
-
 echo Installing Python libraries for 'server browser control' ... >> "%LOGFILE%"
 "%PYTHON_PATH%" -m pip install -r "C:\Data\server_browser_control\requirements.txt" >> "%LOGFILE%" 2>&1
 echo Python libraries for 'server browser control' were installed >> "%LOGFILE%"
@@ -165,23 +157,11 @@ echo Installing Python libraries for 'MCP Computer Control' ... >> "%LOGFILE%"
 "%PYTHON_PATH%" -m pip install -r "C:\Data\mcp_computer_control\requirements.txt" >> "%LOGFILE%" 2>&1
 echo Python libraries for 'MCP Computer Control' were installed >> "%LOGFILE%"
 
-REM ---------------------------
-REM 4.1) Install MCP Playwright Direct
-REM ---------------------------
-echo Installing MCP Playwright Direct... >> "%LOGFILE%"
-if exist "C:\Data\mcp_playwright_direct\install_snippet.bat" (
-    call "C:\Data\mcp_playwright_direct\install_snippet.bat" "%USERNAME%" "%LOGFILE%" "%~dp0"
-    echo MCP Playwright Direct installation completed >> "%LOGFILE%"
-) else (
-    echo WARNING: MCP Playwright Direct install script not found at C:\Data\mcp_playwright_direct\install_snippet.bat >> "%LOGFILE%"
-)
 
 REM ---------------------------
 REM 5) Add Firewall Rules
 REM ---------------------------
 echo Adding firewall rules... >> "%LOGFILE%"
-netsh advfirewall firewall add rule name="SERVER_COMPUTER_CONTROL" dir=in action=allow protocol=TCP localport=5050
-netsh advfirewall firewall add rule name="MCP_SERVER_COMPUTER_CONTROL" dir=in action=allow protocol=TCP localport=5055
 netsh advfirewall firewall add rule name="SERVER_BROWSER_CONTROL" dir=in action=allow protocol=TCP localport=5051
 netsh advfirewall firewall add rule name="SERVER_NETWORK_PROXY" dir=in action=allow protocol=TCP localport=5052
 netsh advfirewall firewall add rule name="SERVER_EVALUATOR" dir=in action=allow protocol=TCP localport=5053
@@ -197,36 +177,6 @@ REM ---------------------------
 REM 6) Create Startup Script
 REM ---------------------------
 echo Creating .bat files for servers >> "%LOGFILE%"
-set "STARTUP_SERVER_COMPUTER_CONTROL_BAT=%~dp0start_server_computer_control.bat"
-(
-    echo @echo off
-    echo set LOGFILE=C:\Logs\ComputerControlServer-startup.txt
-    echo call :logTime ^>^> %%LOGFILE%%
-    echo start /b "ComputerControlServer" "C:\Program Files\Python310\pythonw.exe" "C:\Data\server_computer_control\server.py"
-    echo exit /b
-    echo.
-    echo :logTime
-    echo setlocal ENABLEEXTENSIONS
-    echo set "ts=%%date%% %%time%%"
-    echo echo [%%ts%%] Triggered: ComputerControlServer
-    echo exit /b
-) > "%STARTUP_SERVER_COMPUTER_CONTROL_BAT%"
-
-set "STARTUP_MCP_SERVER_COMPUTER_CONTROL_BAT=%~dp0start_mcp_server_computer_control.bat"
-(
-    echo @echo off
-    echo set LOGFILE=C:\Logs\MCPComputerControlServer-startup.txt
-    echo call :logTime ^>^> %%LOGFILE%%
-    echo start /b "MCPComputerControlServer" "%PYTHONW_PATH%" "C:\Data\mcp_server_computer_control\server.py"
-    echo exit /b
-    echo.
-    echo :logTime
-    echo setlocal ENABLEEXTENSIONS
-    echo set "ts=%%date%% %%time%%"
-    echo echo [%%ts%%] Triggered: MCPComputerControlServer
-    echo exit /b
-) > "%STARTUP_MCP_SERVER_COMPUTER_CONTROL_BAT%"
-
 set "STARTUP_SERVER_BROWSER_CONTROL_BAT=%~dp0start_server_browser_control.bat"
 (
     echo @echo off
@@ -302,7 +252,6 @@ set "STARTUP_APPIUM_SERVER_BAT=%~dp0start_server_appium.bat"
     echo exit /b
 ) > "%STARTUP_APPIUM_SERVER_BAT%"
 
-REM MCP Playwright startup script is created by its install script
 
 set "STARTUP_MCP_COMPUTER_CONTROL_BAT=%~dp0start_mcp_computer_control.bat"
 (
@@ -336,8 +285,6 @@ echo Creating 'scheduled tasks' for servers >> "%LOGFILE%"
 REM Logging
 schtasks /Create /TN "Log-OnStartup" /SC ONLOGON /TR "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"C:\OEM\on_startup.ps1\"" /RU "%USERNAME%" /RL HIGHEST /IT /F
 REM OO Servers
-schtasks /Create /TN "StartServer-ComputerControl" /SC ONLOGON /TR "\"%STARTUP_SERVER_COMPUTER_CONTROL_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /F
-schtasks /Create /TN "StartServer-MCPComputerControlOld" /SC ONLOGON /TR "\"%STARTUP_MCP_SERVER_COMPUTER_CONTROL_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /F
 schtasks /Create /TN "StartServer-BrowserControl" /SC ONLOGON /TR "\"%STARTUP_SERVER_BROWSER_CONTROL_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /F
 schtasks /Create /TN "StartServer-NetworkProxy" /SC ONLOGON /TR "\"%STARTUP_SERVER_NETWORK_PROXY_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /F
 schtasks /Create /TN "StartServer-Evaluator" /SC ONLOGON /TR "\"%STARTUP_SERVER_EVALUATOR_BAT%\"" /RU "%USERNAME%" /RL HIGHEST /IT /F
@@ -353,8 +300,6 @@ echo Triggering 'scheduled tasks' for servers >> "%LOGFILE%"
 REM Logging
 schtasks /Run /TN "Log-OnStartup"
 REM OO Servers
-schtasks /Run /TN "StartServer-ComputerControl"
-schtasks /Run /TN "StartServer-MCPComputerControlOld"
 schtasks /Run /TN "StartServer-BrowserControl"
 schtasks /Run /TN "StartServer-NetworkProxy"
 schtasks /Run /TN "StartServer-Evaluator"

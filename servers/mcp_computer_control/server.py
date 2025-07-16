@@ -71,13 +71,19 @@ from tools.window_operations import (
 
 
 def serve():
+
+    # Port
+    port = os.getenv("PORT", 5040)
+    print("PORT", port)
+    port = int(port)  # Convert to integer
+
     # Configure logging
     logs_path = os.getenv("LOG_PATH", "C:\\Logs")
     configure_logging(logs_path)
     logger = logging.getLogger("mcp_computer_control")
-    
+
     logger.info("Starting MCP Computer Control Server...")
-    
+
     server = Server("mcp-computer-control")
 
     # ----------------------------------
@@ -648,7 +654,7 @@ def serve():
                 result = take_screenshot_with_cursor(
                     region, arguments.get("format", "PNG"), arguments.get("quality", 95)
                 )
-            
+
             # Screen recording operations
             elif name == "start_recording":
                 result = start_recording(arguments["filename"])
@@ -656,7 +662,7 @@ def serve():
                 result = end_recording(arguments["filename"])
             elif name == "get_recording":
                 result = get_recording(arguments["filename"])
-            
+
             # Window operations
             elif name == "launch_application":
                 result = launch_application(
@@ -769,7 +775,7 @@ def serve():
         """Context manager for managing session manager lifecycle."""
         async with session_manager.run():
             logger.info("MCP Computer Control Server started!")
-            logger.info("Available at: http://0.0.0.0:8003/mcp")
+            logger.info(f"Available at: http://0.0.0.0:{port}/mcp")
             try:
                 yield
             finally:
@@ -785,54 +791,12 @@ def serve():
 
     # Run the server
     try:
-        # Custom logging config for Windows service compatibility
-        uvicorn_log_config = {
-            "version": 1,
-            "disable_existing_loggers": False,
-            "formatters": {
-                "default": {
-                    "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-                    "datefmt": "%Y-%m-%d %H:%M:%S"
-                },
-                "access": {
-                    "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-                    "datefmt": "%Y-%m-%d %H:%M:%S"
-                }
-            },
-            "handlers": {
-                "default": {
-                    "formatter": "default",
-                    "class": "logging.StreamHandler",
-                    "stream": "ext://sys.stderr"
-                },
-                "access": {
-                    "formatter": "access",
-                    "class": "logging.StreamHandler",
-                    "stream": "ext://sys.stderr"
-                }
-            },
-            "loggers": {
-                "uvicorn": {
-                    "handlers": ["default"],
-                    "level": "INFO"
-                },
-                "uvicorn.error": {
-                    "level": "INFO"
-                },
-                "uvicorn.access": {
-                    "handlers": ["access"],
-                    "level": "INFO",
-                    "propagate": False
-                }
-            }
-        }
-        
         uvicorn.run(
-            starlette_app, 
-            host="0.0.0.0", 
-            port=8003,
-            log_config=uvicorn_log_config,
-            access_log=False  # Disable access logs to prevent issues
+            starlette_app,
+            host="0.0.0.0",
+            port=port,
+            log_config=None,
+            access_log=False,  # Disable access logs to prevent issues
         )
     except Exception as e:
         logger.error(f"Failed to start server: {str(e)}", exc_info=True)
@@ -848,7 +812,9 @@ if __name__ == "__main__":
     except Exception as e:
         # Try to use logger if available, otherwise print
         try:
-            logging.getLogger("mcp_computer_control").error(f"Server failed: {str(e)}", exc_info=True)
+            logging.getLogger("mcp_computer_control").error(
+                f"Server failed: {str(e)}", exc_info=True
+            )
         except:
             print(f"Server failed: {str(e)}")
         sys.exit(1)

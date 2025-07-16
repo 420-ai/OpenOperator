@@ -12,7 +12,7 @@ from mcp import ClientSession
 # BASE_URL = "http://localhost:8003"
 # BASE_URL = "http://0.0.0.0:8003"
 # BASE_URL = "http://127.0.0.1:8003"
-BASE_URL = "http://192.168.2.114:8003"
+BASE_URL = "http://192.168.2.114:5040"
 
 
 screenshots_dir = "screenshots"
@@ -531,7 +531,9 @@ async def test_multiple_recordings_async():
                             # Save the video
                             if "video_data" in data_get:
                                 video_bytes = base64.b64decode(data_get["video_data"])
-                                video_path = os.path.join(recordings_dir, f"{fname}.mp4")
+                                video_path = os.path.join(
+                                    recordings_dir, f"{fname}.mp4"
+                                )
                                 with open(video_path, "wb") as f:
                                     f.write(video_bytes)
                                 print(f"   Video saved to: {video_path}")
